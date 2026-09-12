@@ -1,0 +1,346 @@
+/* Reusable theme: fonts, colors, buttons, screen chrome, floating widgets,
+   modal dialogs. No app-specific content. */
+
+@font-face {
+    font-family: "Work Sans";
+    src: url("fonts/WorkSans-Regular.woff2");
+}
+
+@font-face {
+    font-family: "Ubuntu Mono";
+    src: url("fonts/UbuntuMono-Regular.ttf");
+}
+
+html {
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    font-family: "Work Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #000;
+}
+
+h1 {
+    margin: 0 0 16px 0;
+    font-size: 28px;
+    font-weight: normal;
+    letter-spacing: 5px;
+    color: #0099ff;
+    text-align: center;
+}
+
+p {
+    margin: 0;
+}
+
+button {
+    font-family: inherit;
+}
+
+.app {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 32px;
+}
+
+.app-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.app-name {
+    font-size: 40px;
+    font-weight: bold;
+    font-family: "Ubuntu Mono", "Courier New", Courier, monospace;
+    color: #0099ff;
+}
+
+.app-tagline {
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.screen-description {
+    font-size: 20px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.screen-actions {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.btn {
+    display: inline-block;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 16px 40px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: background-color 150ms, color 150ms, border-color 150ms, opacity 150ms;
+}
+
+.btn-primary {
+    background-color: #CD2553;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #a91d44;
+}
+
+.btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #0099ff;
+    border-color: #0099ff;
+}
+
+.btn-secondary:hover {
+    background-color: #e6f6ff;
+}
+
+.btn-secondary-pink {
+    background-color: transparent;
+    color: #CD2553;
+    border-color: #CD2553;
+}
+
+.btn-secondary-pink:hover {
+    background-color: #fbe6ec;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 16px 8px;
+    visibility: hidden;
+}
+
+.btn-text.visible {
+    visibility: visible;
+}
+
+.btn-text:hover {
+    color: #0099ff;
+}
+
+.btn-text .fa-solid {
+    margin-right: 4px;
+}
+
+.screen-actions .btn {
+    margin: 8px;
+}
+
+.debug-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #222;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms;
+    z-index: 10;
+}
+
+.debug-toast.visible {
+    opacity: 0.9;
+}
+
+#to-top {
+    border-radius: 8px;
+    border: 2px solid #0099ff;
+    background-color: transparent;
+    text-align: center;
+    padding: 16px 40px;
+    position: fixed;
+    bottom: 32px;
+    left: auto;
+    right: 64px;
+    color: #0099ff;
+    font-size: 20px;
+    font-weight: bold;
+    z-index: 2;
+    transition: opacity 400ms, background-color 150ms;
+    opacity: 0;
+    pointer-events: none;
+    cursor: pointer;
+}
+
+#to-top:hover {
+    background-color: #e6f6ff;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 20;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.modal-close:hover {
+    color: #0099ff;
+}
+
+.modal-title {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #0099ff;
+}
+
+.modal-description {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.modal-input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+}
+
+.modal-input:focus {
+    outline: none;
+    border-color: #0099ff;
+}
+
+.modal-error {
+    margin-top: 8px;
+    color: #CD2553;
+    font-size: 14px;
+}
+
+.modal-error:empty {
+    display: none;
+}
+
+.modal-actions {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.modal-copy-row {
+    display: flex;
+    gap: 8px;
+}
+
+.modal-copy-row .modal-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.modal-copy-row .btn {
+    padding: 12px 20px;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.modal-copied {
+    margin-top: 8px;
+    color: #1a8a4a;
+    font-size: 14px;
+    font-weight: bold;
+    min-height: 1.2em;
+}
+
+@media screen and (max-width: 640px) {
+    .app {
+        padding: 32px 24px;
+    }
+
+    .app-name {
+        font-size: 32px;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        font-size: 18px;
+    }
+
+    #to-top {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+    }
+}
