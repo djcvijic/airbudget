@@ -1,0 +1,271 @@
+suite("state.js: getPeriodRange", function () {
+    test("daily offset 0 spans exactly today", async function () {
+        var win = await freshApp({ period: "daily", currency: "USD" });
+        var range = win.getPeriodRange("daily", 0);
+        var today = new Date();
+
+        assertEqual(range.start.getFullYear(), today.getFullYear());
+        assertEqual(range.start.getMonth(), today.getMonth());
+        assertEqual(range.start.getDate(), today.getDate());
+        assertEqual(range.start.getHours(), 0);
+
+        var oneDayMs = 24 * 60 * 60 * 1000;
+        assertEqual(range.end.getTime() - range.start.getTime(), oneDayMs);
+    });
+
+    test("daily offset -1 is exactly one day before offset 0", async function () {
+        var win = await freshApp({ period: "daily", currency: "USD" });
+        var today = win.getPeriodRange("daily", 0);
+        var yesterday = win.getPeriodRange("daily", -1);
+
+        assertEqual(today.start.getTime() - yesterday.start.getTime(), 24 * 60 * 60 * 1000);
+        assertEqual(yesterday.end.getTime(), today.start.getTime());
+    });
+
+    test("weekly starts on Monday and spans 7 days", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        var range = win.getPeriodRange("weekly", 0);
+
+        assertEqual(range.start.getDay(), 1, "week must start on Monday");
+        assertEqual(range.end.getTime() - range.start.getTime(), 7 * 24 * 60 * 60 * 1000);
+
+        var today = new Date();
+        assertTrue(today >= range.start && today < range.end, "today must fall inside its own week");
+    });
+
+    test("weekly offset moves by whole weeks", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        var thisWeek = win.getPeriodRange("weekly", 0);
+        var nextWeek = win.getPeriodRange("weekly", 1);
+
+        assertEqual(nextWeek.start.getTime() - thisWeek.start.getTime(), 7 * 24 * 60 * 60 * 1000);
+    });
+
+    test("monthly offset 0 spans the calendar month", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var range = win.getPeriodRange("monthly", 0);
+        var today = new Date();
+
+        assertEqual(range.start.getDate(), 1);
+        assertEqual(range.start.getMonth(), today.getMonth());
+        assertEqual(range.start.getFullYear(), today.getFullYear());
+        assertEqual(range.end.getDate(), 1);
+
+        var expectedEndMonth = (today.getMonth() + 1) % 12;
+        assertEqual(range.end.getMonth(), expectedEndMonth);
+    });
+
+    test("monthly offset crosses a year boundary correctly", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var jan = win.getPeriodRange("monthly", 0);
+        // Walk forward far enough to guarantee a wrap regardless of current month.
+        var farFuture = win.getPeriodRange("monthly", 13);
+        var expectedMonth = (jan.start.getMonth() + 13) % 12;
+        var expectedYear = jan.start.getFullYear() + Math.floor((jan.start.getMonth() + 13) / 12);
+        assertEqual(farFuture.start.getMonth(), expectedMonth);
+        assertEqual(farFuture.start.getFullYear(), expectedYear);
+    });
+
+    test("yearly offset 0 spans Jan 1 to Jan 1", async function () {
+        var win = await freshApp({ period: "yearly", currency: "USD" });
+        var range = win.getPeriodRange("yearly", 0);
+        var currentYear = new Date().getFullYear();
+
+        assertEqual(range.start.getFullYear(), currentYear);
+        assertEqual(range.start.getMonth(), 0);
+        assertEqual(range.start.getDate(), 1);
+        assertEqual(range.end.getFullYear(), currentYear + 1);
+    });
+});
+
+suite("state.js: formatPeriodLabel / formatCurrency", function () {
+    test("formatCurrency appends the ISO currency code with 2 decimals", async function () {
+        var win = await freshApp({ period: "monthly", currency: "EUR" });
+        assertEqual(win.formatCurrency(12.5), "12.50 EUR");
+        assertEqual(win.formatCurrency(0), "0.00 EUR");
+    });
+
+    test("formatPeriodLabel collapses a single-day range to one date", async function () {
+        var win = await freshApp({ period: "daily", currency: "USD" });
+        var start = new Date(2026, 2, 15);
+        var end = new Date(2026, 2, 16);
+        var label = win.formatPeriodLabel(start, end);
+        // Locale-dependent day/month order (e.g. "Mar 15" vs "15 Mar"), so
+        // check the pieces independently rather than one fixed ordering.
+        assertTrue(label.indexOf("Mar") !== -1 && label.indexOf("15") !== -1, "expected Mar and 15, got: " + label);
+        assertFalse(label.indexOf(" - ") !== -1, "a single day must not render as a range: " + label);
+    });
+
+    test("formatPeriodLabel shows a range for multi-day periods", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var start = new Date(2026, 2, 1);
+        var end = new Date(2026, 3, 1);
+        var label = win.formatPeriodLabel(start, end);
+        assertTrue(label.indexOf(" - ") !== -1, "expected a range separator, got: " + label);
+        assertTrue(label.indexOf("1") !== -1 && label.indexOf("31") !== -1, "expected day 1 and day 31, got: " + label);
+    });
+});
+
+suite("state.js: getCategorySpend sign convention", function () {
+    test("expense category sums transactions as positive spend", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "expense" });
+        win.state.categories = [cat];
+        win.state.transactions = [
+            baseTransaction({ categoryId: cat.id, amount: 10, datetime: nowDatetime() }),
+            baseTransaction({ categoryId: cat.id, amount: 5, datetime: nowDatetime() })
+        ];
+
+        var range = win.getPeriodRange("monthly", 0);
+        assertClose(win.getCategorySpend(cat.id, range.start, range.end), 15);
+    });
+
+    test("income category sums transactions as negative net spend", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "income", max: null });
+        win.state.categories = [cat];
+        win.state.transactions = [
+            baseTransaction({ categoryId: cat.id, amount: 1000, datetime: nowDatetime() })
+        ];
+
+        var range = win.getPeriodRange("monthly", 0);
+        assertClose(win.getCategorySpend(cat.id, range.start, range.end), -1000);
+    });
+
+    test("transactions outside the range are excluded", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "expense" });
+        win.state.categories = [cat];
+        win.state.transactions = [
+            baseTransaction({ categoryId: cat.id, amount: 999, datetime: "2000-01-01T00:00" })
+        ];
+
+        var range = win.getPeriodRange("monthly", 0);
+        assertClose(win.getCategorySpend(cat.id, range.start, range.end), 0);
+    });
+});
+
+suite("state.js: compareCategoriesBySpend", function () {
+    test("over-max entries always sort first", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var entries = [
+            { id: "a", overMax: false, spend: 500, max: 100 },
+            { id: "b", overMax: true, spend: 10, max: 5 }
+        ];
+        entries.sort(win.compareCategoriesBySpend);
+        assertEqual(entries[0].id, "b");
+    });
+
+    test("ties on overMax break by spend descending", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var entries = [
+            { id: "low", overMax: false, spend: 10, max: 100 },
+            { id: "high", overMax: false, spend: 50, max: 100 }
+        ];
+        entries.sort(win.compareCategoriesBySpend);
+        assertEqual(entries[0].id, "high");
+    });
+
+    test("ties on spend break by max descending, missing max treated as 0", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var entries = [
+            { id: "no-max", overMax: false, spend: 0, max: null },
+            { id: "with-max", overMax: false, spend: 0, max: 50 }
+        ];
+        entries.sort(win.compareCategoriesBySpend);
+        assertEqual(entries[0].id, "with-max");
+    });
+});
+
+suite("state.js: getSortedCategorySpends", function () {
+    test("combines spend calculation and sort order end to end", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var overBudget = baseCategory({ id: "over", type: "expense", max: 10 });
+        var underBudget = baseCategory({ id: "under", type: "expense", max: 100 });
+        win.state.categories = [underBudget, overBudget];
+        win.state.transactions = [
+            baseTransaction({ categoryId: overBudget.id, amount: 20, datetime: nowDatetime() }),
+            baseTransaction({ categoryId: underBudget.id, amount: 5, datetime: nowDatetime() })
+        ];
+
+        var range = win.getPeriodRange("monthly", 0);
+        var entries = win.getSortedCategorySpends(range.start, range.end);
+
+        assertEqual(entries[0].id, "over");
+        assertTrue(entries[0].overMax);
+        assertEqual(entries[1].id, "under");
+    });
+});
+
+suite("main-view.js: formatCompactAmount", function () {
+    test("amounts under 100 keep 2 decimals", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        assertEqual(win.formatCompactAmount(12.5), "12.50");
+        assertEqual(win.formatCompactAmount(0), "0.00");
+    });
+
+    test("amounts from 100 to 99999 drop decimals", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        assertEqual(win.formatCompactAmount(150.75), "151");
+        assertEqual(win.formatCompactAmount(99999), "99999");
+    });
+
+    test("amounts over 99999 use compact notation", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var result = win.formatCompactAmount(150000);
+        assertTrue(/^150K$/i.test(result), "expected compact notation like 150K, got: " + result);
+    });
+});
+
+suite("categories.js: limitToOneGrapheme", function () {
+    test("keeps a single simple emoji intact", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        assertEqual(win.limitToOneGrapheme("🛒"), "🛒");
+    });
+
+    test("truncates typed text after the first grapheme", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        assertEqual(win.limitToOneGrapheme("🛒abc"), "🛒");
+        assertEqual(win.limitToOneGrapheme("ab"), "a");
+    });
+
+    test("keeps a multi-codepoint flag emoji intact as one grapheme", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var flag = "🇷🇸";
+        assertEqual(win.limitToOneGrapheme(flag), flag);
+    });
+
+    test("empty input stays empty", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        assertEqual(win.limitToOneGrapheme(""), "");
+    });
+});
+
+suite("transaction.js: sortedTransactionCategories", function () {
+    test("ranks by current-period usage, then all-time usage, then name", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var a = baseCategory({ id: "a", name: "Zebra" });
+        var b = baseCategory({ id: "b", name: "Apple" });
+        var c = baseCategory({ id: "c", name: "Mango" });
+        win.state.categories = [a, b, c];
+        win.state.transactions = [
+            baseTransaction({ categoryId: b.id, amount: 1, datetime: nowDatetime() }),
+            baseTransaction({ categoryId: b.id, amount: 1, datetime: nowDatetime() })
+        ];
+
+        var sorted = win.sortedTransactionCategories();
+        assertEqual(sorted[0].id, "b", "most-used-this-period category ranks first");
+        // a and c tie on usage counts (both zero); alphabetical breaks the tie.
+        assertEqual(sorted[1].id, "c");
+        assertEqual(sorted[2].id, "a");
+    });
+});
+
+suite("onboarding.js: guessCurrencyFromLocale", function () {
+    test("always returns a code present in the curated currency list", async function () {
+        var win = await freshApp(null);
+        var guess = win.guessCurrencyFromLocale();
+        var codes = win.CURRENCIES.map(function (c) { return c.code; });
+        assertTrue(codes.indexOf(guess) !== -1, "guessed currency " + guess + " is not in CURRENCIES");
+    });
+});

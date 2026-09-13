@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>airbudget tests</title>
+    <style>
+        body {
+            font-family: monospace;
+            font-size: 13px;
+            padding: 16px;
+            background: #fff;
+            color: #111;
+        }
+
+        h1 {
+            font-size: 18px;
+        }
+
+        h2 {
+            font-size: 14px;
+            margin-top: 24px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+
+        #summary {
+            font-weight: bold;
+            font-size: 15px;
+            margin: 12px 0;
+            padding: 8px;
+        }
+
+        #summary.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #summary.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-row {
+            padding: 2px 0;
+            white-space: pre-wrap;
+        }
+
+        .test-row.pass {
+            color: #155724;
+        }
+
+        .test-row.fail {
+            color: #721c24;
+            font-weight: bold;
+        }
+
+        #app-frame {
+            width: 390px;
+            height: 700px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>airbudget test suite</h1>
+    <div id="summary">running…</div>
+    <iframe id="app-frame" src="about:blank"></iframe>
+    <div id="results"></div>
+
+    <script src="runner.js"></script>
+    <script src="helpers.js"></script>
+    <script src="logic.test.js"></script>
+    <script src="onboarding.test.js"></script>
+    <script src="categories.test.js"></script>
+    <script src="transaction.test.js"></script>
+    <script src="detail.test.js"></script>
+    <script src="settings.test.js"></script>
+    <script>
+        // The app under test registers a cache-first service worker. Any
+        // registration left over from manually using the app in this same
+        // browser would otherwise serve stale JS/HTML to every test.
+        Promise.resolve()
+            .then(function () {
+                if (!("serviceWorker" in navigator)) {
+                    return;
+                }
+                return navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    return Promise.all(regs.map(function (r) { return r.unregister(); }));
+                });
+            })
+            .then(function () {
+                if (!("caches" in window)) {
+                    return;
+                }
+                return caches.keys().then(function (keys) {
+                    return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                });
+            })
+            .then(runTests);
+    </script>
+</body>
+
+</html>

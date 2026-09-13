@@ -1,2 +1,77 @@
 /* App-specific styling. Nothing generic (fonts, base buttons, screen chrome)
    belongs here — that's theme.css. */
+
+/* Disables theme.css's back-to-top widget everywhere except the detail
+   (transaction history) screen, where it's genuinely useful once you've
+   scrolled through a long list. Overridden here rather than in
+   theme.css/theme.js, since those stay generic and reusable. */
+#to-top {
+    display: none !important;
+}
+
+/* Raised above our fixed bottom nav bar (64px) instead of theme.css's
+   default bottom:32px, which would otherwise sit underneath it. Also
+   smaller and filled white, rather than theme.css's larger transparent
+   default. */
+body.detail-screen-active #to-top {
+    display: block !important;
+    bottom: 80px;
+    padding: 10px 24px;
+    font-size: 15px;
+    background-color: white;
+}
+
+/* Persistent nav bar, replacing theme.css's .app-header on every screen.
+   Full-bleed and fixed to the bottom so it stays visible while a screen's
+   own content scrolls above it. */
+.top-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: #0099ff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 5;
+}
+
+.top-bar-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.top-bar-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.top-bar-nav .btn-text {
+    font-size: 20px;
+    padding: 8px;
+    color: white;
+}
+
+.top-bar-nav .btn-text:hover {
+    color: #e6f6ff;
+}
+
+/* Room for the fixed nav bar, overriding theme.css's default padding-bottom. */
+.app {
+    padding-bottom: 72px;
+}
+
+/* No nav bar during onboarding (state.js's showScreen toggles this), so
+   the space reserved for it isn't needed either. */
+body.no-top-bar .app {
+    padding-bottom: 0;
+}
+
+/* theme.css centers .app vertically in body; this app's screens scroll, so
+   align to the top instead. */
+body {
+    align-items: flex-start;
+}

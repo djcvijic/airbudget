@@ -1,0 +1,12 @@
+/* Onboarding screen. The period/currency picker fields reuse settings.css's
+   shared widget classes (see settings.js) rather than duplicating them. */
+
+#onboarding-screen .screen-actions {
+    text-align: right;
+}
+
+/* With no top bar during onboarding, the heading needs its own top
+   breathing room instead of relying on the bar's reserved space. */
+#onboarding-screen h1 {
+    margin-top: 48px;
+}

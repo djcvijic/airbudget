@@ -1,0 +1,197 @@
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+/* Extra room below the .app's usual bottom padding so the floating
+   back-to-top button never sits over the last item once fully scrolled.
+   Smaller now that the button itself (main.css) is smaller. */
+#detail-screen {
+    padding-bottom: 60px;
+}
+
+#detail-period-label {
+    color: #0099ff;
+    font-size: 24px;
+}
+
+.detail-mode-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.detail-mode-label {
+    font-weight: bold;
+}
+
+.detail-mode-switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background-color: #eee;
+    border-radius: 999px;
+    padding: 4px;
+}
+
+.detail-mode-option {
+    position: relative;
+    z-index: 1;
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #666;
+    text-align: center;
+    cursor: pointer;
+    transition: color 150ms;
+}
+
+.detail-mode-option.active {
+    color: white;
+}
+
+.detail-mode-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    background-color: #0099ff;
+    border-radius: 999px;
+    transition: transform 200ms ease;
+}
+
+.detail-mode-switch[data-mode="category"] .detail-mode-thumb {
+    transform: translateX(100%);
+}
+
+.detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Keeps scrollIntoView() (used when jumping to a category from a dashboard
+   tile's history button) from landing the group header underneath the
+   fixed top bar. */
+.detail-group {
+    scroll-margin-top: 80px;
+}
+
+.detail-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    background: none;
+    border: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    padding: 0 0 4px 0;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #eee;
+}
+
+.detail-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detail-group-chevron {
+    flex-shrink: 0;
+    color: #666;
+    transition: transform 200ms ease;
+}
+
+.detail-group:not(.collapsed) .detail-group-chevron {
+    transform: rotate(90deg);
+}
+
+.detail-group-balance {
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.detail-group-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 200ms ease;
+}
+
+.detail-group.collapsed .detail-group-body {
+    grid-template-rows: 0fr;
+}
+
+.detail-group-body-inner {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.detail-transaction {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-transaction-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-transaction-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.detail-transaction-emoji {
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.detail-transaction-date {
+    color: #666;
+}
+
+.detail-transaction-amount {
+    white-space: nowrap;
+}
+
+.detail-transaction-amount-spend {
+    color: #CD2553;
+}
+
+.detail-transaction-amount-income {
+    color: #0099ff;
+}
+
+.detail-transaction-comment {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

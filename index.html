@@ -4,31 +4,254 @@
 <head>
     <meta charset="UTF-8" />
     <title>airbudget</title>
+    <link rel="icon" type="image/png" href="images/favicon.png" />
+    <link rel="apple-touch-icon" href="images/icon-192.png" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0099ff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="airbudget" />
     <link href="theme.css" rel="stylesheet" />
     <link href="main.css" rel="stylesheet" />
+    <link href="settings.css" rel="stylesheet" />
+    <link href="onboarding.css" rel="stylesheet" />
+    <link href="categories.css" rel="stylesheet" />
+    <link href="main-view.css" rel="stylesheet" />
+    <link href="transaction.css" rel="stylesheet" />
+    <link href="detail.css" rel="stylesheet" />
     <link href="fontawesome/css/fontawesome.min.css" rel="stylesheet" />
     <link href="fontawesome/css/solid.min.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
 <body>
+    <div id="top-bar" class="top-bar">
+        <img src="images/icon-192.png" alt="airbudget" class="top-bar-icon" />
+        <div class="top-bar-nav">
+            <button id="open-transaction-button" class="btn btn-text" type="button" title="New transaction">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+            <button id="open-detail-button" class="btn btn-text" type="button" title="All transactions">
+                <i class="fa-solid fa-receipt"></i>
+            </button>
+            <button id="open-categories-button" class="btn btn-text" type="button" title="Categories">
+                <i class="fa-solid fa-tags"></i>
+            </button>
+            <button id="open-settings-button" class="btn btn-text" type="button" title="Settings">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </div>
+
     <div class="app">
-        <div class="app-header">
-            <div class="app-name">airbudget</div>
-            <div class="app-tagline">TAGLINE GOES HERE</div>
+        <div id="onboarding-screen" class="screen">
+            <h1>Welcome</h1>
+            <p class="screen-description">
+                airbudget tracks your spending against a budget for each category you
+                create. First, choose how often you want to budget and which currency
+                you use. You can change either of these later in Settings.
+            </p>
+            <div class="settings-field">
+                <div class="settings-field-label">Period</div>
+                <div id="onboarding-period-options" class="settings-period-options"></div>
+            </div>
+            <div class="settings-field">
+                <label class="settings-field-label" for="onboarding-currency-select">Currency</label>
+                <select id="onboarding-currency-select" class="modal-input"></select>
+            </div>
+            <p id="onboarding-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="onboarding-continue-button" class="btn btn-primary" type="button">Next</button>
+            </div>
         </div>
 
-        <div id="start-screen" class="screen active">
-            <p class="screen-description">
-                This is the starting point for airbudget.
+        <div id="categories-screen" class="screen">
+            <div class="categories-header">
+                <button id="categories-back-button" class="btn btn-text" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div id="categories-title" class="categories-title">Categories</div>
+            </div>
+            <p id="categories-description" class="screen-description">
+                Use the plus icon to create categories yourself, or
+                "Auto-create" to get started quickly.
             </p>
+            <div id="category-rows" class="category-rows"></div>
+            <div class="categories-add-row">
+                <button id="add-category-button" class="btn categories-full-button" type="button" title="Add category" aria-label="Add category">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+            <button id="categories-auto-create-button" class="btn categories-full-button" type="button">Auto-create</button>
+            <p id="categories-error" class="modal-error"></p>
             <div class="screen-actions">
-                <button id="start-button" class="btn btn-primary">Start</button>
+                <button id="categories-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="categories-onboarding-back-button" class="btn btn-secondary-pink" type="button">Back</button>
+                <button id="categories-done-button" class="btn btn-primary" type="button">Apply</button>
+            </div>
+        </div>
+
+        <div id="main-view-screen" class="screen">
+            <div class="period-bar">
+                <button id="period-prev-button" class="btn btn-text" type="button" title="Previous period">
+                    <i class="fa-solid fa-angle-left"></i>
+                </button>
+                <div id="period-label" class="period-label"></div>
+                <button id="period-next-button" class="btn btn-text" type="button" title="Next period">
+                    <i class="fa-solid fa-angle-right"></i>
+                </button>
+            </div>
+            <div id="period-current-row" class="period-current-row">
+                <button id="period-current-button" class="btn btn-text period-current-button" type="button">
+                    Back to current
+                </button>
+            </div>
+            <div class="total-progress">
+                <span class="total-progress-label">Balance:</span>
+                <span id="total-progress-amount" class="total-progress-amount"></span>
+            </div>
+            <div id="category-grid" class="category-grid"></div>
+        </div>
+
+        <div id="settings-screen" class="screen">
+            <div class="settings-header">
+                <button id="settings-back-button" class="btn btn-text" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div class="settings-title">Settings</div>
+            </div>
+            <div class="settings-field">
+                <div class="settings-field-label">Period</div>
+                <div id="settings-period-options" class="settings-period-options"></div>
+            </div>
+            <div class="settings-field">
+                <label class="settings-field-label" for="settings-currency-select">Currency</label>
+                <select id="settings-currency-select" class="modal-input"></select>
+            </div>
+            <p id="settings-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="settings-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="settings-apply-button" class="btn btn-primary" type="button">Apply</button>
+            </div>
+            <div class="settings-danger-zone">
+                <button id="delete-data-button" class="btn btn-danger" type="button">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Delete all my data
+                </button>
+            </div>
+        </div>
+
+        <div id="detail-screen" class="screen">
+            <div class="detail-header">
+                <button id="detail-back-button" class="btn btn-text" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div id="detail-period-label" class="period-label"></div>
+            </div>
+            <div class="detail-mode-row">
+                <span class="detail-mode-label">Group by:</span>
+                <div id="detail-mode-switch" class="detail-mode-switch">
+                    <button type="button" class="detail-mode-option" data-mode="day">Day</button>
+                    <button type="button" class="detail-mode-option" data-mode="category">Category</button>
+                    <div class="detail-mode-thumb"></div>
+                </div>
+            </div>
+            <div id="detail-list" class="detail-list"></div>
+        </div>
+
+        <div id="transaction-screen" class="screen">
+            <div class="transaction-header">
+                <button id="transaction-back-button" class="btn btn-text" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div id="transaction-period-label" class="period-label"></div>
+            </div>
+            <div class="transaction-field transaction-date-field">
+                <button type="button" id="transaction-date-display" class="transaction-date-display">
+                    <span id="transaction-date-text"></span>
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+                <input type="date" id="transaction-datetime-input" class="transaction-date-input" tabindex="-1" />
+            </div>
+            <div class="transaction-field-row">
+                <div class="transaction-field">
+                    <label class="transaction-field-label" for="transaction-category-select">Category</label>
+                    <select id="transaction-category-select" class="modal-input"></select>
+                </div>
+                <div class="transaction-field">
+                    <label class="transaction-field-label" for="transaction-amount-input">
+                        Amount (<span id="transaction-currency-label"></span>)
+                    </label>
+                    <div class="transaction-amount-row">
+                        <span id="transaction-amount-sign" class="transaction-amount-sign"></span>
+                        <input type="number" step="0.01" min="0" id="transaction-amount-input" class="modal-input" placeholder="0.00" />
+                    </div>
+                </div>
+            </div>
+            <div class="transaction-field">
+                <label class="transaction-field-label" for="transaction-comment-input">Comment (optional)</label>
+                <input type="text" id="transaction-comment-input" class="modal-input" />
+            </div>
+            <p id="transaction-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="transaction-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
+                <button id="transaction-apply-button" class="btn btn-primary" type="button">Add</button>
             </div>
         </div>
     </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div id="settings-unsaved-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Unapplied changes</div>
+            <div class="modal-description">
+                You have changes that haven't been applied yet.
+            </div>
+            <div class="modal-actions">
+                <button id="settings-unsaved-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="settings-unsaved-apply-button" class="btn btn-primary" type="button">Apply</button>
+            </div>
+        </div>
+
+        <div id="categories-unsaved-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Unapplied changes</div>
+            <div class="modal-description">
+                You have changes that haven't been applied yet.
+            </div>
+            <div class="modal-actions">
+                <button id="categories-unsaved-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="categories-unsaved-apply-button" class="btn btn-primary" type="button">Apply</button>
+            </div>
+        </div>
+
+        <div id="delete-confirm-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Delete all data?</div>
+            <div class="modal-description">
+                This permanently erases your categories, transactions, and settings. This cannot be undone.
+            </div>
+            <div class="modal-actions">
+                <button id="delete-confirm-button" class="btn delete-confirm-button" type="button">
+                    <span class="delete-confirm-fill"></span>
+                    <span class="delete-confirm-label">Hold to delete</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
     <div id="to-top"><i class="fa-solid fa-angle-up"></i> Back to top</div>
+    <div id="debug-toast" class="debug-toast"></div>
     <script src="theme.js" type="application/javascript"></script>
+    <script src="currencies-data.js" type="application/javascript"></script>
+    <script src="state.js" type="application/javascript"></script>
+    <script src="settings.js" type="application/javascript"></script>
+    <script src="onboarding.js" type="application/javascript"></script>
+    <script src="categories.js" type="application/javascript"></script>
+    <script src="main-view.js" type="application/javascript"></script>
+    <script src="transaction.js" type="application/javascript"></script>
+    <script src="detail.js" type="application/javascript"></script>
     <script src="main.js" type="application/javascript"></script>
 </body>
 

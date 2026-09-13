@@ -1,0 +1,188 @@
+.period-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 8px;
+    flex-wrap: nowrap;
+}
+
+.period-bar .btn-text {
+    padding: 8px 4px;
+    flex-shrink: 0;
+}
+
+.period-bar .period-label {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.period-label {
+    font-size: 20px;
+    font-weight: bold;
+    min-width: 160px;
+    text-align: center;
+}
+
+.period-current-row {
+    display: none;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.period-current-button {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #0099ff;
+    text-decoration: underline;
+}
+
+.total-progress {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.total-progress-label {
+    font-size: 14px;
+    color: #666;
+    margin-right: 6px;
+}
+
+.total-progress-amount {
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.total-progress-amount-spend {
+    color: #CD2553;
+}
+
+.total-progress-amount-income {
+    color: #0099ff;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.category-tile {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 8px;
+    text-align: center;
+}
+
+.category-tile-over {
+    border-color: #CD2553;
+}
+
+.category-tile-warning {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    color: #CD2553;
+    font-size: 13px;
+}
+
+.category-tile-add-zone {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.category-tile-add-zone:disabled {
+    cursor: default;
+}
+
+.category-tile-add-zone:hover:not(:disabled) .category-tile-emoji {
+    transform: scale(1.08);
+}
+
+.category-tile-add-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #666;
+    font-size: 11px;
+}
+
+.category-tile-emoji {
+    font-size: 26px;
+    transition: transform 150ms ease;
+}
+
+.category-tile-info {
+    text-align: center;
+}
+
+.category-tile-progress-track {
+    width: 100%;
+    margin-top: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: #eee;
+    overflow: hidden;
+}
+
+.category-tile-progress-fill {
+    height: 100%;
+    background-color: #0099ff;
+}
+
+.category-tile-over .category-tile-progress-fill {
+    background-color: #CD2553;
+}
+
+.category-tile-amounts {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1.3;
+    color: #666;
+}
+
+.category-tile-amounts-spend {
+    color: #CD2553;
+}
+
+.category-tile-amounts-income {
+    color: #0099ff;
+}
+
+.category-tile-divider {
+    margin: 6px -8px 0 -8px;
+    border-top: 1px solid #eee;
+}
+
+.category-tile-history-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -8px -8px -8px;
+    padding: 6px 0;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.category-tile-history-zone:hover {
+    color: #0099ff;
+}
