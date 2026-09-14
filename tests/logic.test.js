@@ -209,6 +209,55 @@ suite("state.js: getSortedCategorySpends", function () {
     });
 });
 
+suite("state.js: getPeriodOffsetForDate", function () {
+    test("monthly buckets a date by calendar-month distance from today", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var today = new Date();
+        var threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, 10);
+        assertEqual(win.getPeriodOffsetForDate("monthly", threeMonthsAgo), -3);
+    });
+
+    test("weekly buckets a date by whole weeks from this week's Monday", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        var thisWeek = win.getPeriodRange("weekly", 0);
+        var nextWeekDay = new Date(thisWeek.start.getFullYear(), thisWeek.start.getMonth(), thisWeek.start.getDate() + 9);
+        assertEqual(win.getPeriodOffsetForDate("weekly", nextWeekDay), 1);
+    });
+
+    test("daily buckets a date by whole days from today", async function () {
+        var win = await freshApp({ period: "daily", currency: "USD" });
+        var today = new Date();
+        var yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1, 23, 0);
+        assertEqual(win.getPeriodOffsetForDate("daily", yesterday), -1);
+    });
+});
+
+suite("state.js: findAdjacentPeriodOffset", function () {
+    test("current period (0) is always a valid target even with no transactions", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        win.state.transactions = [];
+        assertEqual(win.findAdjacentPeriodOffset("monthly", -5, 1), 0);
+    });
+
+    test("skips over empty periods to the nearest one with a transaction", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "expense" });
+        win.state.categories = [cat];
+        win.state.transactions = [
+            baseTransaction({ categoryId: cat.id, amount: 10, datetime: monthsAgoDatetime(5) })
+        ];
+
+        assertEqual(win.findAdjacentPeriodOffset("monthly", 0, -1), -5);
+    });
+
+    test("returns null when there is nothing further in that direction", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        win.state.transactions = [];
+        assertEqual(win.findAdjacentPeriodOffset("monthly", 0, -1), null);
+        assertEqual(win.findAdjacentPeriodOffset("monthly", 0, 1), null);
+    });
+});
+
 suite("main-view.js: formatCompactAmount", function () {
     test("amounts under 100 keep 2 decimals", async function () {
         var win = await freshApp({ period: "monthly", currency: "USD" });

@@ -9,6 +9,8 @@
 
 var mainViewScreen = document.getElementById("main-view-screen");
 var periodLabelEl = document.getElementById("period-label");
+var periodPrevButton = document.getElementById("period-prev-button");
+var periodNextButton = document.getElementById("period-next-button");
 var periodCurrentRow = document.getElementById("period-current-row");
 var totalProgressAmountEl = document.getElementById("total-progress-amount");
 var categoryGridEl = document.getElementById("category-grid");
@@ -126,6 +128,8 @@ function renderMainView() {
     var range = getPeriodRange(state.period, periodOffset);
     periodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     periodCurrentRow.style.display = periodOffset === 0 ? "none" : "flex";
+    periodPrevButton.style.display = findAdjacentPeriodOffset(state.period, periodOffset, -1) === null ? "none" : "";
+    periodNextButton.style.display = findAdjacentPeriodOffset(state.period, periodOffset, 1) === null ? "none" : "";
 
     var entries = getSortedCategorySpends(range.start, range.end);
     renderTotalProgress(entries);
@@ -168,12 +172,20 @@ function handleCategoryGridClick(event) {
 }
 
 function goToPreviousPeriod() {
-    periodOffset -= 1;
+    var target = findAdjacentPeriodOffset(state.period, periodOffset, -1);
+    if (target === null) {
+        return;
+    }
+    periodOffset = target;
     renderMainView();
 }
 
 function goToNextPeriod() {
-    periodOffset += 1;
+    var target = findAdjacentPeriodOffset(state.period, periodOffset, 1);
+    if (target === null) {
+        return;
+    }
+    periodOffset = target;
     renderMainView();
 }
 

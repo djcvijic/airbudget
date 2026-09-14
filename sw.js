@@ -2,7 +2,7 @@
 // app shell listed below; anything else falls back to the network. Bump
 // CACHE_NAME by hand when shipping a change, so old caches get cleaned up
 // on the next visit instead of serving stale files forever.
-var CACHE_NAME = "airbudget-v5";
+var CACHE_NAME = "airbudget-v6";
 
 var APP_SHELL = [
     "index.html",

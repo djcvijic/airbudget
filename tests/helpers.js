@@ -86,6 +86,14 @@ function daysAgoDatetime(n) {
     return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()) + "T12:00";
 }
 
+function monthsAgoDatetime(n) {
+    var d = new Date();
+    var targetMonth = new Date(d.getFullYear(), d.getMonth() - n, 1);
+    var lastDayOfTargetMonth = new Date(targetMonth.getFullYear(), targetMonth.getMonth() + 1, 0).getDate();
+    var day = Math.min(d.getDate(), lastDayOfTargetMonth);
+    return targetMonth.getFullYear() + "-" + pad2(targetMonth.getMonth() + 1) + "-" + pad2(day) + "T12:00";
+}
+
 function baseTransaction(overrides) {
     var transaction = {
         id: "txn-" + Math.random().toString(36).slice(2, 8),

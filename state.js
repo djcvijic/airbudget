@@ -165,6 +165,52 @@ function getPeriodRange(period, offset) {
     return { start: start, end: end };
 }
 
+// Date.UTC on just the y/m/d fields (not the real Date objects) keeps day
+// math exact across DST transitions, which local-time ms subtraction would not.
+function daysBetween(a, b) {
+    return Math.round((Date.UTC(a.getFullYear(), a.getMonth(), a.getDate()) - Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())) / 86400000);
+}
+
+// Inverse of getPeriodRange: which offset bucket a date falls into.
+function getPeriodOffsetForDate(period, date) {
+    var today = startOfDay(new Date());
+
+    if (period === "daily") {
+        return daysBetween(date, today);
+    }
+    if (period === "weekly") {
+        var daysSinceMonday = (today.getDay() + 6) % 7;
+        var monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysSinceMonday);
+        return Math.floor(daysBetween(date, monday) / 7);
+    }
+    if (period === "monthly") {
+        return (date.getFullYear() - today.getFullYear()) * 12 + (date.getMonth() - today.getMonth());
+    }
+    return date.getFullYear() - today.getFullYear();
+}
+
+function getOffsetsWithTransactions(period) {
+    var seen = {};
+    state.transactions.forEach(function (t) {
+        seen[getPeriodOffsetForDate(period, new Date(t.datetime))] = true;
+    });
+    return Object.keys(seen).map(Number);
+}
+
+// The nearest period offset with a transaction in the given direction (-1
+// back, 1 forward) from fromOffset, or null if there isn't one. Offset 0
+// (the current period) always counts as a valid target even when it's
+// empty, so navigation can always return to it.
+function findAdjacentPeriodOffset(period, fromOffset, direction) {
+    var candidates = getOffsetsWithTransactions(period).concat([0]).filter(function (offset) {
+        return direction < 0 ? offset < fromOffset : offset > fromOffset;
+    });
+    if (candidates.length === 0) {
+        return null;
+    }
+    return direction < 0 ? Math.max.apply(null, candidates) : Math.min.apply(null, candidates);
+}
+
 function formatDatePart(date, includeYear) {
     var options = { month: "short", day: "numeric" };
     if (includeYear) {
