@@ -104,7 +104,9 @@ function fillRandomDebugData() {
         });
     });
 
-    saveState();
+    saveMeta();
+    saveCategories();
+    saveTransactions();
     periodOffset = 0;
     closeModals();
     boot();

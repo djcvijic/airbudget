@@ -117,7 +117,7 @@ function applySettings() {
 
     state.period = selectedInput.value;
     state.currency = settingsCurrencySelect.value;
-    saveState();
+    saveMeta();
 
     closeModals();
     resolvePendingSettingsNavigation();
@@ -169,7 +169,9 @@ function cancelDeleteHold() {
 }
 
 function deleteAllData() {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(META_KEY);
+    localStorage.removeItem(CATEGORIES_KEY);
+    localStorage.removeItem(TRANSACTIONS_KEY);
     state = defaultState();
     periodOffset = 0;
 

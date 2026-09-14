@@ -2,36 +2,85 @@
 // globals defined here (state, and the functions below); this file itself
 // depends on nothing else.
 
-var STORAGE_KEY = "airbudget-state-v1";
+// One key per concern rather than one blob: a settings change no longer
+// rewrites the (much larger, ever-growing) transactions array, and vice
+// versa.
+var META_KEY = "airbudget-meta-v1";
+var CATEGORIES_KEY = "airbudget-categories-v1";
+var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
     return { period: null, currency: null, categories: [], transactions: [], detailMode: "day" };
 }
 
-function loadState() {
-    var raw = localStorage.getItem(STORAGE_KEY);
+function readJSON(key, fallback) {
+    var raw = localStorage.getItem(key);
     if (!raw) {
-        return defaultState();
+        return fallback;
     }
     try {
-        var parsed = JSON.parse(raw);
-        return {
-            period: parsed.period || null,
-            currency: parsed.currency || null,
-            categories: parsed.categories || [],
-            transactions: parsed.transactions || [],
-            detailMode: parsed.detailMode || "day"
-        };
+        return JSON.parse(raw);
     } catch (e) {
-        return defaultState();
+        return fallback;
     }
 }
 
-function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function loadState() {
+    var meta = readJSON(META_KEY, {});
+    return {
+        period: meta.period || null,
+        currency: meta.currency || null,
+        categories: readJSON(CATEGORIES_KEY, []),
+        transactions: readJSON(TRANSACTIONS_KEY, []),
+        detailMode: meta.detailMode || "day"
+    };
+}
+
+function persist(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        showToast("Couldn't save — storage is full");
+    }
+}
+
+function saveMeta() {
+    persist(META_KEY, { period: state.period, currency: state.currency, detailMode: state.detailMode });
+}
+
+function saveCategories() {
+    persist(CATEGORIES_KEY, state.categories);
+}
+
+function saveTransactions() {
+    persist(TRANSACTIONS_KEY, state.transactions);
 }
 
 var state = loadState();
+
+// Keeps this tab's in-memory state from going stale when another tab
+// (or an installed-app instance open alongside a browser tab) saves a
+// change — otherwise this tab's next save would overwrite that change
+// with its own outdated copy. The event only fires in tabs other than
+// the one that wrote the change.
+window.addEventListener("storage", function (e) {
+    if (e.key === META_KEY) {
+        var meta = readJSON(META_KEY, {});
+        state.period = meta.period || null;
+        state.currency = meta.currency || null;
+        state.detailMode = meta.detailMode || "day";
+    } else if (e.key === CATEGORIES_KEY) {
+        state.categories = readJSON(CATEGORIES_KEY, []);
+    } else if (e.key === TRANSACTIONS_KEY) {
+        state.transactions = readJSON(TRANSACTIONS_KEY, []);
+    } else {
+        return;
+    }
+
+    if (mainViewScreen.classList.contains("active")) {
+        renderMainView();
+    }
+});
 
 function isOnboardingComplete(s) {
     return !!(s.period && s.currency && s.categories.length > 0);

@@ -2,17 +2,19 @@
 // file interacts with the app exactly like a user would: real DOM events
 // on real elements, never a mocked or reimplemented DOM.
 
-var APP_STORAGE_KEY = "airbudget-state-v1";
+var APP_META_KEY = "airbudget-meta-v1";
+var APP_CATEGORIES_KEY = "airbudget-categories-v1";
+var APP_TRANSACTIONS_KEY = "airbudget-transactions-v1";
+var APP_STORAGE_KEYS = [APP_META_KEY, APP_CATEGORIES_KEY, APP_TRANSACTIONS_KEY];
 
 function seedState(partial) {
-    var full = {
+    localStorage.setItem(APP_META_KEY, JSON.stringify({
         period: partial.period || null,
         currency: partial.currency || null,
-        categories: partial.categories || [],
-        transactions: partial.transactions || [],
         detailMode: partial.detailMode || "day"
-    };
-    localStorage.setItem(APP_STORAGE_KEY, JSON.stringify(full));
+    }));
+    localStorage.setItem(APP_CATEGORIES_KEY, JSON.stringify(partial.categories || []));
+    localStorage.setItem(APP_TRANSACTIONS_KEY, JSON.stringify(partial.transactions || []));
 }
 
 // index.html registers a cache-first service worker; tests.html unregisters
@@ -33,7 +35,7 @@ function loadApp() {
 // Otherwise seeds storage with the given state before the app boots.
 async function freshApp(partialState) {
     if (partialState === null) {
-        localStorage.removeItem(APP_STORAGE_KEY);
+        APP_STORAGE_KEYS.forEach(function (key) { localStorage.removeItem(key); });
     } else {
         seedState(partialState || {});
     }

@@ -26,6 +26,9 @@ function main() {
     document.getElementById("period-next-button").addEventListener("click", goToNextPeriod);
     document.getElementById("period-current-button").addEventListener("click", goToCurrentPeriod);
 
+    document.getElementById("install-banner-action-button").addEventListener("click", installApp);
+    document.getElementById("install-banner-dismiss-button").addEventListener("click", dismissInstallBanner);
+
     // Only one of settings/categories can be the active screen at a time,
     // so nesting these guards is safe: whichever one isn't active is a
     // no-op and just calls through to navigateFn.
@@ -121,4 +124,8 @@ if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
         navigator.serviceWorker.register("sw.js");
     });
+}
+
+if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist();
 }

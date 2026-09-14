@@ -202,7 +202,7 @@ function renderDetailView() {
 function openDetailView(mode, scrollToCategoryId) {
     if (mode) {
         state.detailMode = mode;
-        saveState();
+        saveMeta();
     }
 
     showScreen(detailScreen);
@@ -222,7 +222,7 @@ function setDetailMode(mode) {
         return;
     }
     state.detailMode = mode;
-    saveState();
+    saveMeta();
     renderDetailView();
 }
 

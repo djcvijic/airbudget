@@ -351,7 +351,7 @@ function applyCategories() {
     }
 
     state.categories = updated;
-    saveState();
+    saveCategories();
     categoriesForced = false;
     categoriesDraft = null;
 

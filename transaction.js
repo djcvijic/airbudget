@@ -169,7 +169,7 @@ function applyTransaction() {
         amount: amount,
         comment: comment
     });
-    saveState();
+    saveTransactions();
 
     goToMainView();
 }

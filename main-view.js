@@ -134,6 +134,8 @@ function renderMainView() {
     entries.forEach(function (entry) {
         categoryGridEl.appendChild(buildCategoryTile(entry));
     });
+
+    updateInstallBanner();
 }
 
 function goToMainView() {

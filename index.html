@@ -18,6 +18,7 @@
     <link href="categories.css" rel="stylesheet" />
     <link href="onboarding.css" rel="stylesheet" />
     <link href="main-view.css" rel="stylesheet" />
+    <link href="install-prompt.css" rel="stylesheet" />
     <link href="transaction.css" rel="stylesheet" />
     <link href="detail.css" rel="stylesheet" />
     <link href="fontawesome/css/fontawesome.min.css" rel="stylesheet" />
@@ -97,6 +98,13 @@
         </div>
 
         <div id="main-view-screen" class="screen">
+            <div id="install-banner" class="install-banner">
+                <span id="install-banner-text" class="install-banner-text"></span>
+                <button id="install-banner-action-button" class="btn btn-text install-banner-action" type="button">Install</button>
+                <button id="install-banner-dismiss-button" class="btn btn-text install-banner-dismiss" type="button" aria-label="Dismiss install banner">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
             <div class="period-bar">
                 <button id="period-prev-button" class="btn btn-text" type="button" title="Previous period">
                     <i class="fa-solid fa-angle-left"></i>
@@ -254,6 +262,7 @@
     <script src="onboarding.js" type="application/javascript"></script>
     <script src="categories.js" type="application/javascript"></script>
     <script src="main-view.js" type="application/javascript"></script>
+    <script src="install-prompt.js" type="application/javascript"></script>
     <script src="transaction.js" type="application/javascript"></script>
     <script src="detail.js" type="application/javascript"></script>
     <script src="debug.js" type="application/javascript"></script>

@@ -59,7 +59,7 @@ function applyOnboarding() {
 
     state.period = selectedInput.value;
     state.currency = onboardingCurrencySelect.value;
-    saveState();
+    saveMeta();
 
     openCategoriesScreen(true);
 }
