@@ -1,22 +1,8 @@
-.detail-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
 /* Extra room below the .app's usual bottom padding so the floating
    back-to-top button never sits over the last item once fully scrolled.
    Smaller now that the button itself (main.css) is smaller. */
 #detail-screen {
     padding-bottom: 60px;
-}
-
-#detail-period-label {
-    color: #0099ff;
-    font-size: 24px;
 }
 
 .detail-mode-row {
@@ -31,41 +17,17 @@
 }
 
 .detail-mode-switch {
-    position: relative;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    background-color: #eee;
-    border-radius: 999px;
-    padding: 4px;
 }
 
 .detail-mode-option {
-    position: relative;
-    z-index: 1;
-    background: none;
-    border: none;
     padding: 8px 16px;
     font-size: 14px;
-    font-weight: bold;
-    color: #666;
-    text-align: center;
-    cursor: pointer;
-    transition: color 150ms;
-}
-
-.detail-mode-option.active {
-    color: white;
 }
 
 .detail-mode-thumb {
-    position: absolute;
-    top: 4px;
-    bottom: 4px;
-    left: 4px;
     width: calc(50% - 4px);
-    background-color: #0099ff;
-    border-radius: 999px;
-    transition: transform 200ms ease;
 }
 
 .detail-mode-switch[data-mode="category"] .detail-mode-thumb {
@@ -123,12 +85,6 @@
     transform: rotate(90deg);
 }
 
-.detail-group-balance {
-    font-weight: bold;
-    font-size: 16px;
-    white-space: nowrap;
-}
-
 .detail-group-body {
     display: grid;
     grid-template-rows: 1fr;
@@ -177,14 +133,6 @@
 
 .detail-transaction-amount {
     white-space: nowrap;
-}
-
-.detail-transaction-amount-spend {
-    color: #CD2553;
-}
-
-.detail-transaction-amount-income {
-    color: #0099ff;
 }
 
 .detail-transaction-comment {

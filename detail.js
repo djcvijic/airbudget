@@ -8,20 +8,12 @@ var detailModeSwitch = document.getElementById("detail-mode-switch");
 var detailModeButtons = document.querySelectorAll(".detail-mode-option");
 var detailListEl = document.getElementById("detail-list");
 
-function pad2ForDetail(n) {
-    return n < 10 ? "0" + n : "" + n;
-}
-
-function dayKey(date) {
-    return date.getFullYear() + "-" + pad2ForDetail(date.getMonth() + 1) + "-" + pad2ForDetail(date.getDate());
-}
-
 function formatDayHeader(date) {
     return date.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
 }
 
 function buildTransactionRow(t) {
-    var category = state.categories.filter(function (c) { return c.id === t.categoryId; })[0];
+    var category = getCategoryById(t.categoryId);
 
     var emojiEl = document.createElement("span");
     emojiEl.className = "detail-transaction-emoji";
@@ -40,7 +32,7 @@ function buildTransactionRow(t) {
         amountEl.textContent = formatCurrency(0);
     } else {
         var isIncome = category && category.type === "income";
-        amountEl.className = "detail-transaction-amount" + (isIncome ? " detail-transaction-amount-income" : " detail-transaction-amount-spend");
+        amountEl.className = "detail-transaction-amount" + (isIncome ? " amount-income" : " amount-spend");
         amountEl.textContent = (isIncome ? "+" : "-") + formatCurrency(t.amount);
     }
 
@@ -103,11 +95,11 @@ function buildDetailGroup(title, balance, elementId, collapsed) {
 
     var balanceEl = document.createElement("span");
     if (balance === 0) {
-        balanceEl.className = "detail-group-balance";
+        balanceEl.className = "detail-group-balance balance-amount";
         balanceEl.textContent = formatCurrency(0);
     } else {
         var isIncome = balance < 0;
-        balanceEl.className = "detail-group-balance" + (isIncome ? " detail-transaction-amount-income" : " detail-transaction-amount-spend");
+        balanceEl.className = "detail-group-balance balance-amount" + (isIncome ? " amount-income" : " amount-spend");
         balanceEl.textContent = (isIncome ? "+" : "-") + formatCurrency(Math.abs(balance));
     }
 
@@ -136,7 +128,7 @@ function renderByDay(transactions) {
 
     transactions.forEach(function (t) {
         var date = new Date(t.datetime);
-        var key = dayKey(date);
+        var key = formatDateOnly(date);
 
         if (key !== currentKey) {
             currentKey = key;
@@ -151,7 +143,7 @@ function renderByDay(transactions) {
         // A day can mix categories of both types, so each transaction's
         // sign comes from its own category, not a single shared one.
         var net = day.transactions.reduce(function (sum, t) {
-            var category = state.categories.filter(function (c) { return c.id === t.categoryId; })[0];
+            var category = getCategoryById(t.categoryId);
             var sign = category && category.type === "income" ? -1 : 1;
             return sum + t.amount * sign;
         }, 0);
@@ -192,7 +184,7 @@ function renderDetailView() {
 
     detailModeSwitch.dataset.mode = state.detailMode;
     detailModeButtons.forEach(function (button) {
-        button.classList.toggle("active", button.dataset.mode === state.detailMode);
+        button.classList.toggle("selected", button.dataset.mode === state.detailMode);
     });
 
     detailListEl.innerHTML = "";
@@ -235,6 +227,5 @@ function setDetailMode(mode) {
 }
 
 function backFromDetail() {
-    showScreen(mainViewScreen);
-    renderMainView();
+    goToMainView();
 }

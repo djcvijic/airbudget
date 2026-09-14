@@ -58,10 +58,10 @@ suite("state.js: getPeriodRange", function () {
     test("monthly offset crosses a year boundary correctly", async function () {
         var win = await freshApp({ period: "monthly", currency: "USD" });
         var jan = win.getPeriodRange("monthly", 0);
-        // Walk forward far enough to guarantee a wrap regardless of current month.
-        var farFuture = win.getPeriodRange("monthly", 13);
-        var expectedMonth = (jan.start.getMonth() + 13) % 12;
-        var expectedYear = jan.start.getFullYear() + Math.floor((jan.start.getMonth() + 13) / 12);
+        var monthsPastFullYear = 13;
+        var farFuture = win.getPeriodRange("monthly", monthsPastFullYear);
+        var expectedMonth = (jan.start.getMonth() + monthsPastFullYear) % 12;
+        var expectedYear = jan.start.getFullYear() + Math.floor((jan.start.getMonth() + monthsPastFullYear) / 12);
         assertEqual(farFuture.start.getMonth(), expectedMonth);
         assertEqual(farFuture.start.getFullYear(), expectedYear);
     });
@@ -90,9 +90,7 @@ suite("state.js: formatPeriodLabel / formatCurrency", function () {
         var start = new Date(2026, 2, 15);
         var end = new Date(2026, 2, 16);
         var label = win.formatPeriodLabel(start, end);
-        // Locale-dependent day/month order (e.g. "Mar 15" vs "15 Mar"), so
-        // check the pieces independently rather than one fixed ordering.
-        assertTrue(label.indexOf("Mar") !== -1 && label.indexOf("15") !== -1, "expected Mar and 15, got: " + label);
+        assertTrue(label.indexOf("Mar") !== -1 && label.indexOf("15") !== -1, "expected Mar and 15 in either locale order, got: " + label);
         assertFalse(label.indexOf(" - ") !== -1, "a single day must not render as a range: " + label);
     });
 
@@ -244,20 +242,19 @@ suite("categories.js: limitToOneGrapheme", function () {
 suite("transaction.js: sortedTransactionCategories", function () {
     test("ranks by current-period usage, then all-time usage, then name", async function () {
         var win = await freshApp({ period: "monthly", currency: "USD" });
-        var a = baseCategory({ id: "a", name: "Zebra" });
-        var b = baseCategory({ id: "b", name: "Apple" });
-        var c = baseCategory({ id: "c", name: "Mango" });
-        win.state.categories = [a, b, c];
+        var zebra = baseCategory({ id: "a", name: "Zebra" });
+        var apple = baseCategory({ id: "b", name: "Apple" });
+        var mango = baseCategory({ id: "c", name: "Mango" });
+        win.state.categories = [zebra, apple, mango];
         win.state.transactions = [
-            baseTransaction({ categoryId: b.id, amount: 1, datetime: nowDatetime() }),
-            baseTransaction({ categoryId: b.id, amount: 1, datetime: nowDatetime() })
+            baseTransaction({ categoryId: apple.id, amount: 1, datetime: nowDatetime() }),
+            baseTransaction({ categoryId: apple.id, amount: 1, datetime: nowDatetime() })
         ];
 
         var sorted = win.sortedTransactionCategories();
-        assertEqual(sorted[0].id, "b", "most-used-this-period category ranks first");
-        // a and c tie on usage counts (both zero); alphabetical breaks the tie.
-        assertEqual(sorted[1].id, "c");
-        assertEqual(sorted[2].id, "a");
+        assertEqual(sorted[0].id, apple.id, "most-used-this-period category ranks first");
+        assertEqual(sorted[1].id, mango.id, "zero-usage tie broken alphabetically: Mango before Zebra");
+        assertEqual(sorted[2].id, zebra.id, "zero-usage tie broken alphabetically: Mango before Zebra");
     });
 });
 

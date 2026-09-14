@@ -1,9 +1,7 @@
 function seededForDetail() {
+    var periodWideEnoughForTodayAndYesterday = "yearly";
     return {
-        // Yearly avoids month-boundary flakiness for the "today vs yesterday"
-        // fixture below, since getTransactionsInRange only needs both dates
-        // inside the same period.
-        period: "yearly",
+        period: periodWideEnoughForTodayAndYesterday,
         currency: "USD",
         categories: [
             baseCategory({ id: "cat-groceries", emoji: "🛒", name: "Groceries", type: "expense", max: 200 }),

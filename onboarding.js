@@ -43,11 +43,7 @@ function openOnboardingScreen() {
     onboardingErrorEl.textContent = "";
 
     var periodToSelect = state.period || "monthly";
-    var radios = onboardingPeriodOptionsEl.querySelectorAll("input");
-    radios.forEach(function (input) {
-        input.checked = input.value === periodToSelect;
-    });
-    updatePeriodSelection(onboardingPeriodOptionsEl);
+    selectPeriodOption(onboardingPeriodOptionsEl, periodToSelect);
 
     onboardingCurrencySelect.value = state.currency || guessCurrencyFromLocale();
 

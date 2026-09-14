@@ -3,7 +3,7 @@
 // currency picker itself (PERIODS, buildPeriodOptions, buildCurrencyOptions)
 // is shared with the onboarding screen (onboarding.js), which is why the
 // builders take a target container/select instead of assuming the settings
-// screen's own elements. Calls renderMainView()/boot() only inside a
+// screen's own elements. Calls goToMainView()/boot() only inside a
 // function body, so those files just need to load before a click happens,
 // not before this file parses.
 
@@ -36,6 +36,16 @@ function updatePeriodSelection(containerEl) {
         var input = label.querySelector("input");
         label.classList.toggle("selected", input.checked);
     });
+}
+
+// Shared by this screen and onboarding.js: checks the radio matching period,
+// then refreshes the visible highlight to match.
+function selectPeriodOption(containerEl, period) {
+    var radios = containerEl.querySelectorAll("input");
+    radios.forEach(function (input) {
+        input.checked = input.value === period;
+    });
+    updatePeriodSelection(containerEl);
 }
 
 function buildPeriodOptions(containerEl) {
@@ -75,11 +85,7 @@ buildCurrencyOptions(settingsCurrencySelect);
 function openSettingsScreen() {
     settingsErrorEl.textContent = "";
 
-    var radios = settingsPeriodOptionsEl.querySelectorAll("input");
-    radios.forEach(function (input) {
-        input.checked = input.value === state.period;
-    });
-    updatePeriodSelection(settingsPeriodOptionsEl);
+    selectPeriodOption(settingsPeriodOptionsEl, state.period);
 
     settingsCurrencySelect.value = state.currency;
 
@@ -97,10 +103,7 @@ function hasUnsavedSettingsChanges() {
 }
 
 function resolvePendingSettingsNavigation() {
-    var navigateFn = pendingSettingsNavigation || function () {
-        showScreen(mainViewScreen);
-        renderMainView();
-    };
+    var navigateFn = pendingSettingsNavigation || goToMainView;
     pendingSettingsNavigation = null;
     navigateFn();
 }
@@ -140,10 +143,7 @@ function goFromSettings(navigateFn) {
 }
 
 function backFromSettings() {
-    goFromSettings(function () {
-        showScreen(mainViewScreen);
-        renderMainView();
-    });
+    goFromSettings(goToMainView);
 }
 
 function openDeleteConfirmModal() {

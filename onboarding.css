@@ -1,12 +1,20 @@
 /* Onboarding screen. The period/currency picker fields reuse settings.css's
    shared widget classes (see settings.js) rather than duplicating them. */
 
-#onboarding-screen .screen-actions {
-    text-align: right;
-}
-
-/* With no top bar during onboarding, the heading needs its own top
-   breathing room instead of relying on the bar's reserved space. */
-#onboarding-screen h1 {
-    margin-top: 48px;
+/* Shared "onboarding step" heading look: this screen's own h1, and (via
+   categories.js toggling the same class) categories-title when the
+   categories screen is reached as onboarding's second step, so both steps
+   read as one consistent flow. Both sit inside a .screen-header, same as
+   every other screen's title, so the gap to the content below comes from
+   .screen-header's own margin-bottom rather than being redeclared here.
+   categories-title also carries theme.css's .screen-title class (same
+   24px/bold/blue look every screen title uses); theme.css loads before
+   this file, so this class wins that tie on equal specificity. */
+.onboarding-heading {
+    width: 100%;
+    font-size: 28px;
+    font-weight: normal;
+    letter-spacing: 5px;
+    color: #0099ff;
+    text-align: center;
 }

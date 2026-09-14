@@ -1,5 +1,17 @@
 // Reusable page behavior. No app-specific dependency.
 
+var toastEl = document.getElementById("toast");
+var toastTimer = null;
+
+function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add("visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+        toastEl.classList.remove("visible");
+    }, 2000);
+}
+
 function backToTop() {
     var toTop = document.getElementById("to-top");
 

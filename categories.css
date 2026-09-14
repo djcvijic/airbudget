@@ -1,29 +1,3 @@
-.categories-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.categories-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #0099ff;
-}
-
-/* Matches the h1 style on the first onboarding page, for the categories
-   step of the same flow. */
-.categories-title.onboarding-heading {
-    width: 100%;
-    margin-top: 48px;
-    font-size: 28px;
-    font-weight: normal;
-    letter-spacing: 5px;
-    text-align: center;
-}
-
 .category-rows {
     display: flex;
     flex-direction: column;
@@ -45,18 +19,7 @@
 .category-row-emoji,
 .category-row-name,
 .category-row-max {
-    font-family: inherit;
-    font-size: 16px;
     padding: 10px 12px;
-    border-radius: 8px;
-    border: 2px solid #ccc;
-}
-
-.category-row-emoji:focus,
-.category-row-name:focus,
-.category-row-max:focus {
-    outline: none;
-    border-color: #0099ff;
 }
 
 .category-row-emoji {
@@ -87,42 +50,18 @@
 }
 
 .category-row-type {
-    position: relative;
     display: inline-grid;
     grid-template-columns: repeat(2, 68px);
-    background-color: #eee;
-    border-radius: 999px;
-    padding: 4px;
 }
 
 .category-row-type-option {
-    position: relative;
-    z-index: 1;
-    background: none;
-    border: none;
     padding: 6px 0;
-    color: #666;
-    font-family: inherit;
-    font-weight: bold;
     font-size: 13px;
-    text-align: center;
-    cursor: pointer;
-    transition: color 200ms ease;
-}
-
-.category-row-type-option.selected {
-    color: white;
 }
 
 .category-row-type-thumb {
-    position: absolute;
-    top: 4px;
-    bottom: 4px;
-    left: 4px;
     width: 68px;
-    border-radius: 999px;
     background-color: #CD2553;
-    transition: transform 200ms ease, background-color 200ms ease;
 }
 
 .category-row[data-type="income"] .category-row-type-thumb {
@@ -160,11 +99,6 @@
     margin-top: 20px;
 }
 
-#categories-auto-create-button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
 .categories-add-row {
     margin-top: 12px;
 }
@@ -181,8 +115,4 @@
 
 .categories-full-button:hover {
     background-color: #e6f6ff;
-}
-
-#categories-screen .screen-actions {
-    text-align: right;
 }

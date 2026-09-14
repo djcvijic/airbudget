@@ -29,21 +29,13 @@ var transactionTimeOfDay = null;
 var transactionSelectedDate = null;
 
 function updateTransactionAmountSign() {
-    var category = state.categories.filter(function (c) { return c.id === transactionCategorySelect.value; })[0];
+    var category = getCategoryById(transactionCategorySelect.value);
     var isIncome = category && category.type === "income";
     transactionAmountSignEl.textContent = isIncome ? "+" : "−";
-    transactionAmountSignEl.className = "transaction-amount-sign" + (isIncome ? " transaction-amount-sign-income" : " transaction-amount-sign-spend");
+    transactionAmountSignEl.className = "transaction-amount-sign" + (isIncome ? " amount-income" : " amount-spend");
 }
 
 transactionCategorySelect.addEventListener("change", updateTransactionAmountSign);
-
-function pad2(n) {
-    return n < 10 ? "0" + n : "" + n;
-}
-
-function formatDateOnly(date) {
-    return date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate());
-}
 
 // The native date input's own value is "YYYY-MM-DD"; parsing that directly
 // via `new Date(string)` reads it as UTC, which can roll it back a day in
@@ -179,11 +171,9 @@ function applyTransaction() {
     });
     saveState();
 
-    showScreen(mainViewScreen);
-    renderMainView();
+    goToMainView();
 }
 
 function cancelTransaction() {
-    showScreen(mainViewScreen);
-    renderMainView();
+    goToMainView();
 }

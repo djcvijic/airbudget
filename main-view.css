@@ -51,20 +51,6 @@
     margin-right: 6px;
 }
 
-.total-progress-amount {
-    font-weight: bold;
-    font-size: 16px;
-    white-space: nowrap;
-}
-
-.total-progress-amount-spend {
-    color: #CD2553;
-}
-
-.total-progress-amount-income {
-    color: #0099ff;
-}
-
 .category-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -155,14 +141,6 @@
     font-weight: bold;
     line-height: 1.3;
     color: #666;
-}
-
-.category-tile-amounts-spend {
-    color: #CD2553;
-}
-
-.category-tile-amounts-income {
-    color: #0099ff;
 }
 
 .category-tile-divider {

@@ -86,18 +86,28 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertEqual(saved.name, "Food & Drink");
     });
 
-    test("auto-create adds every template once, then disables itself", async function () {
+    test("auto-create adds every template once, then hides itself", async function () {
         var win = await openReopenedCategories();
         var before = win.categoryRowsEl.querySelectorAll(".category-row").length;
 
         win.categoriesAutoCreateButton.click();
         var afterFirst = win.categoryRowsEl.querySelectorAll(".category-row").length;
         assertEqual(afterFirst, before + win.CATEGORY_TEMPLATES.length);
-        assertTrue(win.categoriesAutoCreateButton.disabled);
+        assertEqual(win.categoriesAutoCreateButton.style.display, "none");
 
         win.categoriesAutoCreateButton.click();
         var afterSecond = win.categoryRowsEl.querySelectorAll(".category-row").length;
-        assertEqual(afterSecond, afterFirst, "a disabled button click must not add rows again");
+        assertEqual(afterSecond, afterFirst, "a hidden button click must not add rows again");
+    });
+
+    test("auto-create button goes from visible to hidden on click, in forced mode", async function () {
+        var win = await freshApp(null);
+        win.document.getElementById("onboarding-continue-button").click();
+        assertNotEqual(win.categoriesAutoCreateButton.style.display, "none");
+
+        win.categoriesAutoCreateButton.click();
+
+        assertEqual(win.categoriesAutoCreateButton.style.display, "none");
     });
 
     test("leaving with unsaved changes opens a warning modal", async function () {

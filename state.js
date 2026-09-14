@@ -1,6 +1,6 @@
 // Persistence and derived calculations. Every other file depends on the
 // globals defined here (state, and the functions below); this file itself
-// depends on nothing but currencies-data.js's load-order position.
+// depends on nothing else.
 
 var STORAGE_KEY = "airbudget-state-v1";
 
@@ -78,6 +78,18 @@ function startOfDay(date) {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+function pad2(n) {
+    return n < 10 ? "0" + n : "" + n;
+}
+
+function formatDateOnly(date) {
+    return date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate());
+}
+
+function getCategoryById(id) {
+    return state.categories.filter(function (c) { return c.id === id; })[0];
+}
+
 // Weeks start Monday. Returns { start, end } as Date objects; end is
 // exclusive (the start of the following period), so filtering can use
 // datetime >= start && datetime < end.
@@ -145,7 +157,7 @@ function getTransactionsInRange(start, end) {
 // negative = net income) since everything downstream (sorting, over-max,
 // progress bars, totals) already relies on that convention.
 function getCategorySpend(categoryId, start, end) {
-    var category = state.categories.filter(function (c) { return c.id === categoryId; })[0];
+    var category = getCategoryById(categoryId);
     var sign = category && category.type === "income" ? -1 : 1;
 
     return sign * getTransactionsInRange(start, end)

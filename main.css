@@ -33,15 +33,9 @@ body.detail-screen-active #to-top {
     background-color: #0099ff;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 20px;
     z-index: 5;
-}
-
-.top-bar-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
 }
 
 .top-bar-nav {
@@ -67,7 +61,7 @@ body.detail-screen-active #to-top {
 /* No nav bar during onboarding (state.js's showScreen toggles this), so
    the space reserved for it isn't needed either. */
 body.no-top-bar .app {
-    padding-bottom: 0;
+    padding-bottom: 32px;
 }
 
 /* theme.css centers .app vertically in body; this app's screens scroll, so

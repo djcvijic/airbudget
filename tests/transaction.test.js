@@ -42,11 +42,11 @@ suite("transaction screen", function () {
 
         setValue(win.transactionCategorySelect, "cat-groceries");
         assertEqual(win.transactionAmountSignEl.textContent, "−");
-        assertTrue(win.transactionAmountSignEl.className.indexOf("transaction-amount-sign-spend") !== -1);
+        assertTrue(win.transactionAmountSignEl.className.indexOf("amount-spend") !== -1);
 
         setValue(win.transactionCategorySelect, "cat-salary");
         assertEqual(win.transactionAmountSignEl.textContent, "+");
-        assertTrue(win.transactionAmountSignEl.className.indexOf("transaction-amount-sign-income") !== -1);
+        assertTrue(win.transactionAmountSignEl.className.indexOf("amount-income") !== -1);
     });
 
     test("missing category or amount blocks saving", async function () {
@@ -100,7 +100,7 @@ suite("transaction screen", function () {
         assertEqual(win.state.transactions[0].amount, 1500, "amount is stored unsigned");
 
         var tile = win.categoryGridEl.querySelector('.category-tile[data-id="cat-salary"]');
-        assertTrue(tile.querySelector(".category-tile-amounts").className.indexOf("category-tile-amounts-income") !== -1);
+        assertTrue(tile.querySelector(".category-tile-amounts").className.indexOf("amount-income") !== -1);
     });
 
     test("cancel discards without saving", async function () {
@@ -136,6 +136,6 @@ suite("transaction screen", function () {
         tileAddZone(win, "cat-hidden").click();
 
         assertFalse(isActive(win.transactionScreen));
-        assertTrue(win.debugToastEl.classList.contains("visible"));
+        assertTrue(win.toastEl.classList.contains("visible"));
     });
 });

@@ -2,7 +2,7 @@
 // onboarding step 2 (forced: no back/revert, requires >=1 valid category)
 // and later reopen from the dashboard (edit rows in place; leaving with
 // unapplied changes warns, same as the settings screen).
-// Calls renderMainView() only inside a function body, so main-view.js just
+// Calls goToMainView() only inside a function body, so main-view.js just
 // needs to load before applyCategories() runs, not before this file parses.
 
 var categoriesScreen = document.getElementById("categories-screen");
@@ -76,7 +76,7 @@ function buildCategoryRow(category) {
 
     var emojiInput = document.createElement("input");
     emojiInput.type = "text";
-    emojiInput.className = "category-row-emoji";
+    emojiInput.className = "category-row-emoji modal-input";
     emojiInput.maxLength = 20;
     emojiInput.title = "Use your device's emoji picker: Cmd+Ctrl+Space (macOS), Win+. (Windows), "
         + "or the emoji key on the iOS/Android keyboard";
@@ -87,13 +87,13 @@ function buildCategoryRow(category) {
 
     var nameInput = document.createElement("input");
     nameInput.type = "text";
-    nameInput.className = "category-row-name";
+    nameInput.className = "category-row-name modal-input";
     nameInput.placeholder = "Name";
     nameInput.value = category ? category.name : "";
 
     var maxInput = document.createElement("input");
     maxInput.type = "number";
-    maxInput.className = "category-row-max";
+    maxInput.className = "category-row-max modal-input";
     maxInput.min = "0";
     maxInput.step = "0.01";
     maxInput.placeholder = "Budget";
@@ -107,20 +107,20 @@ function buildCategoryRow(category) {
     typeLine.className = "category-row-type-line";
 
     var typeRow = document.createElement("div");
-    typeRow.className = "category-row-type";
+    typeRow.className = "category-row-type segmented-toggle";
 
     var expenseButton = document.createElement("button");
     expenseButton.type = "button";
-    expenseButton.className = "category-row-type-option";
+    expenseButton.className = "category-row-type-option segmented-toggle-option";
     expenseButton.textContent = "Expense";
 
     var incomeButton = document.createElement("button");
     incomeButton.type = "button";
-    incomeButton.className = "category-row-type-option";
+    incomeButton.className = "category-row-type-option segmented-toggle-option";
     incomeButton.textContent = "Income";
 
     var thumb = document.createElement("div");
-    thumb.className = "category-row-type-thumb";
+    thumb.className = "category-row-type-thumb segmented-toggle-thumb";
 
     // Income categories can't have a spending limit — disable and clear the
     // field whenever the type is (or becomes) income, rather than just
@@ -205,16 +205,22 @@ function addCategoryRow() {
 
 // Appends one row per template, alphabetically, after whatever rows are
 // already there. Only usable once per visit to the screen — the button is
-// disabled right after, and re-enabled the next time the screen opens.
+// removed right after, and shown again the next time the screen opens.
 function createCategoriesAutomatically() {
     if (categoriesAutoCreated) {
         return;
     }
     categoriesAutoCreated = true;
-    categoriesAutoCreateButton.disabled = true;
+    categoriesAutoCreateButton.style.display = "none";
 
     CATEGORY_TEMPLATES.forEach(function (template) {
         categoryRowsEl.appendChild(buildCategoryRow(template));
+    });
+
+    window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        left: 0,
+        behavior: "smooth"
     });
 }
 
@@ -279,10 +285,11 @@ function openCategoriesScreen(forced) {
         categoriesDraft.forEach(function (draftCategory) {
             categoryRowsEl.appendChild(buildCategoryRow(draftCategory));
         });
-        categoriesAutoCreateButton.disabled = categoriesAutoCreated;
+        if (categoriesAutoCreated) {
+            categoriesAutoCreateButton.style.display = "none";
+        }
     } else {
         categoriesAutoCreated = false;
-        categoriesAutoCreateButton.disabled = false;
         renderCategoryRows();
     }
 
@@ -353,10 +360,7 @@ function applyCategories() {
 }
 
 function resolvePendingCategoriesNavigation() {
-    var navigateFn = pendingCategoriesNavigation || function () {
-        showScreen(mainViewScreen);
-        renderMainView();
-    };
+    var navigateFn = pendingCategoriesNavigation || goToMainView;
     pendingCategoriesNavigation = null;
     navigateFn();
 }
@@ -389,8 +393,5 @@ function backFromCategories() {
         return;
     }
 
-    goFromCategories(function () {
-        showScreen(mainViewScreen);
-        renderMainView();
-    });
+    goFromCategories(goToMainView);
 }

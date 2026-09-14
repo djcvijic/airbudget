@@ -91,7 +91,80 @@ button {
 
 .screen-actions {
     margin-top: 32px;
+    text-align: right;
+}
+
+.screen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.screen-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0099ff;
+}
+
+.balance-amount {
+    font-weight: bold;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+.amount-spend {
+    color: #CD2553;
+}
+
+.amount-income {
+    color: #0099ff;
+}
+
+.field {
+    margin-top: 20px;
+}
+
+.field-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.segmented-toggle {
+    position: relative;
+    background-color: #eee;
+    border-radius: 999px;
+    padding: 4px;
+}
+
+.segmented-toggle-option {
+    position: relative;
+    z-index: 1;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: bold;
+    color: #666;
     text-align: center;
+    cursor: pointer;
+    transition: color 150ms ease;
+}
+
+.segmented-toggle-option.selected {
+    color: white;
+}
+
+.segmented-toggle-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    border-radius: 999px;
+    background-color: #0099ff;
+    transition: transform 200ms ease, background-color 200ms ease;
 }
 
 .btn {
@@ -160,7 +233,7 @@ button {
     margin: 8px;
 }
 
-.debug-toast {
+.toast {
     position: fixed;
     bottom: 24px;
     left: 50%;
@@ -176,7 +249,7 @@ button {
     z-index: 10;
 }
 
-.debug-toast.visible {
+.toast.visible {
     opacity: 0.9;
 }
 

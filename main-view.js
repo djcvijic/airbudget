@@ -19,13 +19,13 @@ function renderTotalProgress(entries) {
     var totalSpend = entries.reduce(function (sum, e) { return sum + e.spend; }, 0);
 
     if (totalSpend === 0) {
-        totalProgressAmountEl.className = "total-progress-amount";
+        totalProgressAmountEl.className = "total-progress-amount balance-amount";
         totalProgressAmountEl.textContent = formatCurrency(0);
         return;
     }
 
     var isIncome = totalSpend < 0;
-    totalProgressAmountEl.className = "total-progress-amount" + (isIncome ? " total-progress-amount-income" : " total-progress-amount-spend");
+    totalProgressAmountEl.className = "total-progress-amount balance-amount" + (isIncome ? " amount-income" : " amount-spend");
     totalProgressAmountEl.textContent = (isIncome ? "+" : "-") + formatCurrency(Math.abs(totalSpend));
 }
 
@@ -82,7 +82,7 @@ function buildCategoryTile(entry) {
     var isZero = entry.spend === 0;
 
     var amountsEl = document.createElement("div");
-    amountsEl.className = "category-tile-amounts" + (isZero ? "" : (isIncome ? " category-tile-amounts-income" : " category-tile-amounts-spend"));
+    amountsEl.className = "category-tile-amounts" + (isZero ? "" : (isIncome ? " amount-income" : " amount-spend"));
 
     var amountValueEl = document.createElement("div");
     amountValueEl.className = "category-tile-amount-value";
@@ -136,6 +136,11 @@ function renderMainView() {
     });
 }
 
+function goToMainView() {
+    showScreen(mainViewScreen);
+    renderMainView();
+}
+
 function handleCategoryGridClick(event) {
     var tile = event.target.closest(".category-tile");
     if (!tile) {
@@ -153,9 +158,9 @@ function handleCategoryGridClick(event) {
         return;
     }
 
-    var category = state.categories.filter(function (c) { return c.id === categoryId; })[0];
+    var category = getCategoryById(categoryId);
     if (category && category.hidden) {
-        showDebugToast("This category is hidden from new transactions");
+        showToast("This category is hidden from new transactions");
         return;
     }
 

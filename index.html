@@ -15,8 +15,8 @@
     <link href="theme.css" rel="stylesheet" />
     <link href="main.css" rel="stylesheet" />
     <link href="settings.css" rel="stylesheet" />
-    <link href="onboarding.css" rel="stylesheet" />
     <link href="categories.css" rel="stylesheet" />
+    <link href="onboarding.css" rel="stylesheet" />
     <link href="main-view.css" rel="stylesheet" />
     <link href="transaction.css" rel="stylesheet" />
     <link href="detail.css" rel="stylesheet" />
@@ -27,8 +27,10 @@
 
 <body>
     <div id="top-bar" class="top-bar">
-        <img src="images/icon-192.png" alt="airbudget" class="top-bar-icon" />
         <div class="top-bar-nav">
+            <button id="open-home-button" class="btn btn-text" type="button" title="Home">
+                <i class="fa-solid fa-house"></i>
+            </button>
             <button id="open-transaction-button" class="btn btn-text" type="button" title="New transaction">
                 <i class="fa-solid fa-plus"></i>
             </button>
@@ -46,18 +48,20 @@
 
     <div class="app">
         <div id="onboarding-screen" class="screen">
-            <h1>Welcome</h1>
+            <div class="screen-header">
+                <h1 class="onboarding-heading">Welcome</h1>
+            </div>
             <p class="screen-description">
                 airbudget tracks your spending against a budget for each category you
                 create. First, choose how often you want to budget and which currency
                 you use. You can change either of these later in Settings.
             </p>
-            <div class="settings-field">
-                <div class="settings-field-label">Period</div>
+            <div class="field">
+                <div class="field-label">Period</div>
                 <div id="onboarding-period-options" class="settings-period-options"></div>
             </div>
-            <div class="settings-field">
-                <label class="settings-field-label" for="onboarding-currency-select">Currency</label>
+            <div class="field">
+                <label class="field-label" for="onboarding-currency-select">Currency</label>
                 <select id="onboarding-currency-select" class="modal-input"></select>
             </div>
             <p id="onboarding-error" class="modal-error"></p>
@@ -67,11 +71,11 @@
         </div>
 
         <div id="categories-screen" class="screen">
-            <div class="categories-header">
+            <div class="screen-header">
                 <button id="categories-back-button" class="btn btn-text" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
-                <div id="categories-title" class="categories-title">Categories</div>
+                <div id="categories-title" class="screen-title">Categories</div>
             </div>
             <p id="categories-description" class="screen-description">
                 Use the plus icon to create categories yourself, or
@@ -115,18 +119,18 @@
         </div>
 
         <div id="settings-screen" class="screen">
-            <div class="settings-header">
+            <div class="screen-header">
                 <button id="settings-back-button" class="btn btn-text" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
-                <div class="settings-title">Settings</div>
+                <div class="screen-title">Settings</div>
             </div>
-            <div class="settings-field">
-                <div class="settings-field-label">Period</div>
+            <div class="field">
+                <div class="field-label">Period</div>
                 <div id="settings-period-options" class="settings-period-options"></div>
             </div>
-            <div class="settings-field">
-                <label class="settings-field-label" for="settings-currency-select">Currency</label>
+            <div class="field">
+                <label class="field-label" for="settings-currency-select">Currency</label>
                 <select id="settings-currency-select" class="modal-input"></select>
             </div>
             <p id="settings-error" class="modal-error"></p>
@@ -142,31 +146,31 @@
         </div>
 
         <div id="detail-screen" class="screen">
-            <div class="detail-header">
+            <div class="screen-header">
                 <button id="detail-back-button" class="btn btn-text" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
-                <div id="detail-period-label" class="period-label"></div>
+                <div id="detail-period-label" class="screen-title"></div>
             </div>
             <div class="detail-mode-row">
                 <span class="detail-mode-label">Group by:</span>
-                <div id="detail-mode-switch" class="detail-mode-switch">
-                    <button type="button" class="detail-mode-option" data-mode="day">Day</button>
-                    <button type="button" class="detail-mode-option" data-mode="category">Category</button>
-                    <div class="detail-mode-thumb"></div>
+                <div id="detail-mode-switch" class="detail-mode-switch segmented-toggle">
+                    <button type="button" class="detail-mode-option segmented-toggle-option" data-mode="day">Day</button>
+                    <button type="button" class="detail-mode-option segmented-toggle-option" data-mode="category">Category</button>
+                    <div class="detail-mode-thumb segmented-toggle-thumb"></div>
                 </div>
             </div>
             <div id="detail-list" class="detail-list"></div>
         </div>
 
         <div id="transaction-screen" class="screen">
-            <div class="transaction-header">
+            <div class="screen-header">
                 <button id="transaction-back-button" class="btn btn-text" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
-                <div id="transaction-period-label" class="period-label"></div>
+                <div id="transaction-period-label" class="screen-title"></div>
             </div>
-            <div class="transaction-field transaction-date-field">
+            <div class="field transaction-date-field">
                 <button type="button" id="transaction-date-display" class="transaction-date-display">
                     <span id="transaction-date-text"></span>
                     <i class="fa-solid fa-pen"></i>
@@ -174,12 +178,12 @@
                 <input type="date" id="transaction-datetime-input" class="transaction-date-input" tabindex="-1" />
             </div>
             <div class="transaction-field-row">
-                <div class="transaction-field">
-                    <label class="transaction-field-label" for="transaction-category-select">Category</label>
+                <div class="field transaction-category-field">
+                    <label class="field-label" for="transaction-category-select">Category</label>
                     <select id="transaction-category-select" class="modal-input"></select>
                 </div>
-                <div class="transaction-field">
-                    <label class="transaction-field-label" for="transaction-amount-input">
+                <div class="field transaction-amount-field">
+                    <label class="field-label" for="transaction-amount-input">
                         Amount (<span id="transaction-currency-label"></span>)
                     </label>
                     <div class="transaction-amount-row">
@@ -188,8 +192,8 @@
                     </div>
                 </div>
             </div>
-            <div class="transaction-field">
-                <label class="transaction-field-label" for="transaction-comment-input">Comment (optional)</label>
+            <div class="field">
+                <label class="field-label" for="transaction-comment-input">Comment (optional)</label>
                 <input type="text" id="transaction-comment-input" class="modal-input" />
             </div>
             <p id="transaction-error" class="modal-error"></p>
@@ -242,7 +246,7 @@
     </div>
 
     <div id="to-top"><i class="fa-solid fa-angle-up"></i> Back to top</div>
-    <div id="debug-toast" class="debug-toast"></div>
+    <div id="toast" class="toast"></div>
     <script src="theme.js" type="application/javascript"></script>
     <script src="currencies-data.js" type="application/javascript"></script>
     <script src="state.js" type="application/javascript"></script>
@@ -252,6 +256,7 @@
     <script src="main-view.js" type="application/javascript"></script>
     <script src="transaction.js" type="application/javascript"></script>
     <script src="detail.js" type="application/javascript"></script>
+    <script src="debug.js" type="application/javascript"></script>
     <script src="main.js" type="application/javascript"></script>
 </body>
 
