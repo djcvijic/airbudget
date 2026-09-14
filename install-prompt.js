@@ -2,9 +2,9 @@
 // what exempts the app from iOS Safari's 7-day storage-eviction timer, so
 // it's a data-safety nudge, not just a shortcut. Chrome/Android get a real
 // install button via beforeinstallprompt; iOS has no such API at all, so
-// it gets instructions instead. updateInstallBanner() is called from
-// main-view.js's renderMainView() only inside a function body, so this
-// file just needs to load before a render happens, not before it parses.
+// it gets instructions instead. The banner lives outside the .screen
+// system (see index.html), so it stays visible across every screen,
+// including onboarding, until dismissed or installed.
 
 var INSTALL_DISMISSED_KEY = "airbudget-install-dismissed-v1";
 
@@ -64,3 +64,5 @@ window.addEventListener("appinstalled", function () {
     deferredInstallPrompt = null;
     installBannerEl.style.display = "none";
 });
+
+updateInstallBanner();
