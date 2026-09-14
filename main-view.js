@@ -71,7 +71,7 @@ function buildCategoryTile(entry) {
     track.className = "category-tile-progress-track";
     var fill = document.createElement("div");
     fill.className = "category-tile-progress-fill";
-    var percent = entry.max != null && entry.max > 0 ? (entry.spend / entry.max) * 100 : 0;
+    var percent = entry.max != null && entry.max > 0 ? (Math.abs(entry.spend) / entry.max) * 100 : 0;
     fill.style.width = Math.max(0, Math.min(100, percent)) + "%";
     track.appendChild(fill);
     infoEl.appendChild(track);

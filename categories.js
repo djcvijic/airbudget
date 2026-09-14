@@ -96,7 +96,6 @@ function buildCategoryRow(category) {
     maxInput.className = "category-row-max modal-input";
     maxInput.min = "0";
     maxInput.step = "0.01";
-    maxInput.placeholder = "Budget";
     maxInput.value = (category && category.max != null) ? category.max : "";
 
     fields.appendChild(emojiInput);
@@ -122,16 +121,10 @@ function buildCategoryRow(category) {
     var thumb = document.createElement("div");
     thumb.className = "category-row-type-thumb segmented-toggle-thumb";
 
-    // Income categories can't have a spending limit — disable and clear the
-    // field whenever the type is (or becomes) income, rather than just
-    // rejecting a value at save time.
     function updateTypeSelection() {
         expenseButton.classList.toggle("selected", row.dataset.type === "expense");
         incomeButton.classList.toggle("selected", row.dataset.type === "income");
-        maxInput.disabled = row.dataset.type === "income";
-        if (maxInput.disabled) {
-            maxInput.value = "";
-        }
+        maxInput.placeholder = row.dataset.type === "income" ? "Expected" : "Budget";
     }
 
     expenseButton.addEventListener("click", function () {
@@ -324,13 +317,11 @@ function applyCategories() {
 
         var type = row.dataset.type === "income" ? "income" : "expense";
 
-        // Income categories can't have a max; the field is disabled and
-        // cleared in the UI, but ignore any value here too just in case.
         var max = null;
-        if (type === "expense" && maxRaw !== "") {
+        if (maxRaw !== "") {
             max = parseFloat(maxRaw);
             if (isNaN(max) || max < 0) {
-                categoriesErrorEl.textContent = "Budget must be 0 or greater, or left blank.";
+                categoriesErrorEl.textContent = "Amount must be 0 or greater, or left blank.";
                 return;
             }
         }

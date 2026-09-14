@@ -193,6 +193,20 @@ suite("state.js: getSortedCategorySpends", function () {
         assertTrue(entries[0].overMax);
         assertEqual(entries[1].id, "under");
     });
+
+    test("income never counts as over-max, even past its expected amount", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var salary = baseCategory({ id: "salary", type: "income", max: 1000 });
+        win.state.categories = [salary];
+        win.state.transactions = [
+            baseTransaction({ categoryId: salary.id, amount: 1500, datetime: nowDatetime() })
+        ];
+
+        var range = win.getPeriodRange("monthly", 0);
+        var entries = win.getSortedCategorySpends(range.start, range.end);
+
+        assertFalse(entries[0].overMax);
+    });
 });
 
 suite("main-view.js: formatCompactAmount", function () {

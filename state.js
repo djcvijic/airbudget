@@ -237,7 +237,9 @@ function getSortedCategorySpends(start, end) {
             emoji: cat.emoji,
             max: cat.max,
             spend: spend,
-            overMax: cat.max != null && spend > cat.max
+            // Income has no over-budget warning: more income than expected
+            // isn't a problem, only more expense than budgeted is.
+            overMax: cat.type === "expense" && cat.max != null && spend > cat.max
         };
     });
     entries.sort(compareCategoriesBySpend);

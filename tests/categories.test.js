@@ -58,7 +58,7 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertTrue(isActive(win.categoriesScreen));
     });
 
-    test("switching a row to income disables and clears its budget field", async function () {
+    test("switching a row to income keeps its budget field enabled, relabeled as Expected", async function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         var maxInput = row.querySelector(".category-row-max");
@@ -69,8 +69,9 @@ suite("categories screen: reopened (non-forced) editing", function () {
         })[0];
         incomeButton.click();
 
-        assertTrue(maxInput.disabled);
-        assertEqual(maxInput.value, "");
+        assertFalse(maxInput.disabled);
+        assertEqual(maxInput.value, "150");
+        assertEqual(maxInput.placeholder, "Expected");
         assertEqual(row.dataset.type, "income");
     });
 

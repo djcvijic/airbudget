@@ -78,7 +78,7 @@ function fillRandomDebugData() {
             id: generateId("cat"),
             emoji: pick.emoji,
             name: pick.name,
-            max: isIncome ? null : randomAmount(1000, 20000),
+            max: randomAmount(1000, 20000),
             type: isIncome ? "income" : "expense"
         };
     });
