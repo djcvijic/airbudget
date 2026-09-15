@@ -14,6 +14,7 @@ var categoriesOnboardingBackButton = document.getElementById("categories-onboard
 var categoriesRevertButton = document.getElementById("categories-revert-button");
 var categoriesAutoCreateButton = document.getElementById("categories-auto-create-button");
 var categoriesDoneButton = document.getElementById("categories-done-button");
+var categoriesCloseButton = document.getElementById("categories-close-button");
 var categoriesDescriptionEl = document.getElementById("categories-description");
 var categoriesUnsavedModal = document.getElementById("categories-unsaved-modal");
 
@@ -193,7 +194,9 @@ function renderCategoryRows() {
 }
 
 function addCategoryRow() {
-    categoryRowsEl.appendChild(buildCategoryRow(null));
+    var row = buildCategoryRow(null);
+    categoryRowsEl.appendChild(row);
+    row.querySelector(".category-row-emoji").focus();
 }
 
 // Appends one row per template, alphabetically, after whatever rows are
@@ -244,6 +247,23 @@ function hasUnsavedCategoriesChanges() {
     return JSON.stringify(getCategoryRowsSnapshot()) !== JSON.stringify(categoriesOriginalSnapshot);
 }
 
+// Forced (onboarding) mode always shows Back + Apply/Done, dirty or not, so
+// Revert and the Done-only close button stay fixed there. Reopened mode
+// instead swaps Revert + Apply for a single Done button once there's
+// nothing left to revert or apply.
+function updateCategoriesActionButtons() {
+    if (categoriesForced) {
+        categoriesRevertButton.style.display = "none";
+        categoriesDoneButton.style.display = "";
+        categoriesCloseButton.style.display = "none";
+        return;
+    }
+    var dirty = hasUnsavedCategoriesChanges();
+    categoriesRevertButton.style.display = dirty ? "" : "none";
+    categoriesDoneButton.style.display = dirty ? "" : "none";
+    categoriesCloseButton.style.display = dirty ? "none" : "";
+}
+
 // Captures the current rows (full fidelity, not just for diffing) so
 // backFromCategories() can restore them if the onboarding flow returns
 // here after visiting the settings step again.
@@ -267,7 +287,6 @@ function openCategoriesScreen(forced) {
     categoriesErrorEl.textContent = "";
     categoriesBackButton.style.display = forced ? "none" : "";
     categoriesOnboardingBackButton.style.display = forced ? "" : "none";
-    categoriesRevertButton.style.display = forced ? "none" : "";
     categoriesAutoCreateButton.style.display = forced ? "" : "none";
     categoriesDescriptionEl.style.display = forced ? "" : "none";
     categoriesTitleEl.classList.toggle("onboarding-heading", forced);
@@ -287,6 +306,7 @@ function openCategoriesScreen(forced) {
     }
 
     categoriesOriginalSnapshot = getCategoryRowsSnapshot();
+    updateCategoriesActionButtons();
 
     showScreen(categoriesScreen);
 }
@@ -386,3 +406,9 @@ function backFromCategories() {
 
     goFromCategories(goToMainView);
 }
+
+// Catches every row edit (typing, type/visibility toggles, add, delete,
+// auto-create) in one place via bubbling, rather than wiring the same
+// recheck into each individual row control.
+categoriesScreen.addEventListener("input", updateCategoriesActionButtons);
+categoriesScreen.addEventListener("click", updateCategoriesActionButtons);

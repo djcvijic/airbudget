@@ -16,6 +16,25 @@ suite("settings screen", function () {
         assertEqual(win.settingsCurrencySelect.value, "USD");
     });
 
+    test("opens clean: shows a single Done button, no Revert/Apply", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+
+        assertEqual(win.settingsRevertButton.style.display, "none");
+        assertEqual(win.settingsApplyButton.style.display, "none");
+        assertNotEqual(win.settingsCloseButton.style.display, "none");
+    });
+
+    test("changing a value swaps Done for Revert + Apply", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        setValue(win.settingsCurrencySelect, "EUR");
+
+        assertNotEqual(win.settingsRevertButton.style.display, "none");
+        assertNotEqual(win.settingsApplyButton.style.display, "none");
+        assertEqual(win.settingsCloseButton.style.display, "none");
+    });
+
     test("unapplied changes trigger a warning when leaving", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
@@ -57,6 +76,16 @@ suite("settings screen", function () {
         assertEqual(tile.textContent, "GBP");
     });
 
+    test("clicking Done navigates back with no warning", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+
+        win.settingsCloseButton.click();
+
+        assertTrue(isActive(win.mainViewScreen));
+        assertTrue(isHidden(win.settingsUnsavedModal));
+    });
+
     test("navigating away with no changes skips the warning", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
@@ -64,6 +93,69 @@ suite("settings screen", function () {
 
         assertTrue(isActive(win.mainViewScreen));
         assertTrue(isHidden(win.settingsUnsavedModal));
+    });
+
+    test("export produces a JSON file with the whole state", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+
+        var capturedBlob = null;
+        var capturedDownload = null;
+        var originalCreate = win.URL.createObjectURL;
+        var originalClick = win.HTMLAnchorElement.prototype.click;
+        win.URL.createObjectURL = function (blob) { capturedBlob = blob; return "blob:captured"; };
+        win.HTMLAnchorElement.prototype.click = function () { capturedDownload = this.download; };
+
+        win.exportData();
+
+        win.URL.createObjectURL = originalCreate;
+        win.HTMLAnchorElement.prototype.click = originalClick;
+
+        var text = await capturedBlob.text();
+        var content = JSON.parse(text);
+        assertTrue(/^airbudget-\d{4}-\d{2}-\d{2}\.json$/.test(capturedDownload), "expected a dated filename, got: " + capturedDownload);
+        assertEqual(content.currency, "USD");
+        assertEqual(content.categories.length, 1);
+    });
+
+    test("importing a file overwrites the whole state and reboots", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+
+        var payload = {
+            period: "weekly",
+            currency: "EUR",
+            categories: [baseCategory({ id: "imported-cat", name: "Imported" })],
+            transactions: [],
+            detailMode: "category"
+        };
+        var file = new win.File([JSON.stringify(payload)], "backup.json", { type: "application/json" });
+        var dataTransfer = new win.DataTransfer();
+        dataTransfer.items.add(file);
+        win.importFileInput.files = dataTransfer.files;
+        win.importFileInput.dispatchEvent(new win.Event("change", { bubbles: true }));
+        await wait(50);
+
+        assertEqual(win.state.period, "weekly");
+        assertEqual(win.state.currency, "EUR");
+        assertEqual(win.state.categories[0].id, "imported-cat");
+        assertTrue(isActive(win.mainViewScreen));
+    });
+
+    test("importing invalid JSON shows an error and leaves state untouched", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        var before = JSON.stringify(win.state);
+
+        var file = new win.File(["not json"], "garbage.json", { type: "application/json" });
+        var dataTransfer = new win.DataTransfer();
+        dataTransfer.items.add(file);
+        win.importFileInput.files = dataTransfer.files;
+        win.importFileInput.dispatchEvent(new win.Event("change", { bubbles: true }));
+        await wait(50);
+
+        assertEqual(JSON.stringify(win.state), before);
+        assertTrue(isActive(win.settingsScreen), "an invalid import must not navigate away");
     });
 
     test("releasing the delete-hold button early cancels the deletion", async function () {

@@ -18,12 +18,57 @@ async function openReopenedCategories() {
 }
 
 suite("categories screen: reopened (non-forced) editing", function () {
-    test("reopened screen shows Apply, Back, Revert, and no forced chrome", async function () {
+    test("reopened screen shows Back and no forced chrome, clean so just Done", async function () {
         var win = await openReopenedCategories();
         assertEqual(win.categoriesDoneButton.textContent, "Apply");
         assertNotEqual(win.categoriesBackButton.style.display, "none");
         assertEqual(win.categoriesOnboardingBackButton.style.display, "none");
+        assertEqual(win.categoriesRevertButton.style.display, "none");
+        assertEqual(win.categoriesDoneButton.style.display, "none");
+        assertNotEqual(win.categoriesCloseButton.style.display, "none");
+    });
+
+    test("editing a row swaps Done for Revert + Apply", async function () {
+        var win = await openReopenedCategories();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        setValue(row.querySelector(".category-row-name"), "Changed Name");
+
+        assertEqual(win.categoriesCloseButton.style.display, "none");
         assertNotEqual(win.categoriesRevertButton.style.display, "none");
+        assertNotEqual(win.categoriesDoneButton.style.display, "none");
+    });
+
+    test("editing back to the original values restores the Done button", async function () {
+        var win = await openReopenedCategories();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        var nameInput = row.querySelector(".category-row-name");
+        setValue(nameInput, "Changed Name");
+        setValue(nameInput, "Groceries");
+
+        assertEqual(win.categoriesRevertButton.style.display, "none");
+        assertNotEqual(win.categoriesCloseButton.style.display, "none");
+    });
+
+    test("clicking Done navigates back with no warning", async function () {
+        var win = await openReopenedCategories();
+
+        win.categoriesCloseButton.click();
+
+        assertTrue(isActive(win.mainViewScreen));
+        assertTrue(isHidden(win.categoriesUnsavedModal));
+    });
+
+    test("switching from a dirty reopened screen into forced mode resets Revert and Done", async function () {
+        var win = await openReopenedCategories();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        setValue(row.querySelector(".category-row-name"), "Changed Name");
+        assertNotEqual(win.categoriesRevertButton.style.display, "none");
+
+        win.openCategoriesScreen(true);
+
+        assertEqual(win.categoriesRevertButton.style.display, "none");
+        assertNotEqual(win.categoriesDoneButton.style.display, "none");
+        assertEqual(win.categoriesCloseButton.style.display, "none");
     });
 
     test("existing categories get a visibility toggle, never a delete button", async function () {

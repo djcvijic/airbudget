@@ -101,6 +101,7 @@
                 <button id="categories-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
                 <button id="categories-onboarding-back-button" class="btn btn-secondary-pink" type="button">Back</button>
                 <button id="categories-done-button" class="btn btn-primary" type="button">Apply</button>
+                <button id="categories-close-button" class="btn btn-primary" type="button">Done</button>
             </div>
         </div>
 
@@ -145,8 +146,14 @@
             <div class="screen-actions">
                 <button id="settings-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
                 <button id="settings-apply-button" class="btn btn-primary" type="button">Apply</button>
+                <button id="settings-close-button" class="btn btn-primary" type="button">Done</button>
             </div>
             <div class="settings-danger-zone">
+                <div class="settings-data-actions">
+                    <button id="export-data-button" class="btn btn-secondary" type="button">Export</button>
+                    <button id="import-data-button" class="btn btn-secondary" type="button">Import</button>
+                    <input type="file" id="import-file-input" accept="application/json" />
+                </div>
                 <button id="delete-data-button" class="btn btn-danger" type="button">
                     <i class="fa-solid fa-triangle-exclamation"></i> Delete all my data
                 </button>
@@ -185,19 +192,17 @@
                 </button>
                 <input type="date" id="transaction-datetime-input" class="transaction-date-input" tabindex="-1" />
             </div>
-            <div class="transaction-field-row">
-                <div class="field transaction-category-field">
-                    <label class="field-label" for="transaction-category-select">Category</label>
-                    <select id="transaction-category-select" class="modal-input"></select>
-                </div>
-                <div class="field transaction-amount-field">
-                    <label class="field-label" for="transaction-amount-input">
-                        Amount (<span id="transaction-currency-label"></span>)
-                    </label>
-                    <div class="transaction-amount-row">
-                        <span id="transaction-amount-sign" class="transaction-amount-sign"></span>
-                        <input type="number" step="0.01" min="0" id="transaction-amount-input" class="modal-input" placeholder="0.00" />
-                    </div>
+            <div class="field">
+                <label class="field-label" for="transaction-category-select">Category</label>
+                <select id="transaction-category-select" class="modal-input"></select>
+            </div>
+            <div class="field">
+                <label class="field-label" for="transaction-amount-input">
+                    Amount (<span id="transaction-currency-label"></span>)
+                </label>
+                <div class="transaction-amount-row">
+                    <span id="transaction-amount-sign" class="transaction-amount-sign"></span>
+                    <input type="number" step="0.01" min="0" id="transaction-amount-input" class="modal-input" placeholder="0.00" />
                 </div>
             </div>
             <div class="field">

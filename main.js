@@ -19,6 +19,7 @@ function main() {
     document.getElementById("categories-onboarding-back-button").addEventListener("click", backFromCategories);
     document.getElementById("categories-revert-button").addEventListener("click", revertCategories);
     document.getElementById("categories-done-button").addEventListener("click", applyCategories);
+    document.getElementById("categories-close-button").addEventListener("click", backFromCategories);
     document.getElementById("categories-unsaved-apply-button").addEventListener("click", applyCategories);
     document.getElementById("categories-unsaved-revert-button").addEventListener("click", revertCategories);
 
@@ -74,8 +75,11 @@ function main() {
     });
 
     document.getElementById("settings-apply-button").addEventListener("click", applySettings);
+    document.getElementById("settings-close-button").addEventListener("click", backFromSettings);
     document.getElementById("transaction-apply-button").addEventListener("click", applyTransaction);
 
+    document.getElementById("export-data-button").addEventListener("click", exportData);
+    document.getElementById("import-data-button").addEventListener("click", openImportPicker);
     document.getElementById("delete-data-button").addEventListener("click", openDeleteConfirmModal);
     var deleteConfirmButtonEl = document.getElementById("delete-confirm-button");
     deleteConfirmButtonEl.addEventListener("mousedown", startDeleteHold);
@@ -120,7 +124,10 @@ function main() {
 
 main();
 
-if ("serviceWorker" in navigator) {
+// Skipped on localhost: the service worker is cache-first, so during local
+// dev it would keep serving pre-edit files after every change instead of
+// the fresh ones, unless CACHE_NAME is bumped on every single edit.
+if (location.hostname !== "localhost" && "serviceWorker" in navigator) {
     window.addEventListener("load", function () {
         navigator.serviceWorker.register("sw.js");
     });

@@ -18,7 +18,11 @@ var settingsScreen = document.getElementById("settings-screen");
 var settingsPeriodOptionsEl = document.getElementById("settings-period-options");
 var settingsCurrencySelect = document.getElementById("settings-currency-select");
 var settingsErrorEl = document.getElementById("settings-error");
+var settingsRevertButton = document.getElementById("settings-revert-button");
+var settingsApplyButton = document.getElementById("settings-apply-button");
+var settingsCloseButton = document.getElementById("settings-close-button");
 var settingsUnsavedModal = document.getElementById("settings-unsaved-modal");
+var importFileInput = document.getElementById("import-file-input");
 var deleteDataButton = document.getElementById("delete-data-button");
 var deleteConfirmModal = document.getElementById("delete-confirm-modal");
 var deleteConfirmButton = document.getElementById("delete-confirm-button");
@@ -82,6 +86,8 @@ function buildCurrencyOptions(selectEl) {
 buildPeriodOptions(settingsPeriodOptionsEl);
 buildCurrencyOptions(settingsCurrencySelect);
 
+settingsScreen.addEventListener("change", updateSettingsActionButtons);
+
 function openSettingsScreen() {
     settingsErrorEl.textContent = "";
 
@@ -91,6 +97,7 @@ function openSettingsScreen() {
 
     settingsOriginalPeriod = state.period;
     settingsOriginalCurrency = state.currency;
+    updateSettingsActionButtons();
 
     showScreen(settingsScreen);
 }
@@ -100,6 +107,13 @@ function hasUnsavedSettingsChanges() {
     var selectedPeriod = selectedInput ? selectedInput.value : null;
     return selectedPeriod !== settingsOriginalPeriod
         || settingsCurrencySelect.value !== settingsOriginalCurrency;
+}
+
+function updateSettingsActionButtons() {
+    var dirty = hasUnsavedSettingsChanges();
+    settingsRevertButton.style.display = dirty ? "" : "none";
+    settingsApplyButton.style.display = dirty ? "" : "none";
+    settingsCloseButton.style.display = dirty ? "none" : "";
 }
 
 function resolvePendingSettingsNavigation() {
@@ -178,3 +192,66 @@ function deleteAllData() {
     closeModals();
     boot();
 }
+
+function exportData() {
+    var blob = new Blob([JSON.stringify(state)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = "airbudget-" + formatDateOnly(new Date()) + ".json";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+function openImportPicker() {
+    importFileInput.click();
+}
+
+// Overwrites the whole app state with the picked file's contents, no
+// merge — the file is expected to be a previous export() output.
+function importData() {
+    var file = importFileInput.files[0];
+    importFileInput.value = "";
+    if (!file) {
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function () {
+        var imported;
+        try {
+            imported = JSON.parse(reader.result);
+        } catch (e) {
+            showToast("That file isn't valid JSON");
+            return;
+        }
+
+        if (!imported || !Array.isArray(imported.categories) || !Array.isArray(imported.transactions)) {
+            showToast("That file doesn't look like an airbudget export");
+            return;
+        }
+
+        state = {
+            period: imported.period || null,
+            currency: imported.currency || null,
+            categories: imported.categories,
+            transactions: imported.transactions,
+            detailMode: imported.detailMode || "day"
+        };
+        saveMeta();
+        saveCategories();
+        saveTransactions();
+        periodOffset = 0;
+
+        boot();
+        showToast("Data imported");
+    };
+    reader.onerror = function () {
+        showToast("Couldn't read that file");
+    };
+    reader.readAsText(file);
+}
+
+importFileInput.addEventListener("change", importData);

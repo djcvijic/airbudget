@@ -133,6 +133,7 @@ function openTransactionScreen(categoryId) {
     updateTransactionAmountSign();
 
     showScreen(transactionScreen);
+    transactionAmountInput.focus();
 }
 
 function applyTransaction() {
