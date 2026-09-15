@@ -131,7 +131,7 @@ function renderMainView() {
     periodPrevButton.style.display = findAdjacentPeriodOffset(state.period, periodOffset, -1) === null ? "none" : "";
     periodNextButton.style.display = findAdjacentPeriodOffset(state.period, periodOffset, 1) === null ? "none" : "";
 
-    var entries = getSortedCategorySpends(range.start, range.end);
+    var entries = getSortedCategoryEntries(range.start, range.end);
     renderTotalProgress(entries);
 
     categoryGridEl.innerHTML = "";

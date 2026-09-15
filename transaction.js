@@ -79,29 +79,15 @@ function formatDatetimeLocal(date) {
     return formatDateOnly(date) + "T" + pad2(date.getHours()) + ":" + pad2(date.getMinutes());
 }
 
-// Ranks categories for the picker: most transactions in the current
-// (real, not-viewed) period first, ties broken by all-time transaction
-// count, remaining ties broken alphabetically by name.
+// Ranks categories for the picker by the same frecency score as the
+// dashboard grid and the detail view's category grouping (state.js).
 function sortedTransactionCategories() {
-    var range = getPeriodRange(state.period, 0);
-
-    function countInRange(categoryId) {
-        return getTransactionsInRange(range.start, range.end)
-            .filter(function (t) { return t.categoryId === categoryId; }).length;
-    }
-
-    function countAllTime(categoryId) {
-        return state.transactions.filter(function (t) { return t.categoryId === categoryId; }).length;
-    }
+    var scores = categoryFrecencyScores();
 
     return state.categories.slice().sort(function (a, b) {
-        var currentDiff = countInRange(b.id) - countInRange(a.id);
-        if (currentDiff !== 0) {
-            return currentDiff;
-        }
-        var allTimeDiff = countAllTime(b.id) - countAllTime(a.id);
-        if (allTimeDiff !== 0) {
-            return allTimeDiff;
+        var scoreDiff = (scores[b.id] || 0) - (scores[a.id] || 0);
+        if (scoreDiff !== 0) {
+            return scoreDiff;
         }
         return a.name.localeCompare(b.name);
     });

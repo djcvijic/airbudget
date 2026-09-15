@@ -143,55 +143,24 @@ suite("state.js: getCategorySpend sign convention", function () {
     });
 });
 
-suite("state.js: compareCategoriesBySpend", function () {
-    test("over-max entries always sort first", async function () {
-        var win = await freshApp({ period: "monthly", currency: "USD" });
-        var entries = [
-            { id: "a", overMax: false, spend: 500, max: 100 },
-            { id: "b", overMax: true, spend: 10, max: 5 }
-        ];
-        entries.sort(win.compareCategoriesBySpend);
-        assertEqual(entries[0].id, "b");
-    });
-
-    test("ties on overMax break by spend descending", async function () {
-        var win = await freshApp({ period: "monthly", currency: "USD" });
-        var entries = [
-            { id: "low", overMax: false, spend: 10, max: 100 },
-            { id: "high", overMax: false, spend: 50, max: 100 }
-        ];
-        entries.sort(win.compareCategoriesBySpend);
-        assertEqual(entries[0].id, "high");
-    });
-
-    test("ties on spend break by max descending, missing max treated as 0", async function () {
-        var win = await freshApp({ period: "monthly", currency: "USD" });
-        var entries = [
-            { id: "no-max", overMax: false, spend: 0, max: null },
-            { id: "with-max", overMax: false, spend: 0, max: 50 }
-        ];
-        entries.sort(win.compareCategoriesBySpend);
-        assertEqual(entries[0].id, "with-max");
-    });
-});
-
-suite("state.js: getSortedCategorySpends", function () {
-    test("combines spend calculation and sort order end to end", async function () {
+suite("state.js: getSortedCategoryEntries", function () {
+    test("sorts by frecency, not spend or over-max status", async function () {
         var win = await freshApp({ period: "monthly", currency: "USD" });
         var overBudget = baseCategory({ id: "over", type: "expense", max: 10 });
         var underBudget = baseCategory({ id: "under", type: "expense", max: 100 });
-        win.state.categories = [underBudget, overBudget];
+        win.state.categories = [overBudget, underBudget];
         win.state.transactions = [
             baseTransaction({ categoryId: overBudget.id, amount: 20, datetime: nowDatetime() }),
+            baseTransaction({ categoryId: underBudget.id, amount: 5, datetime: nowDatetime() }),
             baseTransaction({ categoryId: underBudget.id, amount: 5, datetime: nowDatetime() })
         ];
 
         var range = win.getPeriodRange("monthly", 0);
-        var entries = win.getSortedCategorySpends(range.start, range.end);
+        var entries = win.getSortedCategoryEntries(range.start, range.end);
 
-        assertEqual(entries[0].id, "over");
-        assertTrue(entries[0].overMax);
-        assertEqual(entries[1].id, "under");
+        var overEntry = entries.filter(function (e) { return e.id === "over"; })[0];
+        assertTrue(overEntry.overMax, "overMax is still computed, for the tile warning icon");
+        assertEqual(entries[0].id, "under", "two recent transactions outrank one, despite the other category being over max");
     });
 
     test("income never counts as over-max, even past its expected amount", async function () {
@@ -203,7 +172,7 @@ suite("state.js: getSortedCategorySpends", function () {
         ];
 
         var range = win.getPeriodRange("monthly", 0);
-        var entries = win.getSortedCategorySpends(range.start, range.end);
+        var entries = win.getSortedCategoryEntries(range.start, range.end);
 
         assertFalse(entries[0].overMax);
     });
@@ -302,8 +271,8 @@ suite("categories.js: limitToOneGrapheme", function () {
     });
 });
 
-suite("transaction.js: sortedTransactionCategories", function () {
-    test("ranks by current-period usage, then all-time usage, then name", async function () {
+suite("transaction.js: sortedTransactionCategories (frecency)", function () {
+    test("any usage ranks above none, zero-usage ties broken by name", async function () {
         var win = await freshApp({ period: "monthly", currency: "USD" });
         var zebra = baseCategory({ id: "a", name: "Zebra" });
         var apple = baseCategory({ id: "b", name: "Apple" });
@@ -315,9 +284,25 @@ suite("transaction.js: sortedTransactionCategories", function () {
         ];
 
         var sorted = win.sortedTransactionCategories();
-        assertEqual(sorted[0].id, apple.id, "most-used-this-period category ranks first");
+        assertEqual(sorted[0].id, apple.id, "the only category with transactions ranks first");
         assertEqual(sorted[1].id, mango.id, "zero-usage tie broken alphabetically: Mango before Zebra");
         assertEqual(sorted[2].id, zebra.id, "zero-usage tie broken alphabetically: Mango before Zebra");
+    });
+
+    test("a handful of old transactions decay below a single recent one", async function () {
+        var win = await freshApp({ period: "daily", currency: "USD" });
+        var recent = baseCategory({ id: "recent", name: "Recent" });
+        var old = baseCategory({ id: "old", name: "Old" });
+        win.state.categories = [old, recent];
+        win.state.transactions = [
+            baseTransaction({ categoryId: recent.id, amount: 1, datetime: nowDatetime() })
+        ];
+        for (var i = 0; i < 10; i++) {
+            win.state.transactions.push(baseTransaction({ categoryId: old.id, amount: 1, datetime: daysAgoDatetime(10) }));
+        }
+
+        var sorted = win.sortedTransactionCategories();
+        assertEqual(sorted[0].id, recent.id, "one transaction today outweighs ten from 10 half-lives ago (daily period, 1-day half-life)");
     });
 });
 

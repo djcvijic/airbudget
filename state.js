@@ -260,21 +260,27 @@ function getCategorySpend(categoryId, start, end) {
         .reduce(function (sum, t) { return sum + t.amount; }, 0);
 }
 
-// Over-max categories first, then by spend descending, tied broken by max
-// descending (categories with no max sort as if max were 0). Shared by the
-// dashboard grid and the detail view's category-mode grouping so both stay
-// consistent.
-function compareCategoriesBySpend(a, b) {
-    if (a.overMax !== b.overMax) {
-        return a.overMax ? -1 : 1;
-    }
-    if (b.spend !== a.spend) {
-        return b.spend - a.spend;
-    }
-    return (b.max || 0) - (a.max || 0);
+// Frecency: each transaction contributes a weight that halves every
+// half-life (the current period's length), so recent activity dominates
+// but old activity still counts for something rather than a hard cutoff.
+// Shared by the dashboard grid, the detail view's category-mode grouping,
+// and the transaction screen's category picker, so all three rank
+// categories the same way.
+function categoryFrecencyScores() {
+    var range = getPeriodRange(state.period, 0);
+    var halfLifeDays = daysBetween(range.end, range.start);
+    var now = new Date();
+    var scores = {};
+    state.transactions.forEach(function (t) {
+        var ageInDays = Math.max(0, daysBetween(now, new Date(t.datetime)));
+        var weight = Math.pow(2, -ageInDays / halfLifeDays);
+        scores[t.categoryId] = (scores[t.categoryId] || 0) + weight;
+    });
+    return scores;
 }
 
-function getSortedCategorySpends(start, end) {
+function getSortedCategoryEntries(start, end) {
+    var scores = categoryFrecencyScores();
     var entries = state.categories.map(function (cat) {
         var spend = getCategorySpend(cat.id, start, end);
         return {
@@ -288,6 +294,12 @@ function getSortedCategorySpends(start, end) {
             overMax: cat.type === "expense" && cat.max != null && spend > cat.max
         };
     });
-    entries.sort(compareCategoriesBySpend);
+    entries.sort(function (a, b) {
+        var scoreDiff = (scores[b.id] || 0) - (scores[a.id] || 0);
+        if (scoreDiff !== 0) {
+            return scoreDiff;
+        }
+        return a.name.localeCompare(b.name);
+    });
     return entries;
 }

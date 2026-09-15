@@ -156,7 +156,7 @@ function renderByDay(transactions) {
 }
 
 function renderByCategory(start, end) {
-    var entries = getSortedCategorySpends(start, end);
+    var entries = getSortedCategoryEntries(start, end);
 
     entries.forEach(function (entry) {
         var transactions = getTransactionsInRange(start, end)

@@ -34,7 +34,7 @@ suite("detail view", function () {
         assertEqual(yesterdayBalance, "-20.00 USD");
     });
 
-    test("category mode groups by category, sorted by spend, collapsed by default", async function () {
+    test("category mode groups by category, sorted by frecency, collapsed by default", async function () {
         var win = await freshApp(seededForDetail());
         win.document.getElementById("open-detail-button").click();
 
@@ -46,7 +46,7 @@ suite("detail view", function () {
         assertEqual(groups.length, 2);
         assertTrue(groups[0].classList.contains("collapsed"), "category groups start collapsed");
 
-        assertEqual(groups[0].id, "detail-category-cat-groceries", "higher net spend sorts first");
+        assertEqual(groups[0].id, "detail-category-cat-groceries", "two transactions outrank one, more recent overall");
         assertEqual(groups[1].id, "detail-category-cat-salary");
     });
 
