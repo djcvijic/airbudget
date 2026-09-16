@@ -31,7 +31,10 @@
     left: 50%;
     width: 1px;
     height: 1px;
-    opacity: 0;
+    /* iOS Safari refuses to open the native picker on focus/showPicker()
+       for a fully opacity: 0 input, treating it as invisible; 0.01 is
+       visually identical but keeps it "real" enough for the picker. */
+    opacity: 0.01;
     pointer-events: none;
 }
 
