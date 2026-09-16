@@ -12,6 +12,7 @@ function boot() {
 
 function main() {
     document.getElementById("onboarding-continue-button").addEventListener("click", applyOnboarding);
+    document.getElementById("onboarding-import-button").addEventListener("click", openImportPicker);
 
     document.getElementById("add-category-button").addEventListener("click", addCategoryRow);
     document.getElementById("categories-auto-create-button").addEventListener("click", createCategoriesAutomatically);

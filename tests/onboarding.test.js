@@ -80,4 +80,14 @@ suite("onboarding flow", function () {
         assertTrue(win.categoriesErrorEl.textContent.length > 0);
         assertTrue(isActive(win.categoriesScreen));
     });
+
+    test("the import button opens the same file picker as settings", async function () {
+        var win = await freshApp(null);
+        var clicked = false;
+        win.importFileInput.click = function () { clicked = true; };
+
+        win.document.getElementById("onboarding-import-button").click();
+
+        assertTrue(clicked);
+    });
 });

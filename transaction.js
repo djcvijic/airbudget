@@ -53,9 +53,18 @@ function updateTransactionDateDisplay() {
 }
 
 transactionDateDisplayEl.addEventListener("click", function () {
+    var opened = false;
     if (transactionDatetimeInput.showPicker) {
-        transactionDatetimeInput.showPicker();
-    } else {
+        try {
+            transactionDatetimeInput.showPicker();
+            opened = true;
+        } catch (e) {
+            // Some mobile browsers throw here even though showPicker exists
+            // (e.g. treating this hidden proxy input as gesture-ineligible);
+            // fall through to focus() below instead of doing nothing.
+        }
+    }
+    if (!opened) {
         transactionDatetimeInput.focus();
     }
 });
@@ -133,20 +142,7 @@ function openTransactionScreen(categoryId) {
     updateTransactionAmountSign();
 
     showScreen(transactionScreen);
-    if (categoryId) {
-        transactionAmountInput.focus();
-    } else {
-        transactionCategorySelect.focus();
-        if (transactionCategorySelect.showPicker) {
-            try {
-                transactionCategorySelect.showPicker();
-            } catch (e) {
-                // showPicker() requires a user gesture and can throw if the
-                // browser doesn't consider this call to have one; falling
-                // back to just focusing the select is still a fine result.
-            }
-        }
-    }
+    transactionAmountInput.focus();
 }
 
 function applyTransaction() {
