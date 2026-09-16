@@ -97,6 +97,7 @@ function buildCategoryRow(category) {
     maxInput.className = "category-row-max modal-input";
     maxInput.min = "0";
     maxInput.step = "0.01";
+    maxInput.inputMode = "decimal";
     maxInput.value = (category && category.max != null) ? category.max : "";
 
     fields.appendChild(emojiInput);
@@ -196,7 +197,9 @@ function renderCategoryRows() {
 function addCategoryRow() {
     var row = buildCategoryRow(null);
     categoryRowsEl.appendChild(row);
-    row.querySelector(".category-row-emoji").focus();
+    var emojiInput = row.querySelector(".category-row-emoji");
+    emojiInput.focus();
+    emojiInput.select();
 }
 
 // Appends one row per template, alphabetically, after whatever rows are
