@@ -133,7 +133,20 @@ function openTransactionScreen(categoryId) {
     updateTransactionAmountSign();
 
     showScreen(transactionScreen);
-    transactionAmountInput.focus();
+    if (categoryId) {
+        transactionAmountInput.focus();
+    } else {
+        transactionCategorySelect.focus();
+        if (transactionCategorySelect.showPicker) {
+            try {
+                transactionCategorySelect.showPicker();
+            } catch (e) {
+                // showPicker() requires a user gesture and can throw if the
+                // browser doesn't consider this call to have one; falling
+                // back to just focusing the select is still a fine result.
+            }
+        }
+    }
 }
 
 function applyTransaction() {

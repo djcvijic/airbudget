@@ -20,20 +20,22 @@ function tileAddZone(win, categoryId) {
 }
 
 suite("transaction screen", function () {
-    test("opening via a tile presets that category", async function () {
+    test("opening via a tile presets that category and focuses the amount", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();
 
         assertTrue(isActive(win.transactionScreen));
         assertEqual(win.transactionCategorySelect.value, "cat-groceries");
+        assertEqual(win.document.activeElement.id, win.transactionAmountInput.id);
     });
 
-    test("opening via the top-bar button has no preset category", async function () {
+    test("opening via the top-bar button has no preset category and focuses the category select", async function () {
         var win = await freshApp(seededForTransactions());
         win.document.getElementById("open-transaction-button").click();
 
         assertTrue(isActive(win.transactionScreen));
         assertEqual(win.transactionCategorySelect.value, "");
+        assertEqual(win.document.activeElement.id, win.transactionCategorySelect.id);
     });
 
     test("expense category shows a minus sign, income shows a plus sign", async function () {
