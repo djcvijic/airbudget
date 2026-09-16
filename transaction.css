@@ -25,17 +25,19 @@
     font-size: 12px;
 }
 
+/* Covers the whole field and takes real taps directly, rather than sitting
+   off-screen and being opened via focus()/showPicker() from the visible
+   button's click handler. iOS Safari's native picker is unreliable when
+   triggered that way (showPicker() has a known WebKit bug, and a focus()
+   call on an element the user never actually touched isn't guaranteed to
+   count) but reliably opens on a real, direct tap on the real control. */
 .transaction-date-input {
     position: absolute;
-    top: 0;
-    left: 50%;
-    width: 1px;
-    height: 1px;
-    /* iOS Safari refuses to open the native picker on focus/showPicker()
-       for a fully opacity: 0 input, treating it as invisible; 0.01 is
-       visually identical but keeps it "real" enough for the picker. */
+    inset: 0;
+    width: 100%;
+    height: 100%;
     opacity: 0.01;
-    pointer-events: none;
+    cursor: pointer;
 }
 
 .transaction-amount-row {
