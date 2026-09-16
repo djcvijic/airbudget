@@ -212,6 +212,16 @@ button {
     background-color: #fbe6ec;
 }
 
+.btn-danger {
+    background-color: #333;
+    color: white;
+    border: 2px dashed #111;
+}
+
+.btn-danger:hover {
+    background-color: #111;
+}
+
 .btn-text {
     background: none;
     border: none;
@@ -404,6 +414,10 @@ button {
     .btn {
         padding: 14px 28px;
         font-size: 18px;
+    }
+
+    .back-button {
+        padding: 14px 14px;
     }
 
     #to-top {

@@ -91,4 +91,16 @@ suite("detail view", function () {
 
         assertTrue(isActive(win.mainViewScreen));
     });
+
+    test("clicking a transaction row opens it for editing", async function () {
+        var win = await freshApp(seededForDetail());
+        win.document.getElementById("open-detail-button").click();
+
+        var row = win.detailListEl.querySelector(".detail-transaction");
+        row.click();
+
+        assertTrue(isActive(win.transactionScreen));
+        assertEqual(win.transactionApplyButton.textContent, "Save");
+        assertNotEqual(win.transactionDeleteButton.style.display, "none");
+    });
 });

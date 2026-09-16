@@ -78,6 +78,8 @@ function main() {
     document.getElementById("settings-apply-button").addEventListener("click", applySettings);
     document.getElementById("settings-close-button").addEventListener("click", backFromSettings);
     document.getElementById("transaction-apply-button").addEventListener("click", applyTransaction);
+    document.getElementById("transaction-delete-button").addEventListener("click", openTransactionDeleteConfirmModal);
+    document.getElementById("transaction-delete-confirm-button").addEventListener("click", deleteCurrentTransaction);
 
     document.getElementById("export-data-button").addEventListener("click", exportData);
     document.getElementById("import-data-button").addEventListener("click", openImportPicker);

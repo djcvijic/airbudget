@@ -83,7 +83,7 @@
 
         <div id="categories-screen" class="screen">
             <div class="screen-header">
-                <button id="categories-back-button" class="btn btn-text" type="button">
+                <button id="categories-back-button" class="btn btn-text back-button" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
                 <div id="categories-title" class="screen-title">Categories</div>
@@ -132,7 +132,7 @@
 
         <div id="settings-screen" class="screen">
             <div class="screen-header">
-                <button id="settings-back-button" class="btn btn-text" type="button">
+                <button id="settings-back-button" class="btn btn-text back-button" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
                 <div class="screen-title">Settings</div>
@@ -165,7 +165,7 @@
 
         <div id="detail-screen" class="screen">
             <div class="screen-header">
-                <button id="detail-back-button" class="btn btn-text" type="button">
+                <button id="detail-back-button" class="btn btn-text back-button" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
                 <div id="detail-period-label" class="screen-title"></div>
@@ -183,7 +183,7 @@
 
         <div id="transaction-screen" class="screen">
             <div class="screen-header">
-                <button id="transaction-back-button" class="btn btn-text" type="button">
+                <button id="transaction-back-button" class="btn btn-text back-button" type="button">
                     <i class="fa-solid fa-angle-left"></i>Back
                 </button>
                 <div id="transaction-period-label" class="screen-title"></div>
@@ -215,7 +215,10 @@
             <p id="transaction-error" class="modal-error"></p>
             <div class="screen-actions">
                 <button id="transaction-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
-                <button id="transaction-apply-button" class="btn btn-primary" type="button">Add</button>
+                <button id="transaction-apply-button" class="btn btn-primary" type="button">Save</button>
+                <button id="transaction-delete-button" class="btn btn-danger" type="button">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
             </div>
         </div>
     </div>
@@ -252,10 +255,19 @@
                 This permanently erases your categories, transactions, and settings. This cannot be undone.
             </div>
             <div class="modal-actions">
-                <button id="delete-confirm-button" class="btn delete-confirm-button" type="button">
+                <button id="delete-confirm-button" class="btn btn-danger delete-confirm-button" type="button">
                     <span class="delete-confirm-fill"></span>
                     <span class="delete-confirm-label">Hold to delete</span>
                 </button>
+            </div>
+        </div>
+
+        <div id="transaction-delete-confirm-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Delete this transaction?</div>
+            <div class="modal-description">This cannot be undone.</div>
+            <div class="modal-actions">
+                <button id="transaction-delete-confirm-button" class="btn btn-danger" type="button">Delete</button>
             </div>
         </div>
 

@@ -152,4 +152,84 @@ suite("transaction screen", function () {
         assertFalse(isActive(win.transactionScreen));
         assertTrue(win.toastEl.classList.contains("visible"));
     });
+
+    test("editing an existing transaction prefills the form with Save and Delete shown", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42, comment: "existing" })]
+        }));
+
+        win.openEditTransactionScreen("txn-1");
+
+        assertTrue(isActive(win.transactionScreen));
+        assertEqual(win.transactionCategorySelect.value, "cat-groceries");
+        assertEqual(win.transactionAmountInput.value, "42");
+        assertEqual(win.transactionCommentInput.value, "existing");
+        assertEqual(win.transactionApplyButton.textContent, "Save");
+        assertNotEqual(win.transactionDeleteButton.style.display, "none");
+    });
+
+    test("saving an edit updates the transaction in place and returns to the detail view", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        }));
+        win.openEditTransactionScreen("txn-1");
+
+        setValue(win.transactionAmountInput, "99");
+        win.document.getElementById("transaction-apply-button").click();
+
+        assertEqual(win.state.transactions.length, 1);
+        assertEqual(win.state.transactions[0].id, "txn-1");
+        assertClose(win.state.transactions[0].amount, 99);
+        assertTrue(isActive(win.detailScreen), "editing from the detail view returns there, not the dashboard");
+    });
+
+    test("canceling an edit discards changes and returns to the detail view", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        }));
+        win.openEditTransactionScreen("txn-1");
+
+        setValue(win.transactionAmountInput, "999");
+        win.document.getElementById("transaction-cancel-button").click();
+
+        assertTrue(isActive(win.detailScreen));
+        assertClose(win.state.transactions[0].amount, 42);
+    });
+
+    test("deleting a transaction requires confirmation, then removes it and returns to the detail view", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        }));
+        win.openEditTransactionScreen("txn-1");
+
+        win.transactionDeleteButton.click();
+        assertFalse(isHidden(win.transactionDeleteConfirmModal));
+        assertEqual(win.state.transactions.length, 1, "nothing is deleted until confirmed");
+
+        win.document.getElementById("transaction-delete-confirm-button").click();
+
+        assertEqual(win.state.transactions.length, 0);
+        assertTrue(isHidden(win.transactionDeleteConfirmModal));
+        assertTrue(isActive(win.detailScreen));
+    });
+
+    test("opening add mode after editing a transaction doesn't leak edit state onto the new save", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        }));
+        win.openEditTransactionScreen("txn-1");
+
+        win.openTransactionScreen("cat-salary");
+
+        assertEqual(win.transactionDeleteButton.style.display, "none");
+        assertEqual(win.transactionCategorySelect.value, "cat-salary");
+
+        setValue(win.transactionAmountInput, "500");
+        win.document.getElementById("transaction-apply-button").click();
+
+        assertEqual(win.state.transactions.length, 2, "the original transaction stays and a new one is added");
+        assertEqual(win.state.transactions[0].id, "txn-1");
+        assertClose(win.state.transactions[0].amount, 42, "the earlier edit session must not leak into this save");
+        assertTrue(isActive(win.mainViewScreen), "the add flow returns to the dashboard, not the detail view");
+    });
 });

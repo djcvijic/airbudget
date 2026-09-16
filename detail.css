@@ -106,8 +106,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 0;
+    width: 100%;
+    background: none;
+    border: none;
     border-bottom: 1px solid #eee;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    padding: 10px 0;
 }
 
 .detail-transaction-content {

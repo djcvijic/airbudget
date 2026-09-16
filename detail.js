@@ -54,10 +54,14 @@ function buildTransactionRow(t) {
         content.appendChild(commentEl);
     }
 
-    var row = document.createElement("div");
+    var row = document.createElement("button");
+    row.type = "button";
     row.className = "detail-transaction";
     row.appendChild(emojiEl);
     row.appendChild(content);
+    row.addEventListener("click", function () {
+        openEditTransactionScreen(t.id);
+    });
 
     return row;
 }

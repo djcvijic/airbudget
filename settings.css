@@ -43,21 +43,9 @@
     text-align: right;
 }
 
-.btn-danger {
-    background-color: #333;
-    color: white;
-    border: 2px dashed #111;
-}
-
-.btn-danger:hover {
-    background-color: #111;
-}
-
 .delete-confirm-button {
     position: relative;
     overflow: hidden;
-    background-color: #CD2553;
-    color: white;
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;

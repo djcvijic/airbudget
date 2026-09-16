@@ -1,7 +1,8 @@
-// New-transaction screen, opened from a dashboard tile click (main-view.js)
-// or the top bar's new-transaction button (main.js), the latter with no
-// categoryId so the select just falls back to its first option. The user
-// always enters an unsigned amount, stored as-is — a transaction is an
+// Add/edit transaction screen. Adding is opened from a dashboard tile click
+// (main-view.js) or the top bar's new-transaction button (main.js), the
+// latter with no categoryId so the select just falls back to its first
+// option; editing is opened from a detail-view row click (detail.js). The
+// user always enters an unsigned amount, stored as-is — a transaction is an
 // expense or income purely based on its category's type, shown live via
 // the +/- indicator next to the input, never by negating the amount.
 // Unlike settings/categories, leaving this screen never warns about
@@ -24,9 +25,19 @@ var transactionAmountSignEl = document.getElementById("transaction-amount-sign")
 var transactionCommentInput = document.getElementById("transaction-comment-input");
 var transactionCurrencyLabel = document.getElementById("transaction-currency-label");
 var transactionErrorEl = document.getElementById("transaction-error");
+var transactionApplyButton = document.getElementById("transaction-apply-button");
+var transactionDeleteButton = document.getElementById("transaction-delete-button");
+var transactionDeleteConfirmModal = document.getElementById("transaction-delete-confirm-modal");
 
 var transactionTimeOfDay = null;
 var transactionSelectedDate = null;
+
+// Set by whichever entry point opened the screen, so Apply/Cancel/Delete
+// all land back wherever the user actually came from: the dashboard for a
+// new transaction, or the detail view when editing one opened from there.
+var transactionReturnTo = null;
+
+var editingTransactionId = null;
 
 function updateTransactionAmountSign() {
     var category = getCategoryById(transactionCategorySelect.value);
@@ -125,24 +136,51 @@ function buildTransactionCategoryOptions(currentCategoryId) {
     });
 }
 
-function openTransactionScreen(categoryId) {
+function populateTransactionForm(categoryId, dateOnly, timeOfDay, amount, comment) {
     transactionErrorEl.textContent = "";
     var range = getPeriodRange(state.period, periodOffset);
     transactionPeriodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     buildTransactionCategoryOptions(categoryId);
     transactionCategorySelect.value = categoryId || "";
-    var now = new Date();
-    transactionTimeOfDay = { hours: now.getHours(), minutes: now.getMinutes() };
-    transactionSelectedDate = formatDateOnly(now);
-    transactionDatetimeInput.value = transactionSelectedDate;
+    transactionTimeOfDay = timeOfDay;
+    transactionSelectedDate = dateOnly;
+    transactionDatetimeInput.value = dateOnly;
     updateTransactionDateDisplay();
-    transactionAmountInput.value = "";
-    transactionCommentInput.value = "";
+    transactionAmountInput.value = amount;
+    transactionCommentInput.value = comment;
     transactionCurrencyLabel.textContent = state.currency;
     updateTransactionAmountSign();
 
     showScreen(transactionScreen);
     transactionAmountInput.focus();
+}
+
+function openTransactionScreen(categoryId) {
+    editingTransactionId = null;
+    transactionReturnTo = goToMainView;
+    transactionDeleteButton.style.display = "none";
+
+    var now = new Date();
+    populateTransactionForm(categoryId, formatDateOnly(now), { hours: now.getHours(), minutes: now.getMinutes() }, "", "");
+}
+
+// Opened by clicking a transaction row in the detail view (detail.js).
+// Keeps the transaction's original time of day rather than resetting it to
+// now, since only the user's edits (category/date/amount/comment) should
+// change what gets saved.
+function openEditTransactionScreen(transactionId) {
+    var t = state.transactions.filter(function (x) { return x.id === transactionId; })[0];
+    if (!t) {
+        return;
+    }
+
+    editingTransactionId = transactionId;
+    transactionReturnTo = openDetailView;
+    transactionDeleteButton.style.display = "";
+
+    var datetime = new Date(t.datetime);
+    var timeOfDay = { hours: datetime.getHours(), minutes: datetime.getMinutes() };
+    populateTransactionForm(t.categoryId, formatDateOnly(datetime), timeOfDay, t.amount, t.comment || "");
 }
 
 function applyTransaction() {
@@ -158,18 +196,38 @@ function applyTransaction() {
 
     var datetime = dateOnly + "T" + pad2(transactionTimeOfDay.hours) + ":" + pad2(transactionTimeOfDay.minutes);
 
-    state.transactions.push({
-        id: generateId("txn"),
-        datetime: datetime,
-        categoryId: categoryId,
-        amount: amount,
-        comment: comment
-    });
+    if (editingTransactionId) {
+        var existing = state.transactions.filter(function (t) { return t.id === editingTransactionId; })[0];
+        existing.datetime = datetime;
+        existing.categoryId = categoryId;
+        existing.amount = amount;
+        existing.comment = comment;
+    } else {
+        state.transactions.push({
+            id: generateId("txn"),
+            datetime: datetime,
+            categoryId: categoryId,
+            amount: amount,
+            comment: comment
+        });
+    }
     saveTransactions();
 
-    goToMainView();
+    transactionReturnTo();
+}
+
+function openTransactionDeleteConfirmModal() {
+    openModal(transactionDeleteConfirmModal);
+}
+
+function deleteCurrentTransaction() {
+    state.transactions = state.transactions.filter(function (t) { return t.id !== editingTransactionId; });
+    saveTransactions();
+
+    closeModals();
+    transactionReturnTo();
 }
 
 function cancelTransaction() {
-    goToMainView();
+    transactionReturnTo();
 }
