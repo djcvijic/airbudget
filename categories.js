@@ -85,6 +85,9 @@ function buildCategoryRow(category) {
     emojiInput.addEventListener("input", function () {
         emojiInput.value = limitToOneGrapheme(emojiInput.value);
     });
+    emojiInput.addEventListener("focus", function () {
+        emojiInput.select();
+    });
 
     var nameInput = document.createElement("input");
     nameInput.type = "text";
@@ -197,9 +200,7 @@ function renderCategoryRows() {
 function addCategoryRow() {
     var row = buildCategoryRow(null);
     categoryRowsEl.appendChild(row);
-    var emojiInput = row.querySelector(".category-row-emoji");
-    emojiInput.focus();
-    emojiInput.select();
+    row.querySelector(".category-row-emoji").focus();
 }
 
 // Appends one row per template, alphabetically, after whatever rows are
