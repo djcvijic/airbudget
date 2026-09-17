@@ -366,7 +366,9 @@ function applyCategories() {
     }
 
     state.categories = updated;
-    saveCategories();
+    if (saveCategories()) {
+        showToast("Categories saved");
+    }
     categoriesForced = false;
     categoriesDraft = null;
 

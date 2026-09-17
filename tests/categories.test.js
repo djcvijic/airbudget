@@ -58,6 +58,31 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertTrue(isHidden(win.categoriesUnsavedModal));
     });
 
+    test("applying a change shows a confirmation toast", async function () {
+        var win = await openReopenedCategories();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        setValue(row.querySelector(".category-row-name"), "Renamed");
+
+        win.categoriesDoneButton.click();
+
+        assertEqual(win.toastEl.textContent, "Categories saved");
+    });
+
+    test("a storage failure while applying shows an error instead of a false success", async function () {
+        var win = await openReopenedCategories();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        setValue(row.querySelector(".category-row-name"), "Renamed");
+
+        var originalSetItem = win.localStorage.setItem;
+        win.localStorage.setItem = function () { throw new Error("quota"); };
+
+        win.categoriesDoneButton.click();
+
+        win.localStorage.setItem = originalSetItem;
+
+        assertEqual(win.toastEl.textContent, "Couldn't save — storage is full");
+    });
+
     test("switching from a dirty reopened screen into forced mode resets Revert and Done", async function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');

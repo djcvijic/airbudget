@@ -183,5 +183,49 @@ suite("settings screen", function () {
         assertEqual(win.state.categories.length, 0);
         assertEqual(win.state.period, null);
         assertTrue(isActive(win.onboardingScreen), "boot() re-runs onboarding once data is gone");
+        assertEqual(win.toastEl.textContent, "All data deleted");
+    });
+
+    test("a storage failure during delete-all shows an error and leaves the data intact", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        win.document.getElementById("delete-data-button").click();
+
+        var originalRemoveItem = win.localStorage.removeItem;
+        win.localStorage.removeItem = function () { throw new Error("blocked"); };
+
+        win.deleteConfirmButton.dispatchEvent(new MouseEvent("mousedown"));
+        await wait(win.DELETE_HOLD_MS + 200);
+
+        win.localStorage.removeItem = originalRemoveItem;
+
+        assertEqual(win.state.categories.length, 1, "data must survive a failed deletion");
+        assertFalse(isActive(win.onboardingScreen), "boot() must not run when deletion failed");
+        assertEqual(win.toastEl.textContent, "Couldn't delete — try again");
+    });
+
+    test("applying settings shows a confirmation toast", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        setValue(win.settingsCurrencySelect, "EUR");
+
+        win.document.getElementById("settings-apply-button").click();
+
+        assertEqual(win.toastEl.textContent, "Settings saved");
+    });
+
+    test("a storage failure while applying settings shows an error instead of a false success", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        setValue(win.settingsCurrencySelect, "EUR");
+
+        var originalSetItem = win.localStorage.setItem;
+        win.localStorage.setItem = function () { throw new Error("quota"); };
+
+        win.document.getElementById("settings-apply-button").click();
+
+        win.localStorage.setItem = originalSetItem;
+
+        assertEqual(win.toastEl.textContent, "Couldn't save — storage is full");
     });
 });

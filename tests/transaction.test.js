@@ -102,6 +102,22 @@ suite("transaction screen", function () {
         var tile = win.categoryGridEl.querySelector('.category-tile[data-id="cat-groceries"]');
         var amountText = tile.querySelector(".category-tile-amount-value").textContent;
         assertEqual(amountText, "-42.50");
+        assertEqual(win.toastEl.textContent, "Transaction added");
+    });
+
+    test("a storage failure while adding a transaction shows an error instead of a false success", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        setValue(win.transactionAmountInput, "42.5");
+
+        var originalSetItem = win.localStorage.setItem;
+        win.localStorage.setItem = function () { throw new Error("quota"); };
+
+        win.document.getElementById("transaction-apply-button").click();
+
+        win.localStorage.setItem = originalSetItem;
+
+        assertEqual(win.toastEl.textContent, "Couldn't save — storage is full");
     });
 
     test("an income transaction is stored unsigned but shown as a credit", async function () {
@@ -181,6 +197,24 @@ suite("transaction screen", function () {
         assertEqual(win.state.transactions[0].id, "txn-1");
         assertClose(win.state.transactions[0].amount, 99);
         assertTrue(isActive(win.detailScreen), "editing from the detail view returns there, not the dashboard");
+        assertEqual(win.toastEl.textContent, "Transaction updated");
+    });
+
+    test("a storage failure while saving an edit shows an error instead of a false success", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        }));
+        win.openEditTransactionScreen("txn-1");
+        setValue(win.transactionAmountInput, "99");
+
+        var originalSetItem = win.localStorage.setItem;
+        win.localStorage.setItem = function () { throw new Error("quota"); };
+
+        win.document.getElementById("transaction-apply-button").click();
+
+        win.localStorage.setItem = originalSetItem;
+
+        assertEqual(win.toastEl.textContent, "Couldn't save — storage is full");
     });
 
     test("canceling an edit discards changes and returns to the detail view", async function () {
@@ -211,6 +245,25 @@ suite("transaction screen", function () {
         assertEqual(win.state.transactions.length, 0);
         assertTrue(isHidden(win.transactionDeleteConfirmModal));
         assertTrue(isActive(win.detailScreen));
+        assertEqual(win.toastEl.textContent, "Transaction deleted");
+    });
+
+    test("a storage failure while deleting a transaction shows an error instead of a false success", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        }));
+        win.openEditTransactionScreen("txn-1");
+        win.transactionDeleteButton.click();
+
+        var originalSetItem = win.localStorage.setItem;
+        win.localStorage.setItem = function () { throw new Error("quota"); };
+
+        win.document.getElementById("transaction-delete-confirm-button").click();
+
+        win.localStorage.setItem = originalSetItem;
+
+        assertEqual(win.toastEl.textContent, "Couldn't save — storage is full");
+        assertEqual(win.state.transactions.length, 0, "the in-memory delete still happens even though persisting it failed");
     });
 
     test("opening add mode after editing a transaction doesn't leak edit state onto the new save", async function () {

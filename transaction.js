@@ -211,7 +211,9 @@ function applyTransaction() {
             comment: comment
         });
     }
-    saveTransactions();
+    if (saveTransactions()) {
+        showToast(editingTransactionId ? "Transaction updated" : "Transaction added");
+    }
 
     transactionReturnTo();
 }
@@ -222,7 +224,9 @@ function openTransactionDeleteConfirmModal() {
 
 function deleteCurrentTransaction() {
     state.transactions = state.transactions.filter(function (t) { return t.id !== editingTransactionId; });
-    saveTransactions();
+    if (saveTransactions()) {
+        showToast("Transaction deleted");
+    }
 
     closeModals();
     transactionReturnTo();

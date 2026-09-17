@@ -131,7 +131,9 @@ function applySettings() {
 
     state.period = selectedInput.value;
     state.currency = settingsCurrencySelect.value;
-    saveMeta();
+    if (saveMeta()) {
+        showToast("Settings saved");
+    }
 
     closeModals();
     resolvePendingSettingsNavigation();
@@ -183,11 +185,18 @@ function cancelDeleteHold() {
 }
 
 function deleteAllData() {
-    localStorage.removeItem(META_KEY);
-    localStorage.removeItem(CATEGORIES_KEY);
-    localStorage.removeItem(TRANSACTIONS_KEY);
+    try {
+        localStorage.removeItem(META_KEY);
+        localStorage.removeItem(CATEGORIES_KEY);
+        localStorage.removeItem(TRANSACTIONS_KEY);
+    } catch (e) {
+        showToast("Couldn't delete — try again");
+        return;
+    }
+
     state = defaultState();
     periodOffset = 0;
+    showToast("All data deleted");
 
     closeModals();
     boot();

@@ -39,21 +39,23 @@ function loadState() {
 function persist(key, value) {
     try {
         localStorage.setItem(key, JSON.stringify(value));
+        return true;
     } catch (e) {
         showToast("Couldn't save — storage is full");
+        return false;
     }
 }
 
 function saveMeta() {
-    persist(META_KEY, { period: state.period, currency: state.currency, detailMode: state.detailMode });
+    return persist(META_KEY, { period: state.period, currency: state.currency, detailMode: state.detailMode });
 }
 
 function saveCategories() {
-    persist(CATEGORIES_KEY, state.categories);
+    return persist(CATEGORIES_KEY, state.categories);
 }
 
 function saveTransactions() {
-    persist(TRANSACTIONS_KEY, state.transactions);
+    return persist(TRANSACTIONS_KEY, state.transactions);
 }
 
 var state = loadState();

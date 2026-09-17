@@ -110,5 +110,5 @@ function fillRandomDebugData() {
     periodOffset = 0;
     closeModals();
     boot();
-    showToast("Loaded random debug data");
+    showToast("Debug data loaded");
 }
