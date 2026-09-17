@@ -1,3 +1,34 @@
+/* flex+gap instead of theme.css's per-button margin, which double-counts
+   the gap between adjacent buttons (each side's margin stacking with its
+   neighbor's) and was just barely wide enough to wrap Save onto its own
+   line at mobile widths once Delete became a 3rd button in this row. */
+#transaction-screen .screen-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+#transaction-screen .screen-actions .btn {
+    margin: 0;
+}
+
+.transaction-delete-icon {
+    display: inline-block;
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 22px;
+    padding: 14px 18px;
+    cursor: pointer;
+}
+
+.transaction-delete-icon:hover {
+    color: #0099ff;
+}
+
 .transaction-date-field {
     position: relative;
     text-align: center;
@@ -46,10 +77,15 @@
     gap: 8px;
 }
 
-.transaction-amount-row .modal-input {
+.transaction-amount-display {
     flex: 1;
-    width: auto;
     min-width: 0;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.transaction-amount-display-empty {
+    color: #999;
 }
 
 .transaction-amount-sign {
@@ -57,4 +93,38 @@
     text-align: center;
     font-weight: bold;
     font-size: 20px;
+}
+
+.transaction-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 20px;
+}
+
+.transaction-numpad-button {
+    background: none;
+    border: 2px solid #0099ff;
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: bold;
+    color: inherit;
+    padding: 4px;
+    cursor: pointer;
+}
+
+/* No gap between cells, so adjacent borders would otherwise stack into a
+   double-thick line; pulling each button over its earlier neighbor by
+   exactly the border width overlaps the two into one, matching the
+   grid's outer edge everywhere. */
+.transaction-numpad-button:not(:nth-child(3n+1)) {
+    margin-left: -2px;
+}
+
+.transaction-numpad-button:nth-child(n+4) {
+    margin-top: -2px;
+}
+
+.transaction-numpad-button:hover {
+    background-color: #f5f5f5;
 }

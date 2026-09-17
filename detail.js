@@ -164,8 +164,7 @@ function renderByCategory(start, end) {
 
     entries.forEach(function (entry) {
         var transactions = getTransactionsInRange(start, end)
-            .filter(function (t) { return t.categoryId === entry.id; })
-            .sort(function (a, b) { return b.amount - a.amount; });
+            .filter(function (t) { return t.categoryId === entry.id; });
 
         if (transactions.length === 0) {
             return;

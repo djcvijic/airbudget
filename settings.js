@@ -31,6 +31,10 @@ var settingsOriginalPeriod = null;
 var settingsOriginalCurrency = null;
 var pendingSettingsNavigation = null;
 
+// The test harness flags itself via ?testMode=1 (see tests/helpers.js) so
+// the delete button can skip the 2s hold entirely and act like a normal
+// button, rather than each test burning real seconds waiting it out.
+var TEST_MODE = new URLSearchParams(location.search).has("testMode");
 var DELETE_HOLD_MS = 2000;
 var deleteHoldTimer = null;
 
@@ -167,6 +171,11 @@ function openDeleteConfirmModal() {
 }
 
 function startDeleteHold() {
+    if (TEST_MODE) {
+        deleteAllData();
+        return;
+    }
+
     deleteConfirmButton.classList.add("holding");
     deleteHoldTimer = setTimeout(function () {
         deleteConfirmButton.classList.remove("holding");

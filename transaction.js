@@ -20,10 +20,10 @@ var transactionDateDisplayEl = document.getElementById("transaction-date-display
 var transactionDateTextEl = document.getElementById("transaction-date-text");
 var transactionDatetimeInput = document.getElementById("transaction-datetime-input");
 var transactionCategorySelect = document.getElementById("transaction-category-select");
-var transactionAmountInput = document.getElementById("transaction-amount-input");
+var transactionAmountDisplayEl = document.getElementById("transaction-amount-display");
 var transactionAmountSignEl = document.getElementById("transaction-amount-sign");
+var transactionNumpadEl = document.getElementById("transaction-numpad");
 var transactionCommentInput = document.getElementById("transaction-comment-input");
-var transactionCurrencyLabel = document.getElementById("transaction-currency-label");
 var transactionErrorEl = document.getElementById("transaction-error");
 var transactionApplyButton = document.getElementById("transaction-apply-button");
 var transactionDeleteButton = document.getElementById("transaction-delete-button");
@@ -31,6 +31,37 @@ var transactionDeleteConfirmModal = document.getElementById("transaction-delete-
 
 var transactionTimeOfDay = null;
 var transactionSelectedDate = null;
+
+// Built up one numpad tap at a time (digits, at most one ".", backspace);
+// parsed to a number only when the form is actually applied. There's no
+// minus-sign button, so a negative value can never be entered in the first
+// place — applyTransaction() doesn't need to guard against one.
+var transactionAmountValue = "";
+
+function updateTransactionAmountDisplay() {
+    transactionAmountDisplayEl.textContent = (transactionAmountValue || "0.00") + " " + state.currency;
+    transactionAmountDisplayEl.classList.toggle("transaction-amount-display-empty", transactionAmountValue === "");
+}
+
+transactionNumpadEl.addEventListener("click", function (e) {
+    var button = e.target.closest(".transaction-numpad-button");
+    if (!button) {
+        return;
+    }
+
+    var value = button.dataset.value;
+    var decimalIndex = transactionAmountValue.indexOf(".");
+    if (value === "backspace") {
+        transactionAmountValue = transactionAmountValue.slice(0, -1);
+    } else if (value === "." && decimalIndex !== -1) {
+        return;
+    } else if (value !== "." && decimalIndex !== -1 && transactionAmountValue.length - decimalIndex > 2) {
+        return;
+    } else {
+        transactionAmountValue += value;
+    }
+    updateTransactionAmountDisplay();
+});
 
 // Set by whichever entry point opened the screen, so Apply/Cancel/Delete
 // all land back wherever the user actually came from: the dashboard for a
@@ -121,7 +152,7 @@ function buildTransactionCategoryOptions(currentCategoryId) {
 
     var placeholder = document.createElement("option");
     placeholder.value = "";
-    placeholder.textContent = "Select";
+    placeholder.textContent = "Category";
     placeholder.disabled = true;
     transactionCategorySelect.appendChild(placeholder);
 
@@ -146,13 +177,12 @@ function populateTransactionForm(categoryId, dateOnly, timeOfDay, amount, commen
     transactionSelectedDate = dateOnly;
     transactionDatetimeInput.value = dateOnly;
     updateTransactionDateDisplay();
-    transactionAmountInput.value = amount;
+    transactionAmountValue = amount === "" ? "" : String(amount);
+    updateTransactionAmountDisplay();
     transactionCommentInput.value = comment;
-    transactionCurrencyLabel.textContent = state.currency;
     updateTransactionAmountSign();
 
     showScreen(transactionScreen);
-    transactionAmountInput.focus();
 }
 
 function openTransactionScreen(categoryId) {
@@ -186,10 +216,10 @@ function openEditTransactionScreen(transactionId) {
 function applyTransaction() {
     var dateOnly = transactionDatetimeInput.value;
     var categoryId = transactionCategorySelect.value;
-    var amount = parseFloat(transactionAmountInput.value);
+    var amount = parseFloat(transactionAmountValue);
     var comment = transactionCommentInput.value.trim();
 
-    if (!dateOnly || !categoryId || isNaN(amount) || !isFinite(amount) || amount < 0) {
+    if (!dateOnly || !categoryId || isNaN(amount) || !isFinite(amount)) {
         transactionErrorEl.textContent = "A date, category, and a positive numeric amount are required.";
         return;
     }

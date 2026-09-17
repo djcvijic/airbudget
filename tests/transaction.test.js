@@ -20,22 +20,22 @@ function tileAddZone(win, categoryId) {
 }
 
 suite("transaction screen", function () {
-    test("opening via a tile presets that category and focuses the amount", async function () {
+    test("opening via a tile presets that category and starts the amount empty", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();
 
         assertTrue(isActive(win.transactionScreen));
         assertEqual(win.transactionCategorySelect.value, "cat-groceries");
-        assertEqual(win.document.activeElement.id, win.transactionAmountInput.id);
+        assertEqual(win.transactionAmountDisplayEl.textContent, "0.00 USD");
+        assertTrue(win.transactionAmountDisplayEl.classList.contains("transaction-amount-display-empty"));
     });
 
-    test("opening via the top-bar button has no preset category but still focuses the amount", async function () {
+    test("opening via the top-bar button has no preset category", async function () {
         var win = await freshApp(seededForTransactions());
         win.document.getElementById("open-transaction-button").click();
 
         assertTrue(isActive(win.transactionScreen));
         assertEqual(win.transactionCategorySelect.value, "");
-        assertEqual(win.document.activeElement.id, win.transactionAmountInput.id);
     });
 
     test("a throwing showPicker still falls back to focusing the date input", async function () {
@@ -74,21 +74,38 @@ suite("transaction screen", function () {
         assertTrue(isActive(win.transactionScreen));
     });
 
-    test("a negative amount is rejected", async function () {
+    test("the numpad ignores a second decimal point", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();
-        setValue(win.transactionAmountInput, "-5");
 
-        win.document.getElementById("transaction-apply-button").click();
+        typeTransactionAmount(win, "4.2.5");
 
-        assertTrue(win.transactionErrorEl.textContent.length > 0);
-        assertEqual(win.state.transactions.length, 0);
+        assertEqual(win.transactionAmountDisplayEl.textContent, "4.25 USD");
+    });
+
+    test("the numpad ignores a third decimal digit", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+
+        typeTransactionAmount(win, "4.256");
+
+        assertEqual(win.transactionAmountDisplayEl.textContent, "4.25 USD");
+    });
+
+    test("backspace removes one character at a time", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        typeTransactionAmount(win, "12.5");
+
+        win.transactionNumpadEl.querySelector('.transaction-numpad-button[data-value="backspace"]').click();
+
+        assertEqual(win.transactionAmountDisplayEl.textContent, "12. USD");
     });
 
     test("a valid expense transaction saves and updates the dashboard", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();
-        setValue(win.transactionAmountInput, "42.5");
+        typeTransactionAmount(win, "42.5");
         setValue(win.transactionCommentInput, "weekly shop");
 
         win.document.getElementById("transaction-apply-button").click();
@@ -108,7 +125,7 @@ suite("transaction screen", function () {
     test("a storage failure while adding a transaction shows an error instead of a false success", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();
-        setValue(win.transactionAmountInput, "42.5");
+        typeTransactionAmount(win, "42.5");
 
         var originalSetItem = win.localStorage.setItem;
         win.localStorage.setItem = function () { throw new Error("quota"); };
@@ -123,7 +140,7 @@ suite("transaction screen", function () {
     test("an income transaction is stored unsigned but shown as a credit", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-salary").click();
-        setValue(win.transactionAmountInput, "1500");
+        typeTransactionAmount(win, "1500");
 
         win.document.getElementById("transaction-apply-button").click();
 
@@ -136,7 +153,7 @@ suite("transaction screen", function () {
     test("cancel discards without saving", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();
-        setValue(win.transactionAmountInput, "99");
+        typeTransactionAmount(win, "99");
 
         win.document.getElementById("transaction-cancel-button").click();
 
@@ -178,7 +195,7 @@ suite("transaction screen", function () {
 
         assertTrue(isActive(win.transactionScreen));
         assertEqual(win.transactionCategorySelect.value, "cat-groceries");
-        assertEqual(win.transactionAmountInput.value, "42");
+        assertEqual(win.transactionAmountDisplayEl.textContent, "42 USD");
         assertEqual(win.transactionCommentInput.value, "existing");
         assertEqual(win.transactionApplyButton.textContent, "Save");
         assertNotEqual(win.transactionDeleteButton.style.display, "none");
@@ -190,7 +207,8 @@ suite("transaction screen", function () {
         }));
         win.openEditTransactionScreen("txn-1");
 
-        setValue(win.transactionAmountInput, "99");
+        clearTransactionAmount(win);
+        typeTransactionAmount(win, "99");
         win.document.getElementById("transaction-apply-button").click();
 
         assertEqual(win.state.transactions.length, 1);
@@ -205,7 +223,8 @@ suite("transaction screen", function () {
             transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
         }));
         win.openEditTransactionScreen("txn-1");
-        setValue(win.transactionAmountInput, "99");
+        clearTransactionAmount(win);
+        typeTransactionAmount(win, "99");
 
         var originalSetItem = win.localStorage.setItem;
         win.localStorage.setItem = function () { throw new Error("quota"); };
@@ -223,7 +242,8 @@ suite("transaction screen", function () {
         }));
         win.openEditTransactionScreen("txn-1");
 
-        setValue(win.transactionAmountInput, "999");
+        clearTransactionAmount(win);
+        typeTransactionAmount(win, "999");
         win.document.getElementById("transaction-cancel-button").click();
 
         assertTrue(isActive(win.detailScreen));
@@ -276,8 +296,9 @@ suite("transaction screen", function () {
 
         assertEqual(win.transactionDeleteButton.style.display, "none");
         assertEqual(win.transactionCategorySelect.value, "cat-salary");
+        assertEqual(win.transactionAmountValue, "", "the previous edit's amount must not carry over");
 
-        setValue(win.transactionAmountInput, "500");
+        typeTransactionAmount(win, "500");
         win.document.getElementById("transaction-apply-button").click();
 
         assertEqual(win.state.transactions.length, 2, "the original transaction stays and a new one is added");

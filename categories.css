@@ -13,6 +13,7 @@
 
 .category-row-fields {
     display: flex;
+    align-items: center;
     gap: 8px;
 }
 
@@ -33,7 +34,8 @@
 }
 
 .category-row-max {
-    width: 100px;
+    flex: 1;
+    min-width: 0;
 }
 
 .category-row-type-line {
@@ -66,7 +68,7 @@
 .category-row-visibility {
     background: none;
     border: none;
-    color: #666;
+    color: #000;
     font-size: 18px;
     padding: 6px 8px;
     cursor: pointer;
@@ -79,14 +81,14 @@
 .category-row-delete {
     background: none;
     border: none;
-    color: #CD2553;
+    color: #000;
     font-size: 18px;
     padding: 6px 8px;
     cursor: pointer;
 }
 
 .category-row-delete:hover {
-    color: #a91d44;
+    color: #0099ff;
 }
 
 #categories-auto-create-button {

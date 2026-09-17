@@ -50,6 +50,22 @@ suite("detail view", function () {
         assertEqual(groups[1].id, "detail-category-cat-salary");
     });
 
+    test("category mode sorts each category's transactions by datetime descending, not amount", async function () {
+        var seeded = seededForDetail();
+        seeded.transactions = [
+            baseTransaction({ id: "smaller-but-newer", categoryId: "cat-groceries", amount: 5, datetime: nowDatetime() }),
+            baseTransaction({ id: "bigger-but-older", categoryId: "cat-groceries", amount: 50, datetime: daysAgoDatetime(1) })
+        ];
+        var win = await freshApp(seeded);
+
+        win.openDetailView("category");
+
+        var group = win.document.getElementById("detail-category-cat-groceries");
+        var rows = group.querySelectorAll(".detail-transaction");
+        assertEqual(rows[0].querySelector(".detail-transaction-amount").textContent, "-5.00 USD");
+        assertEqual(rows[1].querySelector(".detail-transaction-amount").textContent, "-50.00 USD");
+    });
+
     test("clicking a group header toggles its collapsed state", async function () {
         var win = await freshApp(seededForDetail());
         win.document.getElementById("open-detail-button").click();

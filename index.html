@@ -196,29 +196,40 @@
                 <input type="date" id="transaction-datetime-input" class="transaction-date-input" tabindex="-1" />
             </div>
             <div class="field">
-                <label class="field-label" for="transaction-category-select">Category</label>
                 <select id="transaction-category-select" class="modal-input"></select>
             </div>
             <div class="field">
-                <label class="field-label" for="transaction-amount-input">
-                    Amount (<span id="transaction-currency-label"></span>)
-                </label>
                 <div class="transaction-amount-row">
                     <span id="transaction-amount-sign" class="transaction-amount-sign"></span>
-                    <input type="number" step="0.01" min="0" inputmode="decimal" id="transaction-amount-input" class="modal-input" placeholder="0.00" />
+                    <span id="transaction-amount-display" class="transaction-amount-display"></span>
                 </div>
             </div>
+            <div id="transaction-numpad" class="transaction-numpad">
+                <button type="button" class="transaction-numpad-button" data-value="1">1</button>
+                <button type="button" class="transaction-numpad-button" data-value="2">2</button>
+                <button type="button" class="transaction-numpad-button" data-value="3">3</button>
+                <button type="button" class="transaction-numpad-button" data-value="4">4</button>
+                <button type="button" class="transaction-numpad-button" data-value="5">5</button>
+                <button type="button" class="transaction-numpad-button" data-value="6">6</button>
+                <button type="button" class="transaction-numpad-button" data-value="7">7</button>
+                <button type="button" class="transaction-numpad-button" data-value="8">8</button>
+                <button type="button" class="transaction-numpad-button" data-value="9">9</button>
+                <button type="button" class="transaction-numpad-button" data-value=".">.</button>
+                <button type="button" class="transaction-numpad-button" data-value="0">0</button>
+                <button type="button" class="transaction-numpad-button" data-value="backspace" aria-label="Backspace">
+                    <i class="fa-solid fa-delete-left"></i>
+                </button>
+            </div>
             <div class="field">
-                <label class="field-label" for="transaction-comment-input">Comment (optional)</label>
-                <input type="text" id="transaction-comment-input" class="modal-input" />
+                <input type="text" id="transaction-comment-input" class="modal-input" placeholder="Comment (optional)" />
             </div>
             <p id="transaction-error" class="modal-error"></p>
             <div class="screen-actions">
+                <button id="transaction-delete-button" class="transaction-delete-icon" type="button" aria-label="Delete">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
                 <button id="transaction-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
                 <button id="transaction-apply-button" class="btn btn-primary" type="button">Save</button>
-                <button id="transaction-delete-button" class="btn btn-danger" type="button">
-                    <i class="fa-solid fa-trash"></i> Delete
-                </button>
             </div>
         </div>
     </div>

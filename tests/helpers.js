@@ -27,7 +27,7 @@ function loadApp() {
             iframe.removeEventListener("load", onLoad);
             resolve(iframe.contentWindow);
         });
-        iframe.src = "../index.html?v=" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+        iframe.src = "../index.html?testMode=1&v=" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
     });
 }
 
@@ -46,6 +46,25 @@ function setValue(el, value) {
     el.value = value;
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+// Drives the transaction screen's numpad the same way a user's taps would,
+// one button per character (digits and ".") — there's no text input to set
+// a value on directly anymore.
+function typeTransactionAmount(win, text) {
+    text.split("").forEach(function (char) {
+        win.transactionNumpadEl.querySelector('.transaction-numpad-button[data-value="' + char + '"]').click();
+    });
+}
+
+// Numpad taps only ever append or backspace, so replacing an amount that's
+// already there (e.g. when editing) means clearing it first, same as a
+// real user would.
+function clearTransactionAmount(win) {
+    var backspace = win.transactionNumpadEl.querySelector('.transaction-numpad-button[data-value="backspace"]');
+    while (win.transactionAmountValue !== "") {
+        backspace.click();
+    }
 }
 
 function isActive(screenEl) {

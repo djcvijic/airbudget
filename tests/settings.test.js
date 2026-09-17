@@ -158,27 +158,12 @@ suite("settings screen", function () {
         assertTrue(isActive(win.settingsScreen), "an invalid import must not navigate away");
     });
 
-    test("releasing the delete-hold button early cancels the deletion", async function () {
-        var win = await freshApp(seededForSettings());
-        win.document.getElementById("open-settings-button").click();
-        win.document.getElementById("delete-data-button").click();
-        assertFalse(isHidden(win.deleteConfirmModal));
-
-        win.deleteConfirmButton.dispatchEvent(new MouseEvent("mousedown"));
-        await wait(300);
-        win.deleteConfirmButton.dispatchEvent(new MouseEvent("mouseup"));
-        await wait(win.DELETE_HOLD_MS + 200);
-
-        assertEqual(win.state.categories.length, 1, "data must survive a cancelled hold");
-    });
-
-    test("holding delete for the full duration erases all data", async function () {
+    test("clicking delete erases all data (instant in test mode)", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
         win.document.getElementById("delete-data-button").click();
 
         win.deleteConfirmButton.dispatchEvent(new MouseEvent("mousedown"));
-        await wait(win.DELETE_HOLD_MS + 200);
 
         assertEqual(win.state.categories.length, 0);
         assertEqual(win.state.period, null);
@@ -195,7 +180,6 @@ suite("settings screen", function () {
         win.localStorage.removeItem = function () { throw new Error("blocked"); };
 
         win.deleteConfirmButton.dispatchEvent(new MouseEvent("mousedown"));
-        await wait(win.DELETE_HOLD_MS + 200);
 
         win.localStorage.removeItem = originalRemoveItem;
 

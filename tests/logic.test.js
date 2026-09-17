@@ -85,6 +85,12 @@ suite("state.js: formatPeriodLabel / formatCurrency", function () {
         assertEqual(win.formatCurrency(0), "0.00 EUR");
     });
 
+    test("formatCurrency adds a thousands separator for large amounts", async function () {
+        var win = await freshApp({ period: "monthly", currency: "EUR" });
+        assertEqual(win.formatCurrency(12345.6), "12,345.60 EUR");
+        assertEqual(win.formatCurrency(1234567.89), "1,234,567.89 EUR");
+    });
+
     test("formatPeriodLabel collapses a single-day range to one date", async function () {
         var win = await freshApp({ period: "daily", currency: "USD" });
         var start = new Date(2026, 2, 15);

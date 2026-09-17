@@ -236,7 +236,7 @@ function formatPeriodLabel(start, end) {
 }
 
 function formatCurrency(amount) {
-    return amount.toFixed(2) + " " + state.currency;
+    return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " " + state.currency;
 }
 
 function getTransactionsInRange(start, end) {

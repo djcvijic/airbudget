@@ -105,7 +105,6 @@ function buildCategoryRow(category) {
 
     fields.appendChild(emojiInput);
     fields.appendChild(nameInput);
-    fields.appendChild(maxInput);
 
     var typeLine = document.createElement("div");
     typeLine.className = "category-row-type-line";
@@ -176,14 +175,16 @@ function buildCategoryRow(category) {
         trailingButton.type = "button";
         trailingButton.className = "category-row-delete";
         trailingButton.title = "Remove this category";
-        trailingButton.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        trailingButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
         trailingButton.addEventListener("click", function () {
             row.remove();
         });
     }
 
+    fields.appendChild(trailingButton);
+
     typeLine.appendChild(typeRow);
-    typeLine.appendChild(trailingButton);
+    typeLine.appendChild(maxInput);
 
     row.appendChild(fields);
     row.appendChild(typeLine);
