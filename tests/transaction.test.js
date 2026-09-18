@@ -92,6 +92,64 @@ suite("transaction screen", function () {
         assertEqual(win.transactionAmountDisplayEl.textContent, "4.25 USD");
     });
 
+    test("pasting extracts a number from the clipboard, stripping thousands separators and capping decimals", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        win.navigator.clipboard.readText = function () { return Promise.resolve("$1,234.567 total"); };
+
+        win.document.getElementById("transaction-amount-paste-button").click();
+        await wait(50);
+
+        assertEqual(win.transactionAmountDisplayEl.textContent, "1234.56 USD");
+    });
+
+    test("a successful paste replaces an existing typed amount rather than appending", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        typeTransactionAmount(win, "999");
+        win.navigator.clipboard.readText = function () { return Promise.resolve("42.50"); };
+
+        win.document.getElementById("transaction-amount-paste-button").click();
+        await wait(50);
+
+        assertEqual(win.transactionAmountDisplayEl.textContent, "42.50 USD");
+    });
+
+    test("a leading decimal point with no digit before it still pastes as a fraction", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        win.navigator.clipboard.readText = function () { return Promise.resolve(".75"); };
+
+        win.document.getElementById("transaction-amount-paste-button").click();
+        await wait(50);
+
+        assertClose(parseFloat(win.transactionAmountValue), 0.75);
+    });
+
+    test("pasting text with no number shows an error and leaves the amount untouched", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        typeTransactionAmount(win, "5");
+        win.navigator.clipboard.readText = function () { return Promise.resolve("no digits here"); };
+
+        win.document.getElementById("transaction-amount-paste-button").click();
+        await wait(50);
+
+        assertEqual(win.toastEl.textContent, "No number found on the clipboard");
+        assertEqual(win.transactionAmountDisplayEl.textContent, "5 USD");
+    });
+
+    test("a rejected clipboard read shows an error", async function () {
+        var win = await freshApp(seededForTransactions());
+        tileAddZone(win, "cat-groceries").click();
+        win.navigator.clipboard.readText = function () { return Promise.reject(new Error("denied")); };
+
+        win.document.getElementById("transaction-amount-paste-button").click();
+        await wait(50);
+
+        assertEqual(win.toastEl.textContent, "Couldn't read the clipboard");
+    });
+
     test("backspace removes one character at a time", async function () {
         var win = await freshApp(seededForTransactions());
         tileAddZone(win, "cat-groceries").click();

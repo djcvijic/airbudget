@@ -23,6 +23,7 @@ var transactionCategorySelect = document.getElementById("transaction-category-se
 var transactionAmountDisplayEl = document.getElementById("transaction-amount-display");
 var transactionAmountSignEl = document.getElementById("transaction-amount-sign");
 var transactionNumpadEl = document.getElementById("transaction-numpad");
+var transactionAmountPasteButton = document.getElementById("transaction-amount-paste-button");
 var transactionCommentInput = document.getElementById("transaction-comment-input");
 var transactionErrorEl = document.getElementById("transaction-error");
 var transactionApplyButton = document.getElementById("transaction-apply-button");
@@ -60,6 +61,37 @@ transactionNumpadEl.addEventListener("click", function (e) {
     } else {
         transactionAmountValue += value;
     }
+    updateTransactionAmountDisplay();
+});
+
+// Commas are stripped so a copied "$1,234.56" still matches. Matching the
+// first number rather than the "right" one (e.g. an order number ahead of
+// the actual amount) is a deliberately accepted simplification, not
+// something this guards against.
+transactionAmountPasteButton.addEventListener("click", async function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) {
+        showToast("Clipboard access isn't available");
+        return;
+    }
+
+    var text;
+    try {
+        text = await navigator.clipboard.readText();
+    } catch (e) {
+        showToast("Couldn't read the clipboard");
+        return;
+    }
+
+    // \d*\.\d+ before \d+ so a leading "." with no digit before it (".75")
+    // still matches as a decimal instead of losing the "." and reading as 75.
+    var match = text.replace(/,/g, "").match(/\d*\.\d+|\d+/);
+    if (!match) {
+        showToast("No number found on the clipboard");
+        return;
+    }
+
+    var parts = match[0].split(".");
+    transactionAmountValue = parts.length > 1 ? parts[0] + "." + parts[1].slice(0, 2) : parts[0];
     updateTransactionAmountDisplay();
 });
 
