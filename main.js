@@ -24,6 +24,14 @@ function main() {
     document.getElementById("categories-unsaved-apply-button").addEventListener("click", applyCategories);
     document.getElementById("categories-unsaved-revert-button").addEventListener("click", revertCategories);
 
+    document.getElementById("goals-back-button").addEventListener("click", backFromGoals);
+    document.getElementById("goals-onboarding-back-button").addEventListener("click", backFromGoals);
+    document.getElementById("goals-revert-button").addEventListener("click", revertGoals);
+    document.getElementById("goals-done-button").addEventListener("click", applyGoals);
+    document.getElementById("goals-close-button").addEventListener("click", backFromGoals);
+    document.getElementById("goals-unsaved-apply-button").addEventListener("click", applyGoals);
+    document.getElementById("goals-unsaved-revert-button").addEventListener("click", revertGoals);
+
     document.getElementById("period-prev-button").addEventListener("click", goToPreviousPeriod);
     document.getElementById("period-next-button").addEventListener("click", goToNextPeriod);
     document.getElementById("period-current-button").addEventListener("click", goToCurrentPeriod);
@@ -31,12 +39,14 @@ function main() {
     document.getElementById("install-banner-action-button").addEventListener("click", installApp);
     document.getElementById("install-banner-dismiss-button").addEventListener("click", dismissInstallBanner);
 
-    // Only one of settings/categories can be the active screen at a time,
-    // so nesting these guards is safe: whichever one isn't active is a
-    // no-op and just calls through to navigateFn.
+    // Only one of settings/categories/goals can be the active screen at a
+    // time, so nesting these guards is safe: whichever ones aren't active
+    // are a no-op and just call through to navigateFn.
     function goToScreen(navigateFn) {
         goFromSettings(function () {
-            goFromCategories(navigateFn);
+            goFromCategories(function () {
+                goFromGoals(navigateFn);
+            });
         });
     }
 
@@ -60,6 +70,11 @@ function main() {
     document.getElementById("open-categories-button").addEventListener("click", function () {
         goToScreen(function () {
             openCategoriesScreen(false);
+        });
+    });
+    document.getElementById("open-goals-button").addEventListener("click", function () {
+        goToScreen(function () {
+            openGoalsScreen(false);
         });
     });
     document.getElementById("open-detail-button").addEventListener("click", function () {
@@ -97,6 +112,7 @@ function main() {
     function dismissModals() {
         pendingSettingsNavigation = null;
         pendingCategoriesNavigation = null;
+        pendingGoalsNavigation = null;
         closeModals();
     }
 

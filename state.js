@@ -10,7 +10,7 @@ var CATEGORIES_KEY = "airbudget-categories-v1";
 var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
-    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day" };
+    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", goalAmount: null, goalSetDate: null };
 }
 
 function readJSON(key, fallback) {
@@ -32,7 +32,9 @@ function loadState() {
         currency: meta.currency || null,
         categories: readJSON(CATEGORIES_KEY, []),
         transactions: readJSON(TRANSACTIONS_KEY, []),
-        detailMode: meta.detailMode || "day"
+        detailMode: meta.detailMode || "day",
+        goalAmount: meta.goalAmount != null ? meta.goalAmount : null,
+        goalSetDate: meta.goalSetDate || null
     };
 }
 
@@ -47,7 +49,13 @@ function persist(key, value) {
 }
 
 function saveMeta() {
-    return persist(META_KEY, { period: state.period, currency: state.currency, detailMode: state.detailMode });
+    return persist(META_KEY, {
+        period: state.period,
+        currency: state.currency,
+        detailMode: state.detailMode,
+        goalAmount: state.goalAmount,
+        goalSetDate: state.goalSetDate
+    });
 }
 
 function saveCategories() {
@@ -71,6 +79,8 @@ window.addEventListener("storage", function (e) {
         state.period = meta.period || null;
         state.currency = meta.currency || null;
         state.detailMode = meta.detailMode || "day";
+        state.goalAmount = meta.goalAmount != null ? meta.goalAmount : null;
+        state.goalSetDate = meta.goalSetDate || null;
     } else if (e.key === CATEGORIES_KEY) {
         state.categories = readJSON(CATEGORIES_KEY, []);
     } else if (e.key === TRANSACTIONS_KEY) {
@@ -121,6 +131,17 @@ function closeModals() {
     });
 }
 
+// Remembers a forced onboarding step's not-yet-applied edit across one
+// backward hop, so returning forward restores it without touching state.
+function createStepDraft() {
+    var value = null;
+    return {
+        save: function (v) { value = v; },
+        get: function () { return value; },
+        clear: function () { value = null; }
+    };
+}
+
 function generateId(prefix) {
     return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
 }
@@ -135,6 +156,14 @@ function pad2(n) {
 
 function formatDateOnly(date) {
     return date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate());
+}
+
+// The native date input's own value is "YYYY-MM-DD"; parsing that directly
+// via `new Date(string)` reads it as UTC, which can roll it back a day in
+// negative-UTC timezones. Parse the components explicitly instead.
+function parseDateOnly(value) {
+    var parts = value.split("-");
+    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
 }
 
 function getCategoryById(id) {
@@ -304,4 +333,16 @@ function getSortedCategoryEntries(start, end) {
         return a.name.localeCompare(b.name);
     });
     return entries;
+}
+
+// Net recurring income per period if every category's budget/expected
+// income is hit exactly: expense budgets subtract, income expectations
+// add. Categories with no budget/expected amount set don't contribute.
+function getExpectedPeriodicIncome() {
+    return state.categories.reduce(function (sum, cat) {
+        if (cat.max == null) {
+            return sum;
+        }
+        return sum + (cat.type === "income" ? cat.max : -cat.max);
+    }, 0);
 }

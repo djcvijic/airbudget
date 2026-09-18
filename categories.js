@@ -23,10 +23,7 @@ var categoriesAutoCreated = false;
 var categoriesOriginalSnapshot = null;
 var pendingCategoriesNavigation = null;
 
-// Unsaved onboarding rows, captured when backing out to the settings step
-// so they're still there if the user comes back to this step, since
-// state.categories itself stays empty until Apply.
-var categoriesDraft = null;
+var categoriesDraft = createStepDraft();
 
 // Templates for "Create automatically", added as unapplied rows the user
 // can still edit or remove before Apply. Salary is the one income entry
@@ -274,7 +271,7 @@ function updateCategoriesActionButtons() {
 // here after visiting the settings step again.
 function captureCategoriesDraft() {
     var rows = categoryRowsEl.querySelectorAll(".category-row");
-    categoriesDraft = [].map.call(rows, function (row) {
+    categoriesDraft.save([].map.call(rows, function (row) {
         var maxRaw = row.querySelector(".category-row-max").value;
         return {
             id: row.dataset.id || null,
@@ -284,7 +281,7 @@ function captureCategoriesDraft() {
             type: row.dataset.type,
             hidden: row.dataset.hidden === "true"
         };
-    });
+    }));
 }
 
 function openCategoriesScreen(forced) {
@@ -295,13 +292,23 @@ function openCategoriesScreen(forced) {
     categoriesAutoCreateButton.style.display = forced ? "" : "none";
     categoriesDescriptionEl.style.display = forced ? "" : "none";
     categoriesTitleEl.classList.toggle("onboarding-heading", forced);
-    categoriesDoneButton.textContent = forced ? "Done" : "Apply";
+    categoriesDoneButton.textContent = forced ? "Next" : "Apply";
 
-    if (forced && categoriesDraft) {
+    var draftRows = categoriesDraft.get();
+    if (forced && draftRows) {
         categoryRowsEl.innerHTML = "";
-        categoriesDraft.forEach(function (draftCategory) {
+        draftRows.forEach(function (draftCategory) {
             categoryRowsEl.appendChild(buildCategoryRow(draftCategory));
         });
+        if (categoriesAutoCreated) {
+            categoriesAutoCreateButton.style.display = "none";
+        }
+    } else if (forced && state.categories.length > 0) {
+        // Returning here via goals.js's onboarding back button, after
+        // categories were already applied (which clears categoriesDraft) —
+        // re-render what was saved without resetting auto-create, which
+        // may already have been used.
+        renderCategoryRows();
         if (categoriesAutoCreated) {
             categoriesAutoCreateButton.style.display = "none";
         }
@@ -367,14 +374,22 @@ function applyCategories() {
     }
 
     state.categories = updated;
-    if (saveCategories()) {
+    var wasForced = categoriesForced;
+    var saved = saveCategories();
+    if (saved && !wasForced) {
         showToast("Categories saved");
     }
     categoriesForced = false;
-    categoriesDraft = null;
+    categoriesDraft.clear();
 
     closeModals();
-    resolvePendingCategoriesNavigation();
+    if (wasForced) {
+        // Onboarding's 3rd step, not the dashboard — goals.js loads after
+        // this file, but this only runs from a click, long after boot.
+        openGoalsScreen(true);
+    } else {
+        resolvePendingCategoriesNavigation();
+    }
 }
 
 function resolvePendingCategoriesNavigation() {
@@ -388,10 +403,7 @@ function revertCategories() {
     resolvePendingCategoriesNavigation();
 }
 
-// Routes any attempt to leave the categories screen (the back button, or
-// one of the top-bar nav buttons while categories is open) through the
-// same unsaved-changes warning used by settings. Forced (onboarding) mode
-// has no back/revert path, so it's never gated.
+// Same warn-before-leaving pattern as settings; forced mode is never gated.
 function goFromCategories(navigateFn) {
     if (!categoriesScreen.classList.contains("active") || categoriesForced || !hasUnsavedCategoriesChanges()) {
         navigateFn();

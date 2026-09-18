@@ -16,6 +16,7 @@
     <link href="main.css" rel="stylesheet" />
     <link href="settings.css" rel="stylesheet" />
     <link href="categories.css" rel="stylesheet" />
+    <link href="goals.css" rel="stylesheet" />
     <link href="onboarding.css" rel="stylesheet" />
     <link href="main-view.css" rel="stylesheet" />
     <link href="install-prompt.css" rel="stylesheet" />
@@ -37,6 +38,9 @@
             </button>
             <button id="open-detail-button" class="btn btn-text" type="button" title="All transactions">
                 <i class="fa-solid fa-receipt"></i>
+            </button>
+            <button id="open-goals-button" class="btn btn-text" type="button" title="Goals">
+                <i class="fa-solid fa-star"></i>
             </button>
             <button id="open-categories-button" class="btn btn-text" type="button" title="Categories">
                 <i class="fa-solid fa-tags"></i>
@@ -74,10 +78,8 @@
             </div>
             <p id="onboarding-error" class="modal-error"></p>
             <div class="screen-actions">
+                <button id="onboarding-import-button" class="btn btn-secondary-pink" type="button">Import</button>
                 <button id="onboarding-continue-button" class="btn btn-primary" type="button">Next</button>
-            </div>
-            <div class="onboarding-import-row">
-                <button id="onboarding-import-button" class="btn btn-secondary" type="button">Import</button>
             </div>
         </div>
 
@@ -92,6 +94,11 @@
                 Use the plus icon to create categories yourself, or
                 "Auto-create" to get started quickly.
             </p>
+            <p class="screen-description">
+                Setting up budgets and expected incomes is optional, but
+                highly recommended because it will allow you to set and
+                track your savings goals.
+            </p>
             <div id="category-rows" class="category-rows"></div>
             <div class="categories-add-row">
                 <button id="add-category-button" class="btn categories-full-button" type="button" title="Add category" aria-label="Add category">
@@ -105,6 +112,39 @@
                 <button id="categories-onboarding-back-button" class="btn btn-secondary-pink" type="button">Back</button>
                 <button id="categories-done-button" class="btn btn-primary" type="button">Apply</button>
                 <button id="categories-close-button" class="btn btn-primary" type="button">Done</button>
+            </div>
+        </div>
+
+        <div id="goals-screen" class="screen">
+            <div class="screen-header">
+                <button id="goals-back-button" class="btn btn-text back-button" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div id="goals-title" class="screen-title">Goals</div>
+            </div>
+            <p class="screen-description">
+                Enter the amount you would like to save up, and we can tell
+                you how long it will take if you follow your budgets.
+            </p>
+            <div class="field">
+                <label class="field-label" for="goals-amount-input">Goal (<span id="goals-currency-label"></span>)</label>
+                <input type="number" step="0.01" min="0" inputmode="decimal" id="goals-amount-input" class="modal-input" placeholder="0.00" />
+            </div>
+            <div id="goals-last-set" class="goals-last-set"></div>
+            <div class="goals-result">
+                <p>If you follow your budgets, this will take:</p>
+                <p id="goals-duration-output" class="goals-output"></p>
+            </div>
+            <div class="goals-result">
+                <p id="goals-date-label">You'll reach your goal on:</p>
+                <p id="goals-date-output" class="goals-output"></p>
+            </div>
+            <p id="goals-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="goals-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="goals-onboarding-back-button" class="btn btn-secondary-pink" type="button">Back</button>
+                <button id="goals-done-button" class="btn btn-primary" type="button">Apply</button>
+                <button id="goals-close-button" class="btn btn-primary" type="button">Done</button>
             </div>
         </div>
 
@@ -262,6 +302,18 @@
             </div>
         </div>
 
+        <div id="goals-unsaved-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Unapplied changes</div>
+            <div class="modal-description">
+                You have changes that haven't been applied yet.
+            </div>
+            <div class="modal-actions">
+                <button id="goals-unsaved-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="goals-unsaved-apply-button" class="btn btn-primary" type="button">Apply</button>
+            </div>
+        </div>
+
         <div id="delete-confirm-modal" class="modal hidden">
             <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-title">Delete all data?</div>
@@ -295,6 +347,7 @@
     <script src="settings.js" type="application/javascript"></script>
     <script src="onboarding.js" type="application/javascript"></script>
     <script src="categories.js" type="application/javascript"></script>
+    <script src="goals.js" type="application/javascript"></script>
     <script src="main-view.js" type="application/javascript"></script>
     <script src="install-prompt.js" type="application/javascript"></script>
     <script src="transaction.js" type="application/javascript"></script>

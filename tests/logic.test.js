@@ -184,6 +184,38 @@ suite("state.js: getSortedCategoryEntries", function () {
     });
 });
 
+suite("state.js: getExpectedPeriodicIncome", function () {
+    test("sums income expectations and subtracts expense budgets", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        win.state.categories = [
+            baseCategory({ id: "salary", type: "income", max: 3000 }),
+            baseCategory({ id: "rent", type: "expense", max: 1000 }),
+            baseCategory({ id: "groceries", type: "expense", max: 500 })
+        ];
+
+        assertEqual(win.getExpectedPeriodicIncome(), 1500);
+    });
+
+    test("categories with no budget/expected amount set don't contribute", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        win.state.categories = [
+            baseCategory({ id: "salary", type: "income", max: 1000 }),
+            baseCategory({ id: "misc", type: "expense", max: null })
+        ];
+
+        assertEqual(win.getExpectedPeriodicIncome(), 1000);
+    });
+
+    test("can be negative when budgets exceed expected income", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        win.state.categories = [
+            baseCategory({ id: "rent", type: "expense", max: 1000 })
+        ];
+
+        assertEqual(win.getExpectedPeriodicIncome(), -1000);
+    });
+});
+
 suite("state.js: getPeriodOffsetForDate", function () {
     test("monthly buckets a date by calendar-month distance from today", async function () {
         var win = await freshApp({ period: "monthly", currency: "USD" });

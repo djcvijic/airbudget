@@ -148,11 +148,8 @@ function revertSettings() {
     resolvePendingSettingsNavigation();
 }
 
-// Routes any attempt to leave the settings screen (the back button, or one
-// of the top-bar nav buttons while settings is open) through the same
-// unsaved-changes warning. navigateFn runs immediately when there's nothing
-// to lose; otherwise it's stashed and only runs once Apply/Revert resolves
-// the warning.
+// Runs navigateFn now if there's nothing to lose; otherwise stashes it
+// and warns, running it once Apply/Revert resolves the warning.
 function goFromSettings(navigateFn) {
     if (!settingsScreen.classList.contains("active") || !hasUnsavedSettingsChanges()) {
         navigateFn();

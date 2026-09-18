@@ -111,14 +111,6 @@ function updateTransactionAmountSign() {
 
 transactionCategorySelect.addEventListener("change", updateTransactionAmountSign);
 
-// The native date input's own value is "YYYY-MM-DD"; parsing that directly
-// via `new Date(string)` reads it as UTC, which can roll it back a day in
-// negative-UTC timezones. Parse the components explicitly instead.
-function parseDateOnly(value) {
-    var parts = value.split("-");
-    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-}
-
 // formatDayHeader is defined in detail.js (loaded after this file), but
 // this only runs from a click/change handler, long after boot finishes.
 function updateTransactionDateDisplay() {
