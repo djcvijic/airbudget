@@ -157,6 +157,22 @@ suite("main view: report", function () {
         assertTrue(freelanceTile.querySelector(".category-tile-amounts").classList.contains("amount-income"));
     });
 
+    test("records the last second of the viewed period as the last-seen report, and persists it", async function () {
+        var win = await freshApp(seededForReport({
+            transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
+        }));
+        win.periodOffset = -1;
+        var range = win.getPeriodRange(win.state.period, win.periodOffset);
+        var expected = win.formatDateTime(new Date(range.end.getTime() - 1000));
+
+        win.openReportModal();
+
+        assertEqual(win.state.lastSeenReport, expected);
+
+        var reloaded = await loadApp();
+        assertEqual(reloaded.state.lastSeenReport, expected);
+    });
+
     test("the Done button closes the modal", async function () {
         var win = await freshApp(seededForReport({
             transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
@@ -167,5 +183,61 @@ suite("main view: report", function () {
         win.document.getElementById("report-done-button").click();
 
         assertTrue(isHidden(win.reportModal));
+    });
+
+    test("opening an older period's report doesn't un-mark a more recently seen report", async function () {
+        var win = await freshApp(seededForReport({}));
+        win.periodOffset = -1;
+        win.openReportModal();
+        var mostRecentSeen = win.state.lastSeenReport;
+        win.closeModals();
+
+        win.periodOffset = -2;
+        win.openReportModal();
+
+        assertEqual(win.state.lastSeenReport, mostRecentSeen);
+    });
+});
+
+suite("main view: report banner", function () {
+    test("shows on the dashboard when the most recent period's report hasn't been seen", async function () {
+        var win = await freshApp(seededForReport({}));
+
+        assertEqual(win.reportBannerEl.style.display, "flex");
+        assertTrue(win.mainViewScreen.contains(win.reportBannerEl), "only ever shown on the main screen");
+    });
+
+    test("hides once the most recent period's report has been seen", async function () {
+        var win = await freshApp(seededForReport({}));
+        var range = win.getPeriodRange(win.state.period, -1);
+        win.state.lastSeenReport = win.formatDateTime(new Date(range.end.getTime() - 1000));
+
+        win.updateReportBanner();
+
+        assertEqual(win.reportBannerEl.style.display, "none");
+    });
+
+    test("the X dismisses it and marks the most recent report as seen, without opening it", async function () {
+        var win = await freshApp(seededForReport({}));
+        var range = win.getPeriodRange(win.state.period, -1);
+        var expected = win.formatDateTime(new Date(range.end.getTime() - 1000));
+
+        win.document.getElementById("report-banner-dismiss-button").click();
+
+        assertEqual(win.state.lastSeenReport, expected);
+        assertEqual(win.reportBannerEl.style.display, "none");
+        assertTrue(isHidden(win.reportModal));
+    });
+
+    test("See report navigates to the most recent period, opens its report, and dismisses the banner", async function () {
+        var win = await freshApp(seededForReport({
+            transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
+        }));
+
+        win.document.getElementById("report-banner-see-button").click();
+
+        assertEqual(win.periodOffset, -1);
+        assertFalse(isHidden(win.reportModal));
+        assertEqual(win.reportBannerEl.style.display, "none");
     });
 });

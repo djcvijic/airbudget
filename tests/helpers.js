@@ -12,7 +12,8 @@ function seedState(partial) {
         period: partial.period || null,
         currency: partial.currency || null,
         goalAmount: partial.goalAmount != null ? partial.goalAmount : null,
-        goalSetDate: partial.goalSetDate || null
+        goalSetDate: partial.goalSetDate || null,
+        lastSeenReport: partial.lastSeenReport || null
     }));
     localStorage.setItem(APP_CATEGORIES_KEY, JSON.stringify(partial.categories || []));
     localStorage.setItem(APP_TRANSACTIONS_KEY, JSON.stringify(partial.transactions || []));

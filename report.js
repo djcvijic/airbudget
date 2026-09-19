@@ -1,6 +1,7 @@
 // Read-only report for the dashboard's current period (reuses its
-// periodOffset). Flagged tiles are a stripped-down, non-interactive
-// dashboard tile — no add/history buttons — reusing its CSS classes.
+// periodOffset), plus the banner nudging toward an unseen one. Flagged
+// tiles are a stripped-down, non-interactive dashboard tile — no
+// add/history buttons — reusing its CSS classes.
 
 var reportModal = document.getElementById("report-modal");
 var reportTitleEl = document.getElementById("report-title");
@@ -12,6 +13,38 @@ var reportBelowTargetMessageEl = document.getElementById("report-below-target-me
 var reportProblemGridEl = document.getElementById("report-problem-grid");
 var reportRealityCheckMessageEl = document.getElementById("report-reality-check-message");
 var reportAccuracyMessageEl = document.getElementById("report-accuracy-message");
+var reportBannerEl = document.getElementById("report-banner");
+
+function lastSecondOfPeriod(range) {
+    return new Date(range.end.getTime() - 1000);
+}
+
+// The most recent report is always last period relative to today, not a
+// stored value, so it naturally advances once the current period rolls over.
+function hasUnseenReport() {
+    var lastSecond = lastSecondOfPeriod(getPeriodRange(state.period, -1));
+    return !state.lastSeenReport || new Date(state.lastSeenReport) < lastSecond;
+}
+
+function updateReportBanner() {
+    reportBannerEl.style.display = hasUnseenReport() ? "flex" : "none";
+}
+
+function markMostRecentReportSeen() {
+    state.lastSeenReport = formatDateTime(lastSecondOfPeriod(getPeriodRange(state.period, -1)));
+    saveMeta();
+}
+
+function dismissReportBanner() {
+    markMostRecentReportSeen();
+    updateReportBanner();
+}
+
+function openMostRecentReport() {
+    periodOffset = -1;
+    renderMainView();
+    openReportModal();
+}
 
 // Flags an expense over budget or unbudgeted-but-spent, and an income
 // unset-but-received or short of its expected amount (including zero).
@@ -83,6 +116,16 @@ function renderReportAmount(el, amount) {
 
 function openReportModal() {
     var range = getPeriodRange(state.period, periodOffset);
+
+    // Only advances lastSeenReport, so opening an older period's report
+    // afterward can't un-mark a more recent one as unseen.
+    var lastSecond = lastSecondOfPeriod(range);
+    if (!state.lastSeenReport || new Date(state.lastSeenReport) < lastSecond) {
+        state.lastSeenReport = formatDateTime(lastSecond);
+        saveMeta();
+    }
+    updateReportBanner();
+
     reportTitleEl.textContent = "Report: " + formatPeriodLabel(range.start, range.end);
     reportExpectedLabelEl.textContent = "Expected balance this " + GOAL_PERIOD_UNIT_NAMES[state.period] + ":";
 

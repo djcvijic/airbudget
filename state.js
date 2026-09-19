@@ -10,7 +10,7 @@ var CATEGORIES_KEY = "airbudget-categories-v1";
 var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
-    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", goalAmount: null, goalSetDate: null };
+    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", goalAmount: null, goalSetDate: null, lastSeenReport: null };
 }
 
 function readJSON(key, fallback) {
@@ -34,7 +34,8 @@ function loadState() {
         transactions: readJSON(TRANSACTIONS_KEY, []),
         detailMode: "day",
         goalAmount: meta.goalAmount != null ? meta.goalAmount : null,
-        goalSetDate: meta.goalSetDate || null
+        goalSetDate: meta.goalSetDate || null,
+        lastSeenReport: meta.lastSeenReport || null
     };
 }
 
@@ -53,7 +54,8 @@ function saveMeta() {
         period: state.period,
         currency: state.currency,
         goalAmount: state.goalAmount,
-        goalSetDate: state.goalSetDate
+        goalSetDate: state.goalSetDate,
+        lastSeenReport: state.lastSeenReport
     });
 }
 
@@ -79,6 +81,7 @@ window.addEventListener("storage", function (e) {
         state.currency = meta.currency || null;
         state.goalAmount = meta.goalAmount != null ? meta.goalAmount : null;
         state.goalSetDate = meta.goalSetDate || null;
+        state.lastSeenReport = meta.lastSeenReport || null;
     } else if (e.key === CATEGORIES_KEY) {
         state.categories = readJSON(CATEGORIES_KEY, []);
     } else if (e.key === TRANSACTIONS_KEY) {
@@ -154,6 +157,10 @@ function pad2(n) {
 
 function formatDateOnly(date) {
     return date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate());
+}
+
+function formatDateTime(date) {
+    return formatDateOnly(date) + "T" + pad2(date.getHours()) + ":" + pad2(date.getMinutes()) + ":" + pad2(date.getSeconds());
 }
 
 // The native date input's own value is "YYYY-MM-DD"; parsing that directly

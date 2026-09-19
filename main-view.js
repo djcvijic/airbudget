@@ -125,6 +125,8 @@ function buildCategoryTile(entry) {
 }
 
 function renderMainView() {
+    updateReportBanner();
+
     var range = getPeriodRange(state.period, periodOffset);
     periodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     periodCurrentRow.style.display = periodOffset === 0 ? "none" : "flex";

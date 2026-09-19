@@ -35,6 +35,8 @@ function main() {
     document.getElementById("period-current-button").addEventListener("click", goToCurrentPeriod);
     document.getElementById("open-report-button").addEventListener("click", openReportModal);
     document.getElementById("report-done-button").addEventListener("click", closeModals);
+    document.getElementById("report-banner-see-button").addEventListener("click", openMostRecentReport);
+    document.getElementById("report-banner-dismiss-button").addEventListener("click", dismissReportBanner);
 
     document.getElementById("install-banner-action-button").addEventListener("click", installApp);
     document.getElementById("install-banner-dismiss-button").addEventListener("click", dismissInstallBanner);
