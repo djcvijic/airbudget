@@ -1,0 +1,29 @@
+#report-modal {
+    padding: 16px;
+}
+
+.report-row {
+    margin-top: 12px;
+}
+
+.report-row-label {
+    display: block;
+    font-size: 14px;
+    color: #666;
+}
+
+.report-row-value {
+    display: block;
+    margin-top: 2px;
+    font-size: 18px;
+}
+
+.report-message {
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.report-problem-grid {
+    margin-top: 16px;
+}

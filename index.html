@@ -22,6 +22,7 @@
     <link href="install-prompt.css" rel="stylesheet" />
     <link href="transaction.css" rel="stylesheet" />
     <link href="detail.css" rel="stylesheet" />
+    <link href="report.css" rel="stylesheet" />
     <link href="fontawesome/css/fontawesome.min.css" rel="stylesheet" />
     <link href="fontawesome/css/solid.min.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -164,6 +165,7 @@
                 <button id="period-current-button" class="btn btn-text period-current-button" type="button">
                     Back to current
                 </button>
+                <button id="open-report-button" class="btn btn-primary report-button" type="button">See report</button>
             </div>
             <div class="total-progress">
                 <span class="total-progress-label">Balance:</span>
@@ -315,6 +317,44 @@
             </div>
         </div>
 
+        <div id="report-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div id="report-title" class="modal-title">Report</div>
+            <div class="report-row">
+                <span id="report-expected-label" class="report-row-label"></span>
+                <span id="report-expected-value" class="report-row-value"></span>
+            </div>
+            <div class="report-row">
+                <span class="report-row-label">Actual balance:</span>
+                <span id="report-actual-value" class="report-row-value"></span>
+            </div>
+            <p id="report-on-track-message" class="report-message">
+                Savings is going great, you're on track with your goal, and
+                you may even want to make your budgets more ambitious.
+            </p>
+            <p id="report-below-target-message" class="report-message">
+                You didn't reach your savings goal in this period. Check the
+                problem categories below, and either be more strict with
+                these categories in the future if you don't care about them,
+                or if they are fixed costs or you care about them then set
+                more accurate budgets for them.
+            </p>
+            <div id="report-problem-grid" class="category-grid report-problem-grid"></div>
+            <p id="report-reality-check-message" class="report-message">
+                If this doesn't line up with reality, try setting up budgets
+                for all categories accurately, and track every penny coming
+                in and out of your account accurately.
+            </p>
+            <p id="report-accuracy-message" class="report-message">
+                Try setting up budgets for all categories accurately, and
+                track every penny coming in and out of your account
+                accurately.
+            </p>
+            <div class="modal-actions">
+                <button id="report-done-button" class="btn btn-primary" type="button">Done</button>
+            </div>
+        </div>
+
         <div id="delete-confirm-modal" class="modal hidden">
             <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
             <div class="modal-title">Delete all data?</div>
@@ -350,6 +390,7 @@
     <script src="categories.js" type="application/javascript"></script>
     <script src="goals.js" type="application/javascript"></script>
     <script src="main-view.js" type="application/javascript"></script>
+    <script src="report.js" type="application/javascript"></script>
     <script src="install-prompt.js" type="application/javascript"></script>
     <script src="transaction.js" type="application/javascript"></script>
     <script src="detail.js" type="application/javascript"></script>

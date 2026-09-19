@@ -309,6 +309,8 @@ button {
     position: relative;
     width: 100%;
     max-width: 480px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
     background-color: white;
     border-radius: 8px;
     padding: 32px;

@@ -316,6 +316,7 @@ function getSortedCategoryEntries(start, end) {
             id: cat.id,
             name: cat.name,
             emoji: cat.emoji,
+            type: cat.type,
             max: cat.max,
             spend: spend,
             // Income has no over-budget warning: more income than expected

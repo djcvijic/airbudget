@@ -33,6 +33,8 @@ function main() {
     document.getElementById("period-prev-button").addEventListener("click", goToPreviousPeriod);
     document.getElementById("period-next-button").addEventListener("click", goToNextPeriod);
     document.getElementById("period-current-button").addEventListener("click", goToCurrentPeriod);
+    document.getElementById("open-report-button").addEventListener("click", openReportModal);
+    document.getElementById("report-done-button").addEventListener("click", closeModals);
 
     document.getElementById("install-banner-action-button").addEventListener("click", installApp);
     document.getElementById("install-banner-dismiss-button").addEventListener("click", dismissInstallBanner);
