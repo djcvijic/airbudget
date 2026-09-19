@@ -18,19 +18,17 @@ function main() {
     document.getElementById("categories-auto-create-button").addEventListener("click", createCategoriesAutomatically);
     document.getElementById("categories-back-button").addEventListener("click", backFromCategories);
     document.getElementById("categories-onboarding-back-button").addEventListener("click", backFromCategories);
-    document.getElementById("categories-revert-button").addEventListener("click", revertCategories);
+    document.getElementById("categories-cancel-button").addEventListener("click", backFromCategories);
     document.getElementById("categories-done-button").addEventListener("click", applyCategories);
-    document.getElementById("categories-close-button").addEventListener("click", backFromCategories);
-    document.getElementById("categories-unsaved-apply-button").addEventListener("click", applyCategories);
-    document.getElementById("categories-unsaved-revert-button").addEventListener("click", revertCategories);
+    document.getElementById("categories-unsaved-back-button").addEventListener("click", dismissModals);
+    document.getElementById("categories-unsaved-discard-button").addEventListener("click", revertCategories);
 
     document.getElementById("goals-back-button").addEventListener("click", backFromGoals);
     document.getElementById("goals-onboarding-back-button").addEventListener("click", backFromGoals);
-    document.getElementById("goals-revert-button").addEventListener("click", revertGoals);
+    document.getElementById("goals-cancel-button").addEventListener("click", backFromGoals);
     document.getElementById("goals-done-button").addEventListener("click", applyGoals);
-    document.getElementById("goals-close-button").addEventListener("click", backFromGoals);
-    document.getElementById("goals-unsaved-apply-button").addEventListener("click", applyGoals);
-    document.getElementById("goals-unsaved-revert-button").addEventListener("click", revertGoals);
+    document.getElementById("goals-unsaved-back-button").addEventListener("click", dismissModals);
+    document.getElementById("goals-unsaved-discard-button").addEventListener("click", revertGoals);
 
     document.getElementById("period-prev-button").addEventListener("click", goToPreviousPeriod);
     document.getElementById("period-next-button").addEventListener("click", goToNextPeriod);
@@ -64,9 +62,9 @@ function main() {
         goToScreen(openSettingsScreen);
     });
     document.getElementById("settings-back-button").addEventListener("click", backFromSettings);
-    document.getElementById("settings-revert-button").addEventListener("click", revertSettings);
-    document.getElementById("settings-unsaved-apply-button").addEventListener("click", applySettings);
-    document.getElementById("settings-unsaved-revert-button").addEventListener("click", revertSettings);
+    document.getElementById("settings-cancel-button").addEventListener("click", backFromSettings);
+    document.getElementById("settings-unsaved-back-button").addEventListener("click", dismissModals);
+    document.getElementById("settings-unsaved-discard-button").addEventListener("click", revertSettings);
     document.getElementById("open-categories-button").addEventListener("click", function () {
         goToScreen(function () {
             openCategoriesScreen(false);
@@ -91,7 +89,6 @@ function main() {
     });
 
     document.getElementById("settings-apply-button").addEventListener("click", applySettings);
-    document.getElementById("settings-close-button").addEventListener("click", backFromSettings);
     document.getElementById("transaction-apply-button").addEventListener("click", applyTransaction);
     document.getElementById("transaction-delete-button").addEventListener("click", openTransactionDeleteConfirmModal);
     document.getElementById("transaction-delete-confirm-button").addEventListener("click", deleteCurrentTransaction);

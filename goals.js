@@ -12,12 +12,13 @@ var goalsTitleEl = document.getElementById("goals-title");
 var goalsCurrencyLabel = document.getElementById("goals-currency-label");
 var goalsAmountInput = document.getElementById("goals-amount-input");
 var goalsLastSetEl = document.getElementById("goals-last-set");
+var goalsResultsEl = document.getElementById("goals-results");
 var goalsDurationOutputEl = document.getElementById("goals-duration-output");
 var goalsDateOutputEl = document.getElementById("goals-date-output");
+var goalsNoSavingsMessageEl = document.getElementById("goals-no-savings-message");
 var goalsErrorEl = document.getElementById("goals-error");
-var goalsRevertButton = document.getElementById("goals-revert-button");
+var goalsCancelButton = document.getElementById("goals-cancel-button");
 var goalsDoneButton = document.getElementById("goals-done-button");
-var goalsCloseButton = document.getElementById("goals-close-button");
 var goalsUnsavedModal = document.getElementById("goals-unsaved-modal");
 
 var goalsForced = false;
@@ -30,19 +31,17 @@ function hasUnsavedGoalsChanges() {
     return goalsAmountInput.value !== goalsOriginalAmount;
 }
 
-// Forced (onboarding) mode always shows Back + Apply/Done, dirty or not,
-// mirroring categories.js's forced/reopened split.
+// Mirrors categories.js's forced/reopened split.
 function updateGoalsActionButtons() {
     if (goalsForced) {
-        goalsRevertButton.style.display = "none";
+        goalsCancelButton.style.display = "none";
         goalsDoneButton.style.display = "";
-        goalsCloseButton.style.display = "none";
+        goalsDoneButton.disabled = false;
         return;
     }
-    var dirty = hasUnsavedGoalsChanges();
-    goalsRevertButton.style.display = dirty ? "" : "none";
-    goalsDoneButton.style.display = dirty ? "" : "none";
-    goalsCloseButton.style.display = dirty ? "none" : "";
+    goalsCancelButton.style.display = "";
+    goalsDoneButton.style.display = "";
+    goalsDoneButton.disabled = !hasUnsavedGoalsChanges();
 }
 
 // Hidden while the input is dirty, since it would otherwise describe a
@@ -86,6 +85,9 @@ function addPeriodsToDate(date, period, count) {
 // Previews the typed amount live, but anchors the target date to the
 // last applied set-date (or today), not to unsaved edits.
 function updateGoalsResults() {
+    goalsResultsEl.style.display = "none";
+    goalsNoSavingsMessageEl.style.display = "none";
+
     var raw = goalsAmountInput.value;
     var goalAmount = raw === "" ? NaN : parseFloat(raw);
     if (isNaN(goalAmount) || goalAmount <= 0) {
@@ -96,11 +98,11 @@ function updateGoalsResults() {
 
     var expectedPeriodicIncome = getExpectedPeriodicIncome();
     if (expectedPeriodicIncome <= 0) {
-        goalsDurationOutputEl.textContent = "Your current budgets don't leave any expected savings.";
-        goalsDateOutputEl.textContent = "";
+        goalsNoSavingsMessageEl.style.display = "";
         return;
     }
 
+    goalsResultsEl.style.display = "";
     var goalPeriodCount = Math.ceil(goalAmount / expectedPeriodicIncome);
     goalsDurationOutputEl.textContent = pluralize(goalPeriodCount, GOAL_PERIOD_UNIT_NAMES[state.period]);
 

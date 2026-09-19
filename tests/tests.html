@@ -69,15 +69,25 @@
     <iframe id="app-frame" src="about:blank"></iframe>
     <div id="results"></div>
 
-    <script src="runner.js"></script>
-    <script src="helpers.js"></script>
-    <script src="logic.test.js"></script>
-    <script src="onboarding.test.js"></script>
-    <script src="categories.test.js"></script>
-    <script src="transaction.test.js"></script>
-    <script src="detail.test.js"></script>
-    <script src="settings.test.js"></script>
-    <script src="goals.test.js"></script>
+    <script>
+        // Each script is independently cached, so a reload alone doesn't
+        // guarantee fresh files. document.write cache-busts them while
+        // preserving load order, same as static script tags.
+        var testScriptCacheBust = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+        [
+            "runner.js",
+            "helpers.js",
+            "logic.test.js",
+            "onboarding.test.js",
+            "categories.test.js",
+            "transaction.test.js",
+            "detail.test.js",
+            "settings.test.js",
+            "goals.test.js"
+        ].forEach(function (src) {
+            document.write('<script src="' + src + '?v=' + testScriptCacheBust + '"><\/script>');
+        });
+    </script>
     <script>
         // The app under test registers a cache-first service worker. Any
         // registration left over from manually using the app in this same

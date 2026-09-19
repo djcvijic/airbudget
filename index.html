@@ -97,7 +97,8 @@
             <p class="screen-description">
                 Setting up budgets and expected incomes is optional, but
                 highly recommended because it will allow you to set and
-                track your savings goals.
+                track your savings goals. For best results, try to track
+                every penny that comes into or out of your account.
             </p>
             <div id="category-rows" class="category-rows"></div>
             <div class="categories-add-row">
@@ -108,10 +109,9 @@
             <button id="categories-auto-create-button" class="btn categories-full-button" type="button">Auto-create</button>
             <p id="categories-error" class="modal-error"></p>
             <div class="screen-actions">
-                <button id="categories-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="categories-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
                 <button id="categories-onboarding-back-button" class="btn btn-secondary-pink" type="button">Back</button>
                 <button id="categories-done-button" class="btn btn-primary" type="button">Apply</button>
-                <button id="categories-close-button" class="btn btn-primary" type="button">Done</button>
             </div>
         </div>
 
@@ -131,20 +131,22 @@
                 <input type="number" step="0.01" min="0" inputmode="decimal" id="goals-amount-input" class="modal-input" placeholder="0.00" />
             </div>
             <div id="goals-last-set" class="goals-last-set"></div>
-            <div class="goals-result">
-                <p>If you follow your budgets, this will take:</p>
-                <p id="goals-duration-output" class="goals-output"></p>
+            <div id="goals-results">
+                <div class="goals-result">
+                    <p>If you follow your budgets, this will take:</p>
+                    <p id="goals-duration-output" class="goals-output"></p>
+                </div>
+                <div class="goals-result">
+                    <p id="goals-date-label">You'll reach your goal on:</p>
+                    <p id="goals-date-output" class="goals-output"></p>
+                </div>
             </div>
-            <div class="goals-result">
-                <p id="goals-date-label">You'll reach your goal on:</p>
-                <p id="goals-date-output" class="goals-output"></p>
-            </div>
+            <p id="goals-no-savings-message" class="goals-result">Oops, your current budgets don't leave any expected savings. Check if your categories are set up correctly, or try to either generate more income or cut back in some categories.</p>
             <p id="goals-error" class="modal-error"></p>
             <div class="screen-actions">
-                <button id="goals-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="goals-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
                 <button id="goals-onboarding-back-button" class="btn btn-secondary-pink" type="button">Back</button>
                 <button id="goals-done-button" class="btn btn-primary" type="button">Apply</button>
-                <button id="goals-close-button" class="btn btn-primary" type="button">Done</button>
             </div>
         </div>
 
@@ -187,9 +189,8 @@
             </div>
             <p id="settings-error" class="modal-error"></p>
             <div class="screen-actions">
-                <button id="settings-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
+                <button id="settings-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
                 <button id="settings-apply-button" class="btn btn-primary" type="button">Apply</button>
-                <button id="settings-close-button" class="btn btn-primary" type="button">Done</button>
             </div>
             <div class="settings-danger-zone">
                 <div class="settings-data-actions">
@@ -285,8 +286,8 @@
                 You have changes that haven't been applied yet.
             </div>
             <div class="modal-actions">
-                <button id="settings-unsaved-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
-                <button id="settings-unsaved-apply-button" class="btn btn-primary" type="button">Apply</button>
+                <button id="settings-unsaved-back-button" class="btn btn-secondary-pink" type="button">Back</button>
+                <button id="settings-unsaved-discard-button" class="btn btn-primary" type="button">Discard</button>
             </div>
         </div>
 
@@ -297,8 +298,8 @@
                 You have changes that haven't been applied yet.
             </div>
             <div class="modal-actions">
-                <button id="categories-unsaved-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
-                <button id="categories-unsaved-apply-button" class="btn btn-primary" type="button">Apply</button>
+                <button id="categories-unsaved-back-button" class="btn btn-secondary-pink" type="button">Back</button>
+                <button id="categories-unsaved-discard-button" class="btn btn-primary" type="button">Discard</button>
             </div>
         </div>
 
@@ -309,8 +310,8 @@
                 You have changes that haven't been applied yet.
             </div>
             <div class="modal-actions">
-                <button id="goals-unsaved-revert-button" class="btn btn-secondary-pink" type="button">Revert</button>
-                <button id="goals-unsaved-apply-button" class="btn btn-primary" type="button">Apply</button>
+                <button id="goals-unsaved-back-button" class="btn btn-secondary-pink" type="button">Back</button>
+                <button id="goals-unsaved-discard-button" class="btn btn-primary" type="button">Discard</button>
             </div>
         </div>
 

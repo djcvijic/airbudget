@@ -16,23 +16,21 @@ suite("settings screen", function () {
         assertEqual(win.settingsCurrencySelect.value, "USD");
     });
 
-    test("opens clean: shows a single Done button, no Revert/Apply", async function () {
+    test("opens clean: Cancel and Apply are both shown, Apply disabled", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
 
-        assertEqual(win.settingsRevertButton.style.display, "none");
-        assertEqual(win.settingsApplyButton.style.display, "none");
-        assertNotEqual(win.settingsCloseButton.style.display, "none");
+        assertNotEqual(win.settingsCancelButton.style.display, "none");
+        assertNotEqual(win.settingsApplyButton.style.display, "none");
+        assertTrue(win.settingsApplyButton.disabled);
     });
 
-    test("changing a value swaps Done for Revert + Apply", async function () {
+    test("changing a value enables Apply", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
         setValue(win.settingsCurrencySelect, "EUR");
 
-        assertNotEqual(win.settingsRevertButton.style.display, "none");
-        assertNotEqual(win.settingsApplyButton.style.display, "none");
-        assertEqual(win.settingsCloseButton.style.display, "none");
+        assertFalse(win.settingsApplyButton.disabled);
     });
 
     test("unapplied changes trigger a warning when leaving", async function () {
@@ -45,16 +43,29 @@ suite("settings screen", function () {
         assertFalse(isHidden(win.settingsUnsavedModal));
     });
 
-    test("reverting the warning discards the change", async function () {
+    test("discarding from the warning modal discards the change", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
         setValue(win.settingsCurrencySelect, "EUR");
         win.document.getElementById("settings-back-button").click();
 
-        win.document.getElementById("settings-unsaved-revert-button").click();
+        win.document.getElementById("settings-unsaved-discard-button").click();
 
         assertTrue(isActive(win.mainViewScreen));
         assertEqual(win.state.currency, "USD");
+    });
+
+    test("backing out of the warning modal keeps the edit and stays on the screen", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        setValue(win.settingsCurrencySelect, "EUR");
+        win.document.getElementById("settings-back-button").click();
+
+        win.document.getElementById("settings-unsaved-back-button").click();
+
+        assertTrue(isActive(win.settingsScreen));
+        assertTrue(isHidden(win.settingsUnsavedModal));
+        assertEqual(win.settingsCurrencySelect.value, "EUR");
     });
 
     test("applying saves the new period and currency", async function () {
@@ -76,14 +87,25 @@ suite("settings screen", function () {
         assertEqual(tile.textContent, "GBP");
     });
 
-    test("clicking Done navigates back with no warning", async function () {
+    test("clicking Cancel with no changes navigates back with no warning", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
 
-        win.settingsCloseButton.click();
+        win.settingsCancelButton.click();
 
         assertTrue(isActive(win.mainViewScreen));
         assertTrue(isHidden(win.settingsUnsavedModal));
+    });
+
+    test("clicking Cancel with unsaved changes shows a warning instead of discarding immediately", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+        setValue(win.settingsCurrencySelect, "EUR");
+
+        win.settingsCancelButton.click();
+
+        assertTrue(isActive(win.settingsScreen), "navigation is blocked until the warning is resolved");
+        assertFalse(isHidden(win.settingsUnsavedModal));
     });
 
     test("navigating away with no changes skips the warning", async function () {

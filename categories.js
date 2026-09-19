@@ -11,10 +11,9 @@ var categoriesErrorEl = document.getElementById("categories-error");
 var categoriesTitleEl = document.getElementById("categories-title");
 var categoriesBackButton = document.getElementById("categories-back-button");
 var categoriesOnboardingBackButton = document.getElementById("categories-onboarding-back-button");
-var categoriesRevertButton = document.getElementById("categories-revert-button");
+var categoriesCancelButton = document.getElementById("categories-cancel-button");
 var categoriesAutoCreateButton = document.getElementById("categories-auto-create-button");
 var categoriesDoneButton = document.getElementById("categories-done-button");
-var categoriesCloseButton = document.getElementById("categories-close-button");
 var categoriesDescriptionEl = document.getElementById("categories-description");
 var categoriesUnsavedModal = document.getElementById("categories-unsaved-modal");
 
@@ -249,21 +248,17 @@ function hasUnsavedCategoriesChanges() {
     return JSON.stringify(getCategoryRowsSnapshot()) !== JSON.stringify(categoriesOriginalSnapshot);
 }
 
-// Forced (onboarding) mode always shows Back + Apply/Done, dirty or not, so
-// Revert and the Done-only close button stay fixed there. Reopened mode
-// instead swaps Revert + Apply for a single Done button once there's
-// nothing left to revert or apply.
+// Forced mode's Apply is never disabled; reopened mode disables it once clean.
 function updateCategoriesActionButtons() {
     if (categoriesForced) {
-        categoriesRevertButton.style.display = "none";
+        categoriesCancelButton.style.display = "none";
         categoriesDoneButton.style.display = "";
-        categoriesCloseButton.style.display = "none";
+        categoriesDoneButton.disabled = false;
         return;
     }
-    var dirty = hasUnsavedCategoriesChanges();
-    categoriesRevertButton.style.display = dirty ? "" : "none";
-    categoriesDoneButton.style.display = dirty ? "" : "none";
-    categoriesCloseButton.style.display = dirty ? "none" : "";
+    categoriesCancelButton.style.display = "";
+    categoriesDoneButton.style.display = "";
+    categoriesDoneButton.disabled = !hasUnsavedCategoriesChanges();
 }
 
 // Captures the current rows (full fidelity, not just for diffing) so

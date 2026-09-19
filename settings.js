@@ -18,9 +18,8 @@ var settingsScreen = document.getElementById("settings-screen");
 var settingsPeriodOptionsEl = document.getElementById("settings-period-options");
 var settingsCurrencySelect = document.getElementById("settings-currency-select");
 var settingsErrorEl = document.getElementById("settings-error");
-var settingsRevertButton = document.getElementById("settings-revert-button");
+var settingsCancelButton = document.getElementById("settings-cancel-button");
 var settingsApplyButton = document.getElementById("settings-apply-button");
-var settingsCloseButton = document.getElementById("settings-close-button");
 var settingsUnsavedModal = document.getElementById("settings-unsaved-modal");
 var importFileInput = document.getElementById("import-file-input");
 var deleteDataButton = document.getElementById("delete-data-button");
@@ -114,10 +113,7 @@ function hasUnsavedSettingsChanges() {
 }
 
 function updateSettingsActionButtons() {
-    var dirty = hasUnsavedSettingsChanges();
-    settingsRevertButton.style.display = dirty ? "" : "none";
-    settingsApplyButton.style.display = dirty ? "" : "none";
-    settingsCloseButton.style.display = dirty ? "none" : "";
+    settingsApplyButton.disabled = !hasUnsavedSettingsChanges();
 }
 
 function resolvePendingSettingsNavigation() {

@@ -18,44 +18,52 @@ async function openReopenedCategories() {
 }
 
 suite("categories screen: reopened (non-forced) editing", function () {
-    test("reopened screen shows Back and no forced chrome, clean so just Done", async function () {
+    test("reopened screen shows Back and no forced chrome, clean so Apply is disabled", async function () {
         var win = await openReopenedCategories();
         assertEqual(win.categoriesDoneButton.textContent, "Apply");
         assertNotEqual(win.categoriesBackButton.style.display, "none");
         assertEqual(win.categoriesOnboardingBackButton.style.display, "none");
-        assertEqual(win.categoriesRevertButton.style.display, "none");
-        assertEqual(win.categoriesDoneButton.style.display, "none");
-        assertNotEqual(win.categoriesCloseButton.style.display, "none");
+        assertNotEqual(win.categoriesCancelButton.style.display, "none");
+        assertNotEqual(win.categoriesDoneButton.style.display, "none");
+        assertTrue(win.categoriesDoneButton.disabled);
     });
 
-    test("editing a row swaps Done for Revert + Apply", async function () {
+    test("editing a row enables Apply", async function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         setValue(row.querySelector(".category-row-name"), "Changed Name");
 
-        assertEqual(win.categoriesCloseButton.style.display, "none");
-        assertNotEqual(win.categoriesRevertButton.style.display, "none");
-        assertNotEqual(win.categoriesDoneButton.style.display, "none");
+        assertFalse(win.categoriesDoneButton.disabled);
     });
 
-    test("editing back to the original values restores the Done button", async function () {
+    test("editing back to the original values disables Apply again", async function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         var nameInput = row.querySelector(".category-row-name");
         setValue(nameInput, "Changed Name");
         setValue(nameInput, "Groceries");
 
-        assertEqual(win.categoriesRevertButton.style.display, "none");
-        assertNotEqual(win.categoriesCloseButton.style.display, "none");
+        assertTrue(win.categoriesDoneButton.disabled);
     });
 
-    test("clicking Done navigates back with no warning", async function () {
+    test("clicking Cancel with no changes navigates back with no warning", async function () {
         var win = await openReopenedCategories();
 
-        win.categoriesCloseButton.click();
+        win.categoriesCancelButton.click();
 
         assertTrue(isActive(win.mainViewScreen));
         assertTrue(isHidden(win.categoriesUnsavedModal));
+    });
+
+    test("clicking Cancel with unsaved changes shows a warning instead of discarding immediately", async function () {
+        var win = await openReopenedCategories();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        setValue(row.querySelector(".category-row-name"), "Changed Name");
+
+        win.categoriesCancelButton.click();
+
+        assertTrue(isActive(win.categoriesScreen), "navigation is blocked until the warning is resolved");
+        assertFalse(isHidden(win.categoriesUnsavedModal));
     });
 
     test("applying a change shows a confirmation toast", async function () {
@@ -87,13 +95,13 @@ suite("categories screen: reopened (non-forced) editing", function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         setValue(row.querySelector(".category-row-name"), "Changed Name");
-        assertNotEqual(win.categoriesRevertButton.style.display, "none");
+        assertFalse(win.categoriesDoneButton.disabled);
 
         win.openCategoriesScreen(true);
 
-        assertEqual(win.categoriesRevertButton.style.display, "none");
+        assertEqual(win.categoriesCancelButton.style.display, "none");
         assertNotEqual(win.categoriesDoneButton.style.display, "none");
-        assertEqual(win.categoriesCloseButton.style.display, "none");
+        assertFalse(win.categoriesDoneButton.disabled);
     });
 
     test("existing categories get a visibility toggle, never a delete button", async function () {
@@ -192,30 +200,31 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertFalse(isHidden(win.modalOverlay));
     });
 
-    test("reverting the warning modal discards the edit", async function () {
+    test("discarding from the warning modal discards the edit", async function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         setValue(row.querySelector(".category-row-name"), "Changed Name");
         win.categoriesBackButton.click();
 
-        win.document.getElementById("categories-unsaved-revert-button").click();
+        win.document.getElementById("categories-unsaved-discard-button").click();
 
         assertTrue(isActive(win.mainViewScreen));
         var saved = win.state.categories.filter(function (c) { return c.id === "cat-groceries"; })[0];
-        assertEqual(saved.name, "Groceries", "revert must discard the unapplied edit");
+        assertEqual(saved.name, "Groceries", "discard must drop the unapplied edit");
     });
 
-    test("applying from the warning modal saves the edit", async function () {
+    test("backing out of the warning modal keeps the edit and stays on the screen", async function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         setValue(row.querySelector(".category-row-name"), "Changed Name");
         win.categoriesBackButton.click();
 
-        win.document.getElementById("categories-unsaved-apply-button").click();
+        win.document.getElementById("categories-unsaved-back-button").click();
 
-        assertTrue(isActive(win.mainViewScreen));
-        var saved = win.state.categories.filter(function (c) { return c.id === "cat-groceries"; })[0];
-        assertEqual(saved.name, "Changed Name");
+        assertTrue(isActive(win.categoriesScreen));
+        assertTrue(isHidden(win.categoriesUnsavedModal));
+        var row2 = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        assertEqual(row2.querySelector(".category-row-name").value, "Changed Name");
     });
 
     test("navigating away with no changes skips the warning modal", async function () {
