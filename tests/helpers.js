@@ -11,7 +11,6 @@ function seedState(partial) {
     localStorage.setItem(APP_META_KEY, JSON.stringify({
         period: partial.period || null,
         currency: partial.currency || null,
-        detailMode: partial.detailMode || "day",
         goalAmount: partial.goalAmount != null ? partial.goalAmount : null,
         goalSetDate: partial.goalSetDate || null
     }));

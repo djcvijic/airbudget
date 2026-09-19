@@ -201,11 +201,10 @@ function renderDetailView() {
 
 // mode is optional: pass it to force a specific grouping (e.g. a tile's
 // history button always wants category mode); omit it to keep whatever
-// grouping was last used, persisted in state.detailMode.
+// grouping was last used this session (state.detailMode, in-memory only).
 function openDetailView(mode, scrollToCategoryId) {
     if (mode) {
         state.detailMode = mode;
-        saveMeta();
     }
 
     showScreen(detailScreen);
@@ -225,7 +224,6 @@ function setDetailMode(mode) {
         return;
     }
     state.detailMode = mode;
-    saveMeta();
     renderDetailView();
 }
 

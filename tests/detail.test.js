@@ -100,6 +100,18 @@ suite("detail view", function () {
         assertEqual(win.state.detailMode, "category");
     });
 
+    test("the selected grouping does not survive a reload", async function () {
+        var win = await freshApp(seededForDetail());
+        win.document.getElementById("open-detail-button").click();
+        var categoryButton = [].filter.call(win.detailModeButtons, function (b) { return b.dataset.mode === "category"; })[0];
+        categoryButton.click();
+        assertEqual(win.state.detailMode, "category");
+
+        var reloaded = await loadApp();
+
+        assertEqual(reloaded.state.detailMode, "day");
+    });
+
     test("back button returns to the dashboard", async function () {
         var win = await freshApp(seededForDetail());
         win.document.getElementById("open-detail-button").click();

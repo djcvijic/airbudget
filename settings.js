@@ -249,7 +249,7 @@ function importData() {
             currency: imported.currency || null,
             categories: imported.categories,
             transactions: imported.transactions,
-            detailMode: imported.detailMode || "day"
+            detailMode: "day"
         };
         saveMeta();
         saveCategories();

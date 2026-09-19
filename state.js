@@ -32,7 +32,7 @@ function loadState() {
         currency: meta.currency || null,
         categories: readJSON(CATEGORIES_KEY, []),
         transactions: readJSON(TRANSACTIONS_KEY, []),
-        detailMode: meta.detailMode || "day",
+        detailMode: "day",
         goalAmount: meta.goalAmount != null ? meta.goalAmount : null,
         goalSetDate: meta.goalSetDate || null
     };
@@ -52,7 +52,6 @@ function saveMeta() {
     return persist(META_KEY, {
         period: state.period,
         currency: state.currency,
-        detailMode: state.detailMode,
         goalAmount: state.goalAmount,
         goalSetDate: state.goalSetDate
     });
@@ -78,7 +77,6 @@ window.addEventListener("storage", function (e) {
         var meta = readJSON(META_KEY, {});
         state.period = meta.period || null;
         state.currency = meta.currency || null;
-        state.detailMode = meta.detailMode || "day";
         state.goalAmount = meta.goalAmount != null ? meta.goalAmount : null;
         state.goalSetDate = meta.goalSetDate || null;
     } else if (e.key === CATEGORIES_KEY) {
