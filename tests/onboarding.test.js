@@ -1,9 +1,9 @@
 suite("onboarding flow", function () {
-    test("fresh install boots straight into onboarding with no top bar", async function () {
+    test("fresh install boots straight into onboarding with no bottom nav", async function () {
         var win = await freshApp(null);
         assertTrue(isActive(win.onboardingScreen), "onboarding screen should be active");
-        assertEqual(win.topBarEl.style.display, "none");
-        assertTrue(win.document.body.classList.contains("no-top-bar"));
+        assertEqual(win.bottomNavEl.style.display, "none");
+        assertTrue(win.document.body.classList.contains("no-bottom-nav"));
     });
 
     test("continuing without a chosen period shows an error and stays put", async function () {
@@ -46,14 +46,14 @@ suite("onboarding flow", function () {
         assertEqual(win.goalsBackButton.style.display, "none");
         assertNotEqual(win.goalsOnboardingBackButton.style.display, "none");
         assertEqual(win.goalsDoneButton.textContent, "Done");
-        assertEqual(win.topBarEl.style.display, "none", "top bar stays hidden through the 3rd onboarding step too");
+        assertEqual(win.bottomNavEl.style.display, "none", "bottom nav stays hidden through the 3rd onboarding step too");
         assertEqual(win.state.categories.length, 1);
         assertEqual(win.state.categories[0].name, "Groceries");
 
         win.goalsDoneButton.click();
 
         assertTrue(isActive(win.mainViewScreen), "dashboard should open after onboarding completes");
-        assertEqual(win.topBarEl.style.display, "", "top bar reappears once onboarding is complete");
+        assertEqual(win.bottomNavEl.style.display, "", "bottom nav reappears once onboarding is complete");
     });
 
     test("backing out of forced categories returns to onboarding and preserves the draft", async function () {

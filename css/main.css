@@ -9,10 +9,9 @@
     display: none !important;
 }
 
-/* Raised above our fixed bottom nav bar (64px) instead of theme.css's
-   default bottom:32px, which would otherwise sit underneath it. Also
-   smaller and filled white, rather than theme.css's larger transparent
-   default. */
+/* Raised above theme.css's .bottom-nav (64px) instead of its default
+   bottom:32px, which would otherwise sit underneath it. Also smaller and
+   filled white, rather than theme.css's larger transparent default. */
 body.detail-screen-active #to-top {
     display: block !important;
     bottom: 80px;
@@ -21,46 +20,15 @@ body.detail-screen-active #to-top {
     background-color: white;
 }
 
-/* Persistent nav bar, replacing theme.css's .app-header on every screen.
-   Full-bleed and fixed to the bottom so it stays visible while a screen's
-   own content scrolls above it. */
-.top-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background-color: #0099ff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 20px;
-    z-index: 5;
-}
-
-.top-bar-nav {
-    display: flex;
-    gap: 20px;
-}
-
-.top-bar-nav .btn-text {
-    font-size: 20px;
-    padding: 8px;
-    color: white;
-}
-
-.top-bar-nav .btn-text:hover {
-    color: #e6f6ff;
-}
-
-/* Room for the fixed nav bar, overriding theme.css's default padding-bottom. */
+/* Room for theme.css's fixed .bottom-nav, overriding its default
+   padding-bottom. */
 .app {
     padding-bottom: 72px;
 }
 
-/* No nav bar during onboarding (state.js's showScreen toggles this), so
+/* No bottom nav during onboarding (state.js's showScreen toggles this), so
    the space reserved for it isn't needed either. */
-body.no-top-bar .app {
+body.no-bottom-nav .app {
     padding-bottom: 32px;
 }
 

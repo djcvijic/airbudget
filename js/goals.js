@@ -133,11 +133,11 @@ function openGoalsScreen(forced) {
 
     showScreen(goalsScreen);
 
-    // showScreen() would show the top bar here (already onboarded by
+    // showScreen() would show the bottom nav here (already onboarded by
     // step 3) — override it back off, like steps 1-2 get for free.
     if (forced) {
-        topBarEl.style.display = "none";
-        document.body.classList.add("no-top-bar");
+        bottomNavEl.style.display = "none";
+        document.body.classList.add("no-bottom-nav");
     }
 }
 

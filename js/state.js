@@ -118,7 +118,7 @@ function isOnboardingComplete(s) {
 // here (rather than duplicated per screen file) because every screen and
 // both modals need them, and no single screen file owns them.
 var modalOverlay = document.getElementById("modal-overlay");
-var topBarEl = document.getElementById("top-bar");
+var bottomNavEl = document.getElementById("bottom-nav");
 
 function showScreen(screen) {
     document.querySelectorAll(".screen").forEach(function (s) {
@@ -126,9 +126,9 @@ function showScreen(screen) {
     });
     screen.classList.add("active");
 
-    var showTopBar = isOnboardingComplete(state);
-    topBarEl.style.display = showTopBar ? "" : "none";
-    document.body.classList.toggle("no-top-bar", !showTopBar);
+    var showBottomNav = isOnboardingComplete(state);
+    bottomNavEl.style.display = showBottomNav ? "" : "none";
+    document.body.classList.toggle("no-bottom-nav", !showBottomNav);
 
     document.body.classList.toggle("detail-screen-active", screen.id === "detail-screen");
 

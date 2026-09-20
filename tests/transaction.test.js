@@ -30,7 +30,7 @@ suite("transaction screen", function () {
         assertTrue(win.transactionAmountDisplayEl.classList.contains("transaction-amount-display-empty"));
     });
 
-    test("opening via the top-bar button has no preset category", async function () {
+    test("opening via the bottom-nav button has no preset category", async function () {
         var win = await freshApp(seededForTransactions());
         win.document.getElementById("open-transaction-button").click();
 

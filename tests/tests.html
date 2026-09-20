@@ -93,6 +93,14 @@
         // The app under test registers a cache-first service worker. Any
         // registration left over from manually using the app in this same
         // browser would otherwise serve stale JS/HTML to every test.
+        //
+        // A leftover service worker isn't the only staleness risk: Chrome's
+        // plain HTTP disk cache survives unregistering one. If another
+        // project was ever served from this same origin, its same-named
+        // files can still be cached and served here with no error.
+        // Force-refresh every asset index.html references, parsed from
+        // index.html itself so the list can't go stale, before any test
+        // loads the app.
         Promise.resolve()
             .then(function () {
                 if (!("serviceWorker" in navigator)) {
@@ -109,6 +117,22 @@
                 return caches.keys().then(function (keys) {
                     return Promise.all(keys.map(function (k) { return caches.delete(k); }));
                 });
+            })
+            .then(function () {
+                var indexUrl = new URL("../index.html", location.href);
+                return fetch(indexUrl, { cache: "reload" })
+                    .then(function (r) { return r.text(); })
+                    .then(function (html) {
+                        var doc = new DOMParser().parseFromString(html, "text/html");
+                        var assetUrls = [];
+                        doc.querySelectorAll("script[src], link[href]").forEach(function (el) {
+                            var attr = el.hasAttribute("src") ? "src" : "href";
+                            assetUrls.push(new URL(el.getAttribute(attr), indexUrl));
+                        });
+                        return Promise.all(assetUrls.map(function (u) {
+                            return fetch(u, { cache: "reload" });
+                        }));
+                    });
             })
             .then(runTests);
     </script>
