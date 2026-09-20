@@ -60,9 +60,7 @@ function isReportProblem(entry) {
 }
 
 function buildReportProblemTile(entry) {
-    var tile = document.createElement("div");
-    tile.className = "category-tile" + (entry.overMax ? " category-tile-over" : "");
-    tile.dataset.id = entry.id;
+    var tile = buildTileShell(entry);
 
     var emojiZone = document.createElement("div");
     emojiZone.className = "category-tile-add-zone";
@@ -72,46 +70,9 @@ function buildReportProblemTile(entry) {
     emojiZone.appendChild(emojiEl);
     tile.appendChild(emojiZone);
 
-    var infoEl = document.createElement("div");
-    infoEl.className = "category-tile-info";
-
-    var track = document.createElement("div");
-    track.className = "category-tile-progress-track";
-    var fill = document.createElement("div");
-    fill.className = "category-tile-progress-fill";
-    var percent = entry.max != null && entry.max > 0 ? (Math.abs(entry.spend) / entry.max) * 100 : 0;
-    fill.style.width = Math.max(0, Math.min(100, percent)) + "%";
-    track.appendChild(fill);
-    infoEl.appendChild(track);
-
-    var isIncome = entry.spend < 0;
-    var isZero = entry.spend === 0;
-
-    var amountsEl = document.createElement("div");
-    amountsEl.className = "category-tile-amounts" + (isZero ? "" : (isIncome ? " amount-income" : " amount-spend"));
-    var amountValueEl = document.createElement("div");
-    amountValueEl.className = "category-tile-amount-value";
-    amountValueEl.textContent = (isZero ? "" : (isIncome ? "+" : "-")) + formatCompactAmount(Math.abs(entry.spend));
-    var amountCurrencyEl = document.createElement("div");
-    amountCurrencyEl.className = "category-tile-amount-currency";
-    amountCurrencyEl.textContent = state.currency;
-    amountsEl.appendChild(amountValueEl);
-    amountsEl.appendChild(amountCurrencyEl);
-    infoEl.appendChild(amountsEl);
-    tile.appendChild(infoEl);
+    tile.appendChild(buildTileInfo(entry));
 
     return tile;
-}
-
-function renderReportAmount(el, amount) {
-    if (amount === 0) {
-        el.className = "report-row-value balance-amount";
-        el.textContent = formatCurrency(0);
-        return;
-    }
-    var isPositive = amount > 0;
-    el.className = "report-row-value balance-amount" + (isPositive ? " amount-income" : " amount-spend");
-    el.textContent = (isPositive ? "+" : "-") + formatCurrency(Math.abs(amount));
 }
 
 function openReportModal() {
@@ -130,11 +91,11 @@ function openReportModal() {
     reportExpectedLabelEl.textContent = "Expected balance this " + GOAL_PERIOD_UNIT_NAMES[state.period] + ":";
 
     var expectedSavings = getExpectedPeriodicIncome();
-    renderReportAmount(reportExpectedValueEl, expectedSavings);
+    renderSignedAmount(reportExpectedValueEl, "report-row-value balance-amount", expectedSavings, expectedSavings > 0, formatCurrency);
 
     var entries = getSortedCategoryEntries(range.start, range.end);
     var actualSavings = -entries.reduce(function (sum, e) { return sum + e.spend; }, 0);
-    renderReportAmount(reportActualValueEl, actualSavings);
+    renderSignedAmount(reportActualValueEl, "report-row-value balance-amount", actualSavings, actualSavings > 0, formatCurrency);
 
     var onTrack = actualSavings >= expectedSavings;
     reportOnTrackMessageEl.style.display = onTrack ? "" : "none";

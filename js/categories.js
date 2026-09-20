@@ -20,7 +20,7 @@ var categoriesUnsavedModal = document.getElementById("categories-unsaved-modal")
 var categoriesForced = false;
 var categoriesAutoCreated = false;
 var categoriesOriginalSnapshot = null;
-var pendingCategoriesNavigation = null;
+var categoriesUnsavedGuard = createUnsavedGuard(hasUnsavedCategoriesChanges, categoriesUnsavedModal);
 
 var categoriesDraft = createStepDraft();
 
@@ -388,9 +388,7 @@ function applyCategories() {
 }
 
 function resolvePendingCategoriesNavigation() {
-    var navigateFn = pendingCategoriesNavigation || goToMainView;
-    pendingCategoriesNavigation = null;
-    navigateFn();
+    categoriesUnsavedGuard.resolvePending(goToMainView);
 }
 
 function revertCategories() {
@@ -398,14 +396,13 @@ function revertCategories() {
     resolvePendingCategoriesNavigation();
 }
 
-// Same warn-before-leaving pattern as settings; forced mode is never gated.
+// Forced mode is never gated, same as goFromGoals.
 function goFromCategories(navigateFn) {
-    if (!categoriesScreen.classList.contains("active") || categoriesForced || !hasUnsavedCategoriesChanges()) {
+    if (categoriesForced) {
         navigateFn();
         return;
     }
-    pendingCategoriesNavigation = navigateFn;
-    openModal(categoriesUnsavedModal);
+    categoriesUnsavedGuard.goFrom(categoriesScreen, navigateFn);
 }
 
 function backFromCategories() {

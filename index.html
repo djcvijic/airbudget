@@ -12,17 +12,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="airbudget" />
-    <link href="theme.css" rel="stylesheet" />
-    <link href="main.css" rel="stylesheet" />
-    <link href="settings.css" rel="stylesheet" />
-    <link href="categories.css" rel="stylesheet" />
-    <link href="goals.css" rel="stylesheet" />
-    <link href="onboarding.css" rel="stylesheet" />
-    <link href="main-view.css" rel="stylesheet" />
-    <link href="install-prompt.css" rel="stylesheet" />
-    <link href="transaction.css" rel="stylesheet" />
-    <link href="detail.css" rel="stylesheet" />
-    <link href="report.css" rel="stylesheet" />
+    <link href="css/theme.css" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
+    <link href="css/settings.css" rel="stylesheet" />
+    <link href="css/categories.css" rel="stylesheet" />
+    <link href="css/goals.css" rel="stylesheet" />
+    <link href="css/onboarding.css" rel="stylesheet" />
+    <link href="css/main-view.css" rel="stylesheet" />
+    <link href="css/transaction.css" rel="stylesheet" />
+    <link href="css/detail.css" rel="stylesheet" />
+    <link href="css/report.css" rel="stylesheet" />
     <link href="fontawesome/css/fontawesome.min.css" rel="stylesheet" />
     <link href="fontawesome/css/solid.min.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -53,10 +52,10 @@
     </div>
 
     <div class="app">
-        <div id="install-banner" class="install-banner">
-            <span id="install-banner-text" class="install-banner-text"></span>
-            <button id="install-banner-action-button" class="btn btn-text install-banner-action" type="button">Install</button>
-            <button id="install-banner-dismiss-button" class="btn btn-text install-banner-dismiss" type="button" aria-label="Dismiss install banner">
+        <div id="install-banner" class="banner">
+            <span id="install-banner-text" class="banner-text"></span>
+            <button id="install-banner-action-button" class="btn btn-text banner-action" type="button">Install</button>
+            <button id="install-banner-dismiss-button" class="btn btn-text banner-dismiss" type="button" aria-label="Dismiss install banner">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -152,10 +151,10 @@
         </div>
 
         <div id="main-view-screen" class="screen">
-            <div id="report-banner" class="report-banner">
-                <span id="report-banner-text" class="report-banner-text">A new report is ready.</span>
-                <button id="report-banner-see-button" class="btn btn-text report-banner-action" type="button">See report</button>
-                <button id="report-banner-dismiss-button" class="btn btn-text report-banner-dismiss" type="button" aria-label="Dismiss report banner">
+            <div id="report-banner" class="banner">
+                <span id="report-banner-text" class="banner-text">A new report is ready.</span>
+                <button id="report-banner-see-button" class="btn btn-text banner-action" type="button">See report</button>
+                <button id="report-banner-dismiss-button" class="btn btn-text banner-dismiss" type="button" aria-label="Dismiss report banner">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -389,20 +388,20 @@
 
     <div id="to-top"><i class="fa-solid fa-angle-up"></i> Back to top</div>
     <div id="toast" class="toast"></div>
-    <script src="theme.js" type="application/javascript"></script>
-    <script src="currencies-data.js" type="application/javascript"></script>
-    <script src="state.js" type="application/javascript"></script>
-    <script src="settings.js" type="application/javascript"></script>
-    <script src="onboarding.js" type="application/javascript"></script>
-    <script src="categories.js" type="application/javascript"></script>
-    <script src="goals.js" type="application/javascript"></script>
-    <script src="main-view.js" type="application/javascript"></script>
-    <script src="report.js" type="application/javascript"></script>
-    <script src="install-prompt.js" type="application/javascript"></script>
-    <script src="transaction.js" type="application/javascript"></script>
-    <script src="detail.js" type="application/javascript"></script>
-    <script src="debug.js" type="application/javascript"></script>
-    <script src="main.js" type="application/javascript"></script>
+    <script src="js/theme.js" type="application/javascript"></script>
+    <script src="js/currencies-data.js" type="application/javascript"></script>
+    <script src="js/state.js" type="application/javascript"></script>
+    <script src="js/settings.js" type="application/javascript"></script>
+    <script src="js/onboarding.js" type="application/javascript"></script>
+    <script src="js/categories.js" type="application/javascript"></script>
+    <script src="js/goals.js" type="application/javascript"></script>
+    <script src="js/main-view.js" type="application/javascript"></script>
+    <script src="js/report.js" type="application/javascript"></script>
+    <script src="js/install-prompt.js" type="application/javascript"></script>
+    <script src="js/transaction.js" type="application/javascript"></script>
+    <script src="js/detail.js" type="application/javascript"></script>
+    <script src="js/debug.js" type="application/javascript"></script>
+    <script src="js/main.js" type="application/javascript"></script>
 </body>
 
 </html>

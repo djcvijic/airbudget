@@ -3,12 +3,12 @@
 
 @font-face {
     font-family: "Work Sans";
-    src: url("fonts/WorkSans-Regular.woff2");
+    src: url("../fonts/WorkSans-Regular.woff2");
 }
 
 @font-face {
     font-family: "Ubuntu Mono";
-    src: url("fonts/UbuntuMono-Regular.ttf");
+    src: url("../fonts/UbuntuMono-Regular.ttf");
 }
 
 html {
@@ -285,6 +285,38 @@ button {
 
 #to-top:hover {
     background-color: #e6f6ff;
+}
+
+/* Dismissible pill banner: shared by every "there's something new" nudge
+   (install prompt, report-ready). Feature files only need their own
+   trigger/dismiss logic and content — this covers the shared look. */
+.banner {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background-color: #e6f6ff;
+    border: 2px solid #0099ff;
+    font-size: 14px;
+}
+
+.banner-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.banner-action {
+    color: #0099ff;
+    font-weight: bold;
+    white-space: nowrap;
+    padding: 4px 8px;
+}
+
+.banner-dismiss {
+    color: #666;
+    padding: 4px 8px;
 }
 
 .modal-overlay {

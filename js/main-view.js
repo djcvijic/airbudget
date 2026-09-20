@@ -19,16 +19,7 @@ var periodOffset = 0;
 
 function renderTotalProgress(entries) {
     var totalSpend = entries.reduce(function (sum, e) { return sum + e.spend; }, 0);
-
-    if (totalSpend === 0) {
-        totalProgressAmountEl.className = "total-progress-amount balance-amount";
-        totalProgressAmountEl.textContent = formatCurrency(0);
-        return;
-    }
-
-    var isIncome = totalSpend < 0;
-    totalProgressAmountEl.className = "total-progress-amount balance-amount" + (isIncome ? " amount-income" : " amount-spend");
-    totalProgressAmountEl.textContent = (isIncome ? "+" : "-") + formatCurrency(Math.abs(totalSpend));
+    renderSignedAmount(totalProgressAmountEl, "total-progress-amount balance-amount", totalSpend, totalSpend < 0, formatCurrency);
 }
 
 // Keeps tile amounts to ~5 characters so they fit the compact grid: plain
@@ -45,27 +36,17 @@ function formatCompactAmount(amount) {
     return amount.toFixed(abs > 99.99 ? 0 : 2);
 }
 
-function buildCategoryTile(entry) {
+// Shared by the dashboard grid and the report's inert problem tiles
+// (report.js): both show the same progress bar and amount readout for a
+// category entry, and only the emoji zone and trailing controls differ.
+function buildTileShell(entry) {
     var tile = document.createElement("div");
     tile.className = "category-tile" + (entry.overMax ? " category-tile-over" : "");
     tile.dataset.id = entry.id;
+    return tile;
+}
 
-    var addZone = document.createElement("button");
-    addZone.type = "button";
-    addZone.className = "category-tile-add-zone";
-    addZone.disabled = periodOffset !== 0;
-
-    var addIcon = document.createElement("i");
-    addIcon.className = "fa-solid fa-plus category-tile-add-icon";
-
-    var emojiEl = document.createElement("div");
-    emojiEl.className = "category-tile-emoji";
-    emojiEl.textContent = entry.emoji;
-
-    addZone.appendChild(addIcon);
-    addZone.appendChild(emojiEl);
-    tile.appendChild(addZone);
-
+function buildTileInfo(entry) {
     var infoEl = document.createElement("div");
     infoEl.className = "category-tile-info";
 
@@ -97,7 +78,30 @@ function buildCategoryTile(entry) {
     amountsEl.appendChild(amountValueEl);
     amountsEl.appendChild(amountCurrencyEl);
     infoEl.appendChild(amountsEl);
-    tile.appendChild(infoEl);
+
+    return infoEl;
+}
+
+function buildCategoryTile(entry) {
+    var tile = buildTileShell(entry);
+
+    var addZone = document.createElement("button");
+    addZone.type = "button";
+    addZone.className = "category-tile-add-zone";
+    addZone.disabled = periodOffset !== 0;
+
+    var addIcon = document.createElement("i");
+    addIcon.className = "fa-solid fa-plus category-tile-add-icon";
+
+    var emojiEl = document.createElement("div");
+    emojiEl.className = "category-tile-emoji";
+    emojiEl.textContent = entry.emoji;
+
+    addZone.appendChild(addIcon);
+    addZone.appendChild(emojiEl);
+    tile.appendChild(addZone);
+
+    tile.appendChild(buildTileInfo(entry));
 
     var divider = document.createElement("div");
     divider.className = "category-tile-divider";

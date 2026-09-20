@@ -39,6 +39,21 @@ function loadState() {
     };
 }
 
+// Copies each defaultState() field from the imported file when present.
+// A field added to defaultState() later is picked up automatically, with
+// no matching edit needed here or in any other reset path (deleteAllData,
+// fillRandomDebugData). detailMode is excluded: it's session-only and
+// never persisted (see loadState()).
+function stateFromImport(imported) {
+    var result = defaultState();
+    Object.keys(result).forEach(function (key) {
+        if (key !== "detailMode" && imported[key] !== undefined) {
+            result[key] = imported[key];
+        }
+    });
+    return result;
+}
+
 function persist(key, value) {
     try {
         localStorage.setItem(key, JSON.stringify(value));
@@ -271,6 +286,20 @@ function formatPeriodLabel(start, end) {
 
 function formatCurrency(amount) {
     return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " " + state.currency;
+}
+
+// Shared by every signed, colored amount (dashboard total, report
+// balances, detail rows). isIncome is caller-resolved rather than derived
+// from amount's sign here, since that convention differs by screen: net
+// spend positive, savings positive, or a transaction's fixed category type.
+function renderSignedAmount(el, baseClassName, amount, isIncome, formatFn) {
+    if (amount === 0) {
+        el.className = baseClassName;
+        el.textContent = formatFn(0);
+        return;
+    }
+    el.className = baseClassName + (isIncome ? " amount-income" : " amount-spend");
+    el.textContent = (isIncome ? "+" : "-") + formatFn(Math.abs(amount));
 }
 
 function getTransactionsInRange(start, end) {

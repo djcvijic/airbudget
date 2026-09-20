@@ -27,14 +27,7 @@ function buildTransactionRow(t) {
     });
 
     var amountEl = document.createElement("span");
-    if (t.amount === 0) {
-        amountEl.className = "detail-transaction-amount";
-        amountEl.textContent = formatCurrency(0);
-    } else {
-        var isIncome = category && category.type === "income";
-        amountEl.className = "detail-transaction-amount" + (isIncome ? " amount-income" : " amount-spend");
-        amountEl.textContent = (isIncome ? "+" : "-") + formatCurrency(t.amount);
-    }
+    renderSignedAmount(amountEl, "detail-transaction-amount", t.amount, category && category.type === "income", formatCurrency);
 
     var top = document.createElement("div");
     top.className = "detail-transaction-top";
@@ -98,14 +91,7 @@ function buildDetailGroup(title, balance, elementId, collapsed) {
     titleEl.appendChild(titleTextEl);
 
     var balanceEl = document.createElement("span");
-    if (balance === 0) {
-        balanceEl.className = "detail-group-balance balance-amount";
-        balanceEl.textContent = formatCurrency(0);
-    } else {
-        var isIncome = balance < 0;
-        balanceEl.className = "detail-group-balance balance-amount" + (isIncome ? " amount-income" : " amount-spend");
-        balanceEl.textContent = (isIncome ? "+" : "-") + formatCurrency(Math.abs(balance));
-    }
+    renderSignedAmount(balanceEl, "detail-group-balance balance-amount", balance, balance < 0, formatCurrency);
 
     header.appendChild(titleEl);
     header.appendChild(balanceEl);

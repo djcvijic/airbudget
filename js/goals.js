@@ -23,7 +23,7 @@ var goalsUnsavedModal = document.getElementById("goals-unsaved-modal");
 
 var goalsForced = false;
 var goalsOriginalAmount = null;
-var pendingGoalsNavigation = null;
+var goalsUnsavedGuard = createUnsavedGuard(hasUnsavedGoalsChanges, goalsUnsavedModal);
 
 var goalsDraft = createStepDraft();
 
@@ -173,9 +173,7 @@ function applyGoals() {
 }
 
 function resolvePendingGoalsNavigation() {
-    var navigateFn = pendingGoalsNavigation || goToMainView;
-    pendingGoalsNavigation = null;
-    navigateFn();
+    goalsUnsavedGuard.resolvePending(goToMainView);
 }
 
 function revertGoals() {
@@ -189,14 +187,13 @@ function revertGoals() {
     resolvePendingGoalsNavigation();
 }
 
-// Same warn-before-leaving pattern as settings/categories; forced is never gated.
+// Forced mode is never gated, same as goFromCategories.
 function goFromGoals(navigateFn) {
-    if (!goalsScreen.classList.contains("active") || goalsForced || !hasUnsavedGoalsChanges()) {
+    if (goalsForced) {
         navigateFn();
         return;
     }
-    pendingGoalsNavigation = navigateFn;
-    openModal(goalsUnsavedModal);
+    goalsUnsavedGuard.goFrom(goalsScreen, navigateFn);
 }
 
 function backFromGoals() {

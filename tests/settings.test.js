@@ -164,6 +164,36 @@ suite("settings screen", function () {
         assertTrue(isActive(win.mainViewScreen));
     });
 
+    test("a round trip through export and import preserves goal and report-seen state", async function () {
+        var seeded = seededForSettings();
+        seeded.goalAmount = 5000;
+        seeded.goalSetDate = "2026-01-01";
+        seeded.lastSeenReport = "2026-01-31T23:59:59";
+        var win = await freshApp(seeded);
+        win.document.getElementById("open-settings-button").click();
+
+        var capturedBlob = null;
+        var originalCreate = win.URL.createObjectURL;
+        var originalClick = win.HTMLAnchorElement.prototype.click;
+        win.URL.createObjectURL = function (blob) { capturedBlob = blob; return "blob:captured"; };
+        win.HTMLAnchorElement.prototype.click = function () { };
+        win.exportData();
+        win.URL.createObjectURL = originalCreate;
+        win.HTMLAnchorElement.prototype.click = originalClick;
+        var exported = await capturedBlob.text();
+
+        var file = new win.File([exported], "backup.json", { type: "application/json" });
+        var dataTransfer = new win.DataTransfer();
+        dataTransfer.items.add(file);
+        win.importFileInput.files = dataTransfer.files;
+        win.importFileInput.dispatchEvent(new win.Event("change", { bubbles: true }));
+        await wait(50);
+
+        assertEqual(win.state.goalAmount, 5000);
+        assertEqual(win.state.goalSetDate, "2026-01-01");
+        assertEqual(win.state.lastSeenReport, "2026-01-31T23:59:59");
+    });
+
     test("importing invalid JSON shows an error and leaves state untouched", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();

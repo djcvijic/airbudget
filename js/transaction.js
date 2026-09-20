@@ -148,12 +148,6 @@ transactionDatetimeInput.addEventListener("change", function () {
     updateTransactionDateDisplay();
 });
 
-// Used by the debug data generator (main.js) for random full timestamps;
-// the transaction screen itself only ever works with the date portion.
-function formatDatetimeLocal(date) {
-    return formatDateOnly(date) + "T" + pad2(date.getHours()) + ":" + pad2(date.getMinutes());
-}
-
 // Ranks categories for the picker by the same frecency score as the
 // dashboard grid and the detail view's category grouping (state.js).
 function sortedTransactionCategories() {

@@ -111,9 +111,9 @@ function main() {
     });
 
     function dismissModals() {
-        pendingSettingsNavigation = null;
-        pendingCategoriesNavigation = null;
-        pendingGoalsNavigation = null;
+        settingsUnsavedGuard.clearPending();
+        categoriesUnsavedGuard.clearPending();
+        goalsUnsavedGuard.clearPending();
         closeModals();
     }
 

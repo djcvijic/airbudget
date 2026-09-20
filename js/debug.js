@@ -50,7 +50,7 @@ function randomAmount(min, max) {
 }
 
 function randomDatetimeInRange(start, end) {
-    return formatDatetimeLocal(new Date(randomInt(start.getTime(), end.getTime() - 1)));
+    return formatDateTime(new Date(randomInt(start.getTime(), end.getTime() - 1)));
 }
 
 function shuffled(array) {

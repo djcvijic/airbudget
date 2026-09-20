@@ -28,7 +28,7 @@ var deleteConfirmButton = document.getElementById("delete-confirm-button");
 
 var settingsOriginalPeriod = null;
 var settingsOriginalCurrency = null;
-var pendingSettingsNavigation = null;
+var settingsUnsavedGuard = createUnsavedGuard(hasUnsavedSettingsChanges, settingsUnsavedModal);
 
 // The test harness flags itself via ?testMode=1 (see tests/helpers.js) so
 // the delete button can skip the 2s hold entirely and act like a normal
@@ -117,9 +117,7 @@ function updateSettingsActionButtons() {
 }
 
 function resolvePendingSettingsNavigation() {
-    var navigateFn = pendingSettingsNavigation || goToMainView;
-    pendingSettingsNavigation = null;
-    navigateFn();
+    settingsUnsavedGuard.resolvePending(goToMainView);
 }
 
 function applySettings() {
@@ -144,15 +142,8 @@ function revertSettings() {
     resolvePendingSettingsNavigation();
 }
 
-// Runs navigateFn now if there's nothing to lose; otherwise stashes it
-// and warns, running it once Apply/Revert resolves the warning.
 function goFromSettings(navigateFn) {
-    if (!settingsScreen.classList.contains("active") || !hasUnsavedSettingsChanges()) {
-        navigateFn();
-        return;
-    }
-    pendingSettingsNavigation = navigateFn;
-    openModal(settingsUnsavedModal);
+    settingsUnsavedGuard.goFrom(settingsScreen, navigateFn);
 }
 
 function backFromSettings() {
@@ -244,13 +235,7 @@ function importData() {
             return;
         }
 
-        state = {
-            period: imported.period || null,
-            currency: imported.currency || null,
-            categories: imported.categories,
-            transactions: imported.transactions,
-            detailMode: "day"
-        };
+        state = stateFromImport(imported);
         saveMeta();
         saveCategories();
         saveTransactions();
