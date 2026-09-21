@@ -30,6 +30,9 @@ body {
     background-color: white;
     font-family: "Work Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #000;
+    /* Fast repeated taps can otherwise be read as a double-tap and trigger
+       the browser's zoom gesture. */
+    touch-action: manipulation;
 }
 
 h1 {

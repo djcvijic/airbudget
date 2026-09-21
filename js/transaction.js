@@ -1,10 +1,10 @@
-// Add/edit transaction screen. Adding is opened from a dashboard tile click
-// (main-view.js) or the top bar's new-transaction button (main.js), the
-// latter with no categoryId so the select just falls back to its first
-// option; editing is opened from a detail-view row click (detail.js). The
-// user always enters an unsigned amount, stored as-is — a transaction is an
-// expense or income purely based on its category's type, shown live via
-// the +/- indicator next to the input, never by negating the amount.
+// Add/edit transaction screen. Adding opens from a dashboard tile click
+// (main-view.js) or the bottom nav's new-transaction button (main.js); the
+// latter has no categoryId, so the select just falls back to its first
+// option. Editing opens from a detail-view row click (detail.js).
+// The user always enters an unsigned amount, stored as-is. Whether it's an
+// expense or income comes purely from its category's type, shown live via
+// the +/- indicator next to the input — the amount itself is never negated.
 // Unlike settings/categories, leaving this screen never warns about
 // unsaved input — Back and Cancel both just discard and return.
 //
@@ -94,11 +94,6 @@ transactionAmountPasteButton.addEventListener("click", async function () {
     transactionAmountValue = parts.length > 1 ? parts[0] + "." + parts[1].slice(0, 2) : parts[0];
     updateTransactionAmountDisplay();
 });
-
-// Set by whichever entry point opened the screen, so Apply/Cancel/Delete
-// all land back wherever the user actually came from: the dashboard for a
-// new transaction, or the detail view when editing one opened from there.
-var transactionReturnTo = null;
 
 var editingTransactionId = null;
 
@@ -205,7 +200,6 @@ function populateTransactionForm(categoryId, dateOnly, timeOfDay, amount, commen
 
 function openTransactionScreen(categoryId) {
     editingTransactionId = null;
-    transactionReturnTo = goToMainView;
     transactionDeleteButton.style.display = "none";
 
     var now = new Date();
@@ -223,7 +217,6 @@ function openEditTransactionScreen(transactionId) {
     }
 
     editingTransactionId = transactionId;
-    transactionReturnTo = openDetailView;
     transactionDeleteButton.style.display = "";
 
     var datetime = new Date(t.datetime);
@@ -263,7 +256,7 @@ function applyTransaction() {
         showToast(editingTransactionId ? "Transaction updated" : "Transaction added");
     }
 
-    transactionReturnTo();
+    goToMainView();
 }
 
 function openTransactionDeleteConfirmModal() {
@@ -277,9 +270,9 @@ function deleteCurrentTransaction() {
     }
 
     closeModals();
-    transactionReturnTo();
+    goToMainView();
 }
 
 function cancelTransaction() {
-    transactionReturnTo();
+    goToMainView();
 }

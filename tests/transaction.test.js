@@ -259,7 +259,7 @@ suite("transaction screen", function () {
         assertNotEqual(win.transactionDeleteButton.style.display, "none");
     });
 
-    test("saving an edit updates the transaction in place and returns to the detail view", async function () {
+    test("saving an edit updates the transaction in place and returns to the dashboard", async function () {
         var win = await freshApp(seededForTransactions({
             transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
         }));
@@ -272,7 +272,7 @@ suite("transaction screen", function () {
         assertEqual(win.state.transactions.length, 1);
         assertEqual(win.state.transactions[0].id, "txn-1");
         assertClose(win.state.transactions[0].amount, 99);
-        assertTrue(isActive(win.detailScreen), "editing from the detail view returns there, not the dashboard");
+        assertTrue(isActive(win.mainViewScreen));
         assertEqual(win.toastEl.textContent, "Transaction updated");
     });
 
@@ -294,7 +294,7 @@ suite("transaction screen", function () {
         assertEqual(win.toastEl.textContent, "Couldn't save — storage is full");
     });
 
-    test("canceling an edit discards changes and returns to the detail view", async function () {
+    test("canceling an edit discards changes and returns to the dashboard", async function () {
         var win = await freshApp(seededForTransactions({
             transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
         }));
@@ -304,11 +304,11 @@ suite("transaction screen", function () {
         typeTransactionAmount(win, "999");
         win.document.getElementById("transaction-cancel-button").click();
 
-        assertTrue(isActive(win.detailScreen));
+        assertTrue(isActive(win.mainViewScreen));
         assertClose(win.state.transactions[0].amount, 42);
     });
 
-    test("deleting a transaction requires confirmation, then removes it and returns to the detail view", async function () {
+    test("deleting a transaction requires confirmation, then removes it and returns to the dashboard", async function () {
         var win = await freshApp(seededForTransactions({
             transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
         }));
@@ -322,7 +322,7 @@ suite("transaction screen", function () {
 
         assertEqual(win.state.transactions.length, 0);
         assertTrue(isHidden(win.transactionDeleteConfirmModal));
-        assertTrue(isActive(win.detailScreen));
+        assertTrue(isActive(win.mainViewScreen));
         assertEqual(win.toastEl.textContent, "Transaction deleted");
     });
 
@@ -362,6 +362,6 @@ suite("transaction screen", function () {
         assertEqual(win.state.transactions.length, 2, "the original transaction stays and a new one is added");
         assertEqual(win.state.transactions[0].id, "txn-1");
         assertClose(win.state.transactions[0].amount, 42, "the earlier edit session must not leak into this save");
-        assertTrue(isActive(win.mainViewScreen), "the add flow returns to the dashboard, not the detail view");
+        assertTrue(isActive(win.mainViewScreen));
     });
 });

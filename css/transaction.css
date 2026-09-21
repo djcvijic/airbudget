@@ -126,9 +126,6 @@
     color: inherit;
     padding: 6px 4px;
     cursor: pointer;
-    /* Fast repeated taps on adjacent buttons can otherwise be read as a
-       double-tap and trigger the browser's zoom gesture. */
-    touch-action: manipulation;
 }
 
 .transaction-numpad-button:hover {

@@ -112,6 +112,19 @@ suite("detail view", function () {
         assertEqual(reloaded.state.detailMode, "day");
     });
 
+    test("leaving and returning to the detail screen resets to day mode", async function () {
+        var win = await freshApp(seededForDetail());
+        win.document.getElementById("open-detail-button").click();
+        var categoryButton = [].filter.call(win.detailModeButtons, function (b) { return b.dataset.mode === "category"; })[0];
+        categoryButton.click();
+        assertEqual(win.state.detailMode, "category");
+
+        win.document.getElementById("detail-back-button").click();
+        win.document.getElementById("open-detail-button").click();
+
+        assertEqual(win.state.detailMode, "day");
+    });
+
     test("back button returns to the dashboard", async function () {
         var win = await freshApp(seededForDetail());
         win.document.getElementById("open-detail-button").click();

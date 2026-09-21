@@ -185,13 +185,11 @@ function renderDetailView() {
     }
 }
 
-// mode is optional: pass it to force a specific grouping (e.g. a tile's
-// history button always wants category mode); omit it to keep whatever
-// grouping was last used this session (state.detailMode, in-memory only).
+// mode is optional. Omit it to reset to day mode, the default whenever the
+// screen opens fresh. Pass it to force a specific grouping instead — a
+// tile's history button always forces category mode.
 function openDetailView(mode, scrollToCategoryId) {
-    if (mode) {
-        state.detailMode = mode;
-    }
+    state.detailMode = mode || "day";
 
     showScreen(detailScreen);
     renderDetailView();
