@@ -97,7 +97,7 @@ button {
 
 .bottom-nav-row {
     display: flex;
-    gap: 20px;
+    gap: 16px;
 }
 
 .bottom-nav-row .btn-text {
