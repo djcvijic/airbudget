@@ -83,8 +83,7 @@ function baseCategory(overrides) {
         emoji: "🛒",
         name: "Groceries",
         max: 100,
-        type: "expense",
-        hidden: false
+        type: "expense"
     };
     for (var key in overrides) {
         category[key] = overrides[key];

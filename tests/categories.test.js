@@ -104,12 +104,11 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertFalse(win.categoriesDoneButton.disabled);
     });
 
-    test("existing categories get a visibility toggle, never a delete button", async function () {
+    test("existing categories get no delete button", async function () {
         var win = await openReopenedCategories();
         var rows = win.categoryRowsEl.querySelectorAll(".category-row");
         rows.forEach(function (row) {
             assertTrue(row.dataset.id.length > 0);
-            assertTrue(row.querySelector(".category-row-visibility") !== null);
             assertTrue(row.querySelector(".category-row-delete") === null);
         });
     });

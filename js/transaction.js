@@ -157,10 +157,7 @@ function sortedTransactionCategories() {
     });
 }
 
-// Hidden categories are left out of the picker, except the one already
-// selected (e.g. from clicking a dashboard tile directly) so the select
-// still reflects it correctly instead of silently falling back.
-function buildTransactionCategoryOptions(currentCategoryId) {
+function buildTransactionCategoryOptions() {
     transactionCategorySelect.innerHTML = "";
 
     var placeholder = document.createElement("option");
@@ -170,9 +167,6 @@ function buildTransactionCategoryOptions(currentCategoryId) {
     transactionCategorySelect.appendChild(placeholder);
 
     sortedTransactionCategories().forEach(function (category) {
-        if (category.hidden && category.id !== currentCategoryId) {
-            return;
-        }
         var option = document.createElement("option");
         option.value = category.id;
         option.textContent = category.emoji + (category.name ? " " + category.name : "");
@@ -184,7 +178,7 @@ function populateTransactionForm(categoryId, dateOnly, timeOfDay, amount, commen
     transactionErrorEl.textContent = "";
     var range = getPeriodRange(state.period, periodOffset);
     transactionPeriodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
-    buildTransactionCategoryOptions(categoryId);
+    buildTransactionCategoryOptions();
     transactionCategorySelect.value = categoryId || "";
     transactionTimeOfDay = timeOfDay;
     transactionSelectedDate = dateOnly;

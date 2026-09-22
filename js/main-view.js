@@ -168,12 +168,6 @@ function handleCategoryGridClick(event) {
         return;
     }
 
-    var category = getCategoryById(categoryId);
-    if (category && category.hidden) {
-        showToast("This category is hidden from new transactions");
-        return;
-    }
-
     openTransactionScreen(categoryId);
 }
 

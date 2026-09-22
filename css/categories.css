@@ -65,19 +65,6 @@
     background-color: #0099ff;
 }
 
-.category-row-visibility {
-    background: none;
-    border: none;
-    color: #000;
-    font-size: 18px;
-    padding: 6px 8px;
-    cursor: pointer;
-}
-
-.category-row-visibility:hover {
-    color: #0099ff;
-}
-
 .category-row-delete {
     background: none;
     border: none;

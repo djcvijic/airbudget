@@ -66,7 +66,6 @@ function buildCategoryRow(category) {
         row.dataset.id = category.id;
     }
     row.dataset.type = (category && category.type === "income") ? "income" : "expense";
-    row.dataset.hidden = (category && category.hidden) ? "true" : "false";
 
     var fields = document.createElement("div");
     fields.className = "category-row-fields";
@@ -143,41 +142,19 @@ function buildCategoryRow(category) {
 
     // An unapplied row (no id yet, whether a blank placeholder or a filled
     // template from "Create automatically") isn't a real category yet, so
-    // it gets a delete control instead of the hide toggle a saved category
-    // would have.
-    var trailingButton;
-    if (category && category.id) {
-        trailingButton = document.createElement("button");
-        trailingButton.type = "button";
-        trailingButton.className = "category-row-visibility";
-
-        var updateVisibilityButton = function () {
-            var hidden = row.dataset.hidden === "true";
-            trailingButton.innerHTML = hidden
-                ? '<i class="fa-solid fa-eye-slash"></i>'
-                : '<i class="fa-solid fa-eye"></i>';
-            trailingButton.title = hidden
-                ? "Hidden from transaction category picker"
-                : "Visible in transaction category picker";
-        };
-
-        trailingButton.addEventListener("click", function () {
-            row.dataset.hidden = row.dataset.hidden === "true" ? "false" : "true";
-            updateVisibilityButton();
-        });
-        updateVisibilityButton();
-    } else {
-        trailingButton = document.createElement("button");
-        trailingButton.type = "button";
-        trailingButton.className = "category-row-delete";
-        trailingButton.title = "Remove this category";
-        trailingButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
-        trailingButton.addEventListener("click", function () {
+    // it gets a delete control. Existing categories can't be deleted, so
+    // saved rows get no trailing control at all.
+    if (!category || !category.id) {
+        var deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "category-row-delete";
+        deleteButton.title = "Remove this category";
+        deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        deleteButton.addEventListener("click", function () {
             row.remove();
         });
+        fields.appendChild(deleteButton);
     }
-
-    fields.appendChild(trailingButton);
 
     typeLine.appendChild(typeRow);
     typeLine.appendChild(maxInput);
@@ -238,7 +215,7 @@ function getCategoryRowsSnapshot() {
             return;
         }
 
-        snapshot.push({ id: row.dataset.id || null, emoji: emoji, name: name, max: maxRaw, type: row.dataset.type, hidden: row.dataset.hidden });
+        snapshot.push({ id: row.dataset.id || null, emoji: emoji, name: name, max: maxRaw, type: row.dataset.type });
     });
 
     return snapshot;
@@ -273,8 +250,7 @@ function captureCategoriesDraft() {
             emoji: row.querySelector(".category-row-emoji").value,
             name: row.querySelector(".category-row-name").value,
             max: maxRaw === "" ? null : parseFloat(maxRaw),
-            type: row.dataset.type,
-            hidden: row.dataset.hidden === "true"
+            type: row.dataset.type
         };
     }));
 }
@@ -358,8 +334,7 @@ function applyCategories() {
             emoji: emoji,
             name: name,
             max: max,
-            type: type,
-            hidden: row.dataset.hidden === "true"
+            type: type
         });
     }
 
@@ -418,8 +393,8 @@ function backFromCategories() {
     goFromCategories(goToMainView);
 }
 
-// Catches every row edit (typing, type/visibility toggles, add, delete,
-// auto-create) in one place via bubbling, rather than wiring the same
-// recheck into each individual row control.
+// Catches every row edit (typing, type toggle, add, delete, auto-create)
+// in one place via bubbling, rather than wiring the same recheck into
+// each individual row control.
 categoriesScreen.addEventListener("input", updateCategoriesActionButtons);
 categoriesScreen.addEventListener("click", updateCategoriesActionButtons);

@@ -219,31 +219,6 @@ suite("transaction screen", function () {
         assertEqual(win.state.transactions.length, 0);
     });
 
-    test("hidden categories are excluded from the picker unless already selected", async function () {
-        var seeded = seededForTransactions();
-        seeded.categories.push(baseCategory({ id: "cat-hidden", emoji: "🙈", name: "Hidden", type: "expense", hidden: true }));
-        var win = await freshApp(seeded);
-
-        win.buildTransactionCategoryOptions();
-        var optionsWithoutPreset = [].map.call(win.transactionCategorySelect.options, function (o) { return o.value; });
-        assertTrue(optionsWithoutPreset.indexOf("cat-hidden") === -1);
-
-        win.buildTransactionCategoryOptions("cat-hidden");
-        var optionsWithPreset = [].map.call(win.transactionCategorySelect.options, function (o) { return o.value; });
-        assertTrue(optionsWithPreset.indexOf("cat-hidden") !== -1);
-    });
-
-    test("clicking a hidden category's tile shows a toast instead of opening the screen", async function () {
-        var seeded = seededForTransactions();
-        seeded.categories.push(baseCategory({ id: "cat-hidden", emoji: "🙈", name: "Hidden", type: "expense", hidden: true }));
-        var win = await freshApp(seeded);
-
-        tileAddZone(win, "cat-hidden").click();
-
-        assertFalse(isActive(win.transactionScreen));
-        assertTrue(win.toastEl.classList.contains("visible"));
-    });
-
     test("editing an existing transaction prefills the form with Save and Delete shown", async function () {
         var win = await freshApp(seededForTransactions({
             transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42, comment: "existing" })]
