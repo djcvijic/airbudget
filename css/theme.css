@@ -15,10 +15,13 @@ html {
     box-sizing: border-box;
 }
 
+/* Set per-element, not just on body — iOS Safari doesn't reliably propagate
+   touch-action to descendants, letting double-tap-zoom slip through otherwise. */
 *,
 *:before,
 *:after {
     box-sizing: inherit;
+    touch-action: manipulation;
 }
 
 body {
@@ -30,9 +33,6 @@ body {
     background-color: white;
     font-family: "Work Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #000;
-    /* Fast repeated taps can otherwise be read as a double-tap and trigger
-       the browser's zoom gesture. */
-    touch-action: manipulation;
 }
 
 h1 {
