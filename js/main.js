@@ -34,7 +34,7 @@ function main() {
     document.getElementById("period-next-button").addEventListener("click", goToNextPeriod);
     document.getElementById("period-current-button").addEventListener("click", goToCurrentPeriod);
     document.getElementById("open-report-button").addEventListener("click", openReportModal);
-    document.getElementById("report-done-button").addEventListener("click", closeModals);
+    document.getElementById("report-back-button").addEventListener("click", backFromReport);
     document.getElementById("report-banner-see-button").addEventListener("click", openMostRecentReport);
     document.getElementById("report-banner-dismiss-button").addEventListener("click", dismissReportBanner);
 

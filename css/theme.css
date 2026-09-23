@@ -97,17 +97,27 @@ button {
 
 .bottom-nav-row {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .bottom-nav-row .btn-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
     font-size: 20px;
-    padding: 8px;
     color: white;
 }
 
 .bottom-nav-row .btn-text:hover {
     color: #e6f6ff;
+}
+
+.bottom-nav-row .btn-text.active {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
 }
 
 .screen {
@@ -142,6 +152,22 @@ button {
     font-size: 24px;
     font-weight: bold;
     color: #0099ff;
+}
+
+/* A title with a second, lighter line (e.g. a period label) needs top
+   alignment, not the default centering, to keep its first line level with
+   the back button's text. */
+.screen-header:has(> .screen-title-block) {
+    align-items: flex-start;
+}
+
+.screen-title-block {
+    text-align: right;
+}
+
+.screen-subtitle {
+    font-size: 20px;
+    color: #000;
 }
 
 .balance-amount {
@@ -270,7 +296,7 @@ button {
     color: #0099ff;
 }
 
-.btn-text .fa-solid {
+.back-button .fa-solid {
     margin-right: 4px;
 }
 
@@ -278,16 +304,33 @@ button {
     margin: 8px;
 }
 
+@keyframes toast-punch-in {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.85);
+    }
+    60% {
+        opacity: 0.9;
+        transform: translateX(-50%) scale(1.1);
+    }
+    100% {
+        opacity: 0.9;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
 .toast {
     position: fixed;
-    bottom: 24px;
+    bottom: 88px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #222;
     color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 16px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 200ms;
@@ -296,6 +339,7 @@ button {
 
 .toast.visible {
     opacity: 0.9;
+    animation: toast-punch-in 250ms ease-out;
 }
 
 #to-top {

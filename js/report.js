@@ -3,8 +3,8 @@
 // tiles are a stripped-down, non-interactive dashboard tile — no
 // add/history buttons — reusing its CSS classes.
 
-var reportModal = document.getElementById("report-modal");
-var reportTitleEl = document.getElementById("report-title");
+var reportScreen = document.getElementById("report-screen");
+var reportPeriodLabelEl = document.getElementById("report-period-label");
 var reportExpectedLabelEl = document.getElementById("report-expected-label");
 var reportExpectedValueEl = document.getElementById("report-expected-value");
 var reportActualValueEl = document.getElementById("report-actual-value");
@@ -87,7 +87,7 @@ function openReportModal() {
     }
     updateReportBanner();
 
-    reportTitleEl.textContent = "Report: " + formatPeriodLabel(range.start, range.end);
+    reportPeriodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     reportExpectedLabelEl.textContent = "Expected balance this " + GOAL_PERIOD_UNIT_NAMES[state.period] + ":";
 
     var expectedSavings = getExpectedPeriodicIncome();
@@ -111,5 +111,9 @@ function openReportModal() {
         });
     }
 
-    openModal(reportModal);
+    showScreen(reportScreen);
+}
+
+function backFromReport() {
+    goToMainView();
 }

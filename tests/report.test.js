@@ -40,8 +40,8 @@ suite("main view: report", function () {
 
         win.openReportModal();
 
-        assertFalse(isHidden(win.reportModal));
-        assertEqual(win.reportTitleEl.textContent, "Report: " + win.formatPeriodLabel(range.start, range.end));
+        assertTrue(isActive(win.reportScreen));
+        assertEqual(win.reportPeriodLabelEl.textContent, win.formatPeriodLabel(range.start, range.end));
         assertEqual(win.reportExpectedLabelEl.textContent, "Expected balance this month:");
         assertEqual(win.reportExpectedValueEl.textContent, "+1,700.00 USD");
         assertEqual(win.reportActualValueEl.textContent, "+1,800.00 USD");
@@ -173,16 +173,16 @@ suite("main view: report", function () {
         assertEqual(reloaded.state.lastSeenReport, expected);
     });
 
-    test("the Done button closes the modal", async function () {
+    test("the back button returns to the dashboard", async function () {
         var win = await freshApp(seededForReport({
             transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
         }));
         win.periodOffset = -1;
         win.openReportModal();
 
-        win.document.getElementById("report-done-button").click();
+        win.document.getElementById("report-back-button").click();
 
-        assertTrue(isHidden(win.reportModal));
+        assertTrue(isActive(win.mainViewScreen));
     });
 
     test("opening an older period's report doesn't un-mark a more recently seen report", async function () {
@@ -190,7 +190,6 @@ suite("main view: report", function () {
         win.periodOffset = -1;
         win.openReportModal();
         var mostRecentSeen = win.state.lastSeenReport;
-        win.closeModals();
 
         win.periodOffset = -2;
         win.openReportModal();
@@ -226,7 +225,7 @@ suite("main view: report banner", function () {
 
         assertEqual(win.state.lastSeenReport, expected);
         assertEqual(win.reportBannerEl.style.display, "none");
-        assertTrue(isHidden(win.reportModal));
+        assertFalse(isActive(win.reportScreen));
     });
 
     test("See report navigates to the most recent period, opens its report, and dismisses the banner", async function () {
@@ -237,7 +236,7 @@ suite("main view: report banner", function () {
         win.document.getElementById("report-banner-see-button").click();
 
         assertEqual(win.periodOffset, -1);
-        assertFalse(isHidden(win.reportModal));
+        assertTrue(isActive(win.reportScreen));
         assertEqual(win.reportBannerEl.style.display, "none");
     });
 });

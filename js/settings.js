@@ -183,7 +183,7 @@ function deleteAllData() {
         localStorage.removeItem(CATEGORIES_KEY);
         localStorage.removeItem(TRANSACTIONS_KEY);
     } catch (e) {
-        showToast("Couldn't delete — try again");
+        showToast("Couldn't delete, try again");
         return;
     }
 

@@ -59,7 +59,7 @@ function persist(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
     } catch (e) {
-        showToast("Couldn't save — storage is full");
+        showToast("Couldn't save, storage is full");
         return false;
     }
 }
@@ -120,6 +120,17 @@ function isOnboardingComplete(s) {
 var modalOverlay = document.getElementById("modal-overlay");
 var bottomNavEl = document.getElementById("bottom-nav");
 
+// Screens with no entry here (report-screen, onboarding) just leave every
+// nav button unhighlighted, since neither has one of its own.
+var NAV_BUTTON_ID_BY_SCREEN_ID = {
+    "main-view-screen": "open-home-button",
+    "transaction-screen": "open-transaction-button",
+    "detail-screen": "open-detail-button",
+    "goals-screen": "open-goals-button",
+    "categories-screen": "open-categories-button",
+    "settings-screen": "open-settings-button"
+};
+
 function showScreen(screen) {
     document.querySelectorAll(".screen").forEach(function (s) {
         s.classList.remove("active");
@@ -131,6 +142,14 @@ function showScreen(screen) {
     document.body.classList.toggle("no-bottom-nav", !showBottomNav);
 
     document.body.classList.toggle("detail-screen-active", screen.id === "detail-screen");
+
+    document.querySelectorAll(".bottom-nav-row .btn-text").forEach(function (b) {
+        b.classList.remove("active");
+    });
+    var navButtonId = NAV_BUTTON_ID_BY_SCREEN_ID[screen.id];
+    if (navButtonId) {
+        document.getElementById(navButtonId).classList.add("active");
+    }
 
     window.scrollTo(0, 0);
 }
