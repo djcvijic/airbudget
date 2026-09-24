@@ -134,8 +134,8 @@ function renderMainView() {
     var range = getPeriodRange(state.period, periodOffset);
     periodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     periodCurrentRow.style.display = periodOffset === 0 ? "none" : "flex";
-    periodPrevButton.style.display = findAdjacentPeriodOffset(state.period, periodOffset, -1) === null ? "none" : "";
-    periodNextButton.style.display = findAdjacentPeriodOffset(state.period, periodOffset, 1) === null ? "none" : "";
+    periodPrevButton.style.visibility = findAdjacentPeriodOffset(state.period, periodOffset, -1) === null ? "hidden" : "";
+    periodNextButton.style.visibility = findAdjacentPeriodOffset(state.period, periodOffset, 1) === null ? "hidden" : "";
 
     var entries = getSortedCategoryEntries(range.start, range.end);
     renderTotalProgress(entries);
