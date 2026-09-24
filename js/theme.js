@@ -41,6 +41,15 @@ function createUnsavedGuard(hasChangesFn, modalEl) {
     };
 }
 
+function setActiveNavButton(buttonId) {
+    document.querySelectorAll(".bottom-nav-row .btn-text").forEach(function (b) {
+        b.classList.remove("active");
+    });
+    if (buttonId) {
+        document.getElementById(buttonId).classList.add("active");
+    }
+}
+
 function backToTop() {
     var toTop = document.getElementById("to-top");
 

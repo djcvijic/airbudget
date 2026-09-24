@@ -143,13 +143,7 @@ function showScreen(screen) {
 
     document.body.classList.toggle("detail-screen-active", screen.id === "detail-screen");
 
-    document.querySelectorAll(".bottom-nav-row .btn-text").forEach(function (b) {
-        b.classList.remove("active");
-    });
-    var navButtonId = NAV_BUTTON_ID_BY_SCREEN_ID[screen.id];
-    if (navButtonId) {
-        document.getElementById(navButtonId).classList.add("active");
-    }
+    setActiveNavButton(NAV_BUTTON_ID_BY_SCREEN_ID[screen.id]);
 
     window.scrollTo(0, 0);
 }
