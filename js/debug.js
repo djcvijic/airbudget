@@ -68,24 +68,45 @@ function fillRandomDebugData() {
         };
     });
 
-    // Both the current period and the one before it, so period navigation
-    // (prev arrow / "Back to current") has something to look at too.
-    var ranges = [getPeriodRange(state.period, 0), getPeriodRange(state.period, -1)];
+    var currentRange = getPeriodRange(state.period, 0);
+    var previousRange = getPeriodRange(state.period, -1);
+
+    // The previous period is what the report screen shows by default, so it
+    // always needs a problem — but only one side, so both the shown and
+    // hidden gating paths get exercised.
+    var problemType = Math.random() < 0.5 ? "expense" : "income";
 
     state.categories.forEach(function (category) {
-        var amountCeiling = (category.max != null ? category.max : 20000) * 0.6;
-        ranges.forEach(function (range) {
-            var count = randomInt(0, 3);
-            for (var i = 0; i < count; i++) {
-                var amount = randomAmount(50, amountCeiling);
-                state.transactions.push({
-                    id: generateId("txn"),
-                    datetime: randomDatetimeInRange(range.start, range.end),
-                    categoryId: category.id,
-                    amount: amount,
-                    comment: randomDebugComment()
-                });
-            }
+        var count = randomInt(0, 3);
+        for (var i = 0; i < count; i++) {
+            state.transactions.push({
+                id: generateId("txn"),
+                datetime: randomDatetimeInRange(currentRange.start, currentRange.end),
+                categoryId: category.id,
+                amount: randomAmount(50, category.max * 0.6),
+                comment: randomDebugComment()
+            });
+        }
+
+        // The non-problem side stays close to its own target so it can't
+        // itself swing the overall balance enough to mask the problem side.
+        var isProblemCategory = category.type === problemType;
+        var previousAmount;
+        if (category.type === "income") {
+            previousAmount = isProblemCategory
+                ? randomAmount(category.max * 0.1, category.max * 0.6)
+                : randomAmount(category.max, category.max * 1.05);
+        } else {
+            previousAmount = isProblemCategory
+                ? randomAmount(category.max * 1.1, category.max * 1.6)
+                : randomAmount(category.max * 0.95, category.max);
+        }
+        state.transactions.push({
+            id: generateId("txn"),
+            datetime: randomDatetimeInRange(previousRange.start, previousRange.end),
+            categoryId: category.id,
+            amount: previousAmount,
+            comment: randomDebugComment()
         });
     });
 

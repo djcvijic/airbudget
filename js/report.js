@@ -46,17 +46,52 @@ function openMostRecentReport() {
     openReportModal();
 }
 
-// Flags an expense over budget or unbudgeted-but-spent, and an income
-// unset-but-received or short of its expected amount (including zero).
+// Flags an expense over budget and an income short of its expected amount,
+// each treating an unset budget/expectation as zero so unbudgeted-but-spent
+// and unexpected-shortfall fall out of the same comparison.
 function isReportProblem(entry) {
-    if (entry.overMax) {
-        return true;
-    }
-    if (entry.type === "expense") {
-        return entry.max == null && entry.spend > 0;
-    }
-    var actualIncome = -entry.spend;
-    return entry.max == null ? actualIncome !== 0 : actualIncome < entry.max;
+    return entry.type === "expense" ? entry.spend > (entry.max || 0) : -entry.spend < (entry.max || 0);
+}
+
+// Only the balance is colored — the operands are just its inputs, not
+// something to react to.
+function renderReportBalanceRow(containerEl, income, expense, balance, formatFn) {
+    containerEl.className = "report-row-value report-equation";
+    containerEl.innerHTML = "";
+
+    var blankOperatorEl = document.createElement("span");
+    blankOperatorEl.className = "report-equation-operator";
+
+    var incomeEl = document.createElement("span");
+    incomeEl.className = "balance-amount";
+    incomeEl.textContent = formatFn(income);
+
+    var minusEl = document.createElement("span");
+    minusEl.className = "report-equation-operator";
+    minusEl.textContent = "−";
+
+    var expenseEl = document.createElement("span");
+    expenseEl.className = "balance-amount";
+    expenseEl.textContent = formatFn(expense);
+
+    // Its own row spanning both columns, so the rule reads as one
+    // unbroken line rather than two segments split by the column gap.
+    var ruleEl = document.createElement("span");
+    ruleEl.className = "report-equation-rule";
+
+    var resultOperatorEl = document.createElement("span");
+    resultOperatorEl.className = "report-equation-operator";
+
+    var balanceEl = document.createElement("span");
+    renderSignedAmount(balanceEl, "balance-amount", balance, balance > 0, formatFn);
+
+    containerEl.appendChild(blankOperatorEl);
+    containerEl.appendChild(incomeEl);
+    containerEl.appendChild(minusEl);
+    containerEl.appendChild(expenseEl);
+    containerEl.appendChild(ruleEl);
+    containerEl.appendChild(resultOperatorEl);
+    containerEl.appendChild(balanceEl);
 }
 
 function buildReportProblemTile(entry) {
@@ -90,12 +125,22 @@ function openReportModal() {
     reportPeriodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     reportExpectedLabelEl.textContent = "Expected balance this " + GOAL_PERIOD_UNIT_NAMES[state.period] + ":";
 
-    var expectedSavings = getExpectedPeriodicIncome();
-    renderSignedAmount(reportExpectedValueEl, "report-row-value balance-amount", expectedSavings, expectedSavings > 0, formatCurrency);
+    var expectedTotals = getExpectedPeriodTotals();
+    var expectedSavings = expectedTotals.income - expectedTotals.expense;
+    renderReportBalanceRow(reportExpectedValueEl, expectedTotals.income, expectedTotals.expense, expectedSavings, formatCurrency);
 
     var entries = getSortedCategoryEntries(range.start, range.end);
-    var actualSavings = -entries.reduce(function (sum, e) { return sum + e.spend; }, 0);
-    renderSignedAmount(reportActualValueEl, "report-row-value balance-amount", actualSavings, actualSavings > 0, formatCurrency);
+    var actualIncome = 0;
+    var actualExpense = 0;
+    entries.forEach(function (e) {
+        if (e.type === "income") {
+            actualIncome += -e.spend;
+        } else {
+            actualExpense += e.spend;
+        }
+    });
+    var actualSavings = actualIncome - actualExpense;
+    renderReportBalanceRow(reportActualValueEl, actualIncome, actualExpense, actualSavings, formatCurrency);
 
     var onTrack = actualSavings >= expectedSavings;
     reportOnTrackMessageEl.style.display = onTrack ? "" : "none";
@@ -104,9 +149,17 @@ function openReportModal() {
     reportProblemGridEl.style.display = onTrack ? "none" : "";
     reportAccuracyMessageEl.style.display = onTrack ? "none" : "";
 
+    // Only shows a type's problem categories when that type actually
+    // caused the shortfall, so a flag on the other side isn't just noise.
+    var expensesOverBudget = actualExpense > expectedTotals.expense;
+    var incomeUnderExpected = actualIncome < expectedTotals.income;
+
     reportProblemGridEl.innerHTML = "";
     if (!onTrack) {
-        entries.filter(isReportProblem).forEach(function (entry) {
+        entries.filter(function (entry) {
+            var typeIsResponsible = entry.type === "expense" ? expensesOverBudget : incomeUnderExpected;
+            return typeIsResponsible && isReportProblem(entry);
+        }).forEach(function (entry) {
             reportProblemGridEl.appendChild(buildReportProblemTile(entry));
         });
     }

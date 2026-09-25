@@ -27,7 +27,7 @@ suite("main view: report", function () {
         assertNotEqual(win.periodCurrentRow.style.display, "none");
     });
 
-    test("shows the period title, and expected and actual balance for the viewed period", async function () {
+    test("shows the period title, and expected and actual balance as a stacked income/expense/balance equation", async function () {
         var win = await freshApp(seededForReport({
             transactions: [
                 baseTransaction({ categoryId: "salary", amount: 3000, datetime: monthsAgoDatetime(1) }),
@@ -43,8 +43,35 @@ suite("main view: report", function () {
         assertTrue(isActive(win.reportScreen));
         assertEqual(win.reportPeriodLabelEl.textContent, win.formatPeriodLabel(range.start, range.end));
         assertEqual(win.reportExpectedLabelEl.textContent, "Expected balance this month:");
-        assertEqual(win.reportExpectedValueEl.textContent, "+1,700.00 USD");
-        assertEqual(win.reportActualValueEl.textContent, "+1,800.00 USD");
+        assertEqual(win.reportExpectedValueEl.textContent, "3,000.00 USD−1,300.00 USD+1,700.00 USD");
+        assertEqual(win.reportExpectedValueEl.querySelectorAll(".balance-amount")[1].textContent, "1,300.00 USD");
+        assertTrue(win.reportExpectedValueEl.querySelector(".report-equation-rule") !== null);
+        assertEqual(win.reportExpectedValueEl.querySelectorAll(".amount-income, .amount-spend").length, 1);
+        assertEqual(win.reportExpectedValueEl.querySelector(".amount-income").textContent, "+1,700.00 USD");
+        assertEqual(win.reportActualValueEl.textContent, "3,000.00 USD−1,200.00 USD+1,800.00 USD");
+        assertEqual(win.reportActualValueEl.querySelectorAll(".balance-amount")[1].textContent, "1,200.00 USD");
+        assertTrue(win.reportActualValueEl.querySelector(".report-equation-rule") !== null);
+        assertEqual(win.reportActualValueEl.querySelectorAll(".amount-income, .amount-spend").length, 1);
+        assertEqual(win.reportActualValueEl.querySelector(".amount-income").textContent, "+1,800.00 USD");
+    });
+
+    test("still renders the equation when one side is zero", async function () {
+        var win = await freshApp(seededForReport({
+            categories: [
+                baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 3000 })
+            ],
+            transactions: [
+                baseTransaction({ categoryId: "salary", amount: 3000, datetime: monthsAgoDatetime(1) })
+            ]
+        }));
+        win.periodOffset = -1;
+
+        win.openReportModal();
+
+        assertEqual(win.reportExpectedValueEl.textContent, "3,000.00 USD−0.00 USD+3,000.00 USD");
+        assertTrue(win.reportExpectedValueEl.querySelector(".report-equation-rule") !== null);
+        assertEqual(win.reportActualValueEl.textContent, "3,000.00 USD−0.00 USD+3,000.00 USD");
+        assertTrue(win.reportActualValueEl.querySelector(".report-equation-rule") !== null);
     });
 
     test("shows the on-track message and reality-check paragraph when actual balance meets or exceeds expected", async function () {
@@ -123,7 +150,7 @@ suite("main view: report", function () {
         assertFalse(coffeeTile.classList.contains("category-tile-over"), "an unbudgeted category was never actually over its budget");
     });
 
-    test("also includes income categories with no expected amount, or that fell short of it", async function () {
+    test("also includes income categories that fell short of their expected amount", async function () {
         var win = await freshApp(seededForReport({
             categories: [
                 baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 3000 }),
@@ -146,15 +173,59 @@ suite("main view: report", function () {
         win.openReportModal();
 
         var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
-        assertTrue(tileIds.indexOf("freelance") !== -1, "income with no expected amount, but some received, is flagged");
+        assertTrue(tileIds.indexOf("freelance") === -1, "income with no expected amount is never flagged, since received income can't go negative");
         assertTrue(tileIds.indexOf("bonus") !== -1, "income below its expected amount is flagged");
         assertTrue(tileIds.indexOf("dividends") !== -1, "income that never arrived at all is flagged");
         assertTrue(tileIds.indexOf("salary") === -1, "income that met its expected amount is not flagged");
 
-        var freelanceTile = win.reportProblemGridEl.querySelector('.category-tile[data-id="freelance"]');
-        assertFalse(freelanceTile.classList.contains("category-tile-over"), "income tiles never get the over-budget border");
-        assertEqual(freelanceTile.querySelector(".category-tile-amount-value").textContent, "+50.00");
-        assertTrue(freelanceTile.querySelector(".category-tile-amounts").classList.contains("amount-income"));
+        var bonusTile = win.reportProblemGridEl.querySelector('.category-tile[data-id="bonus"]');
+        assertFalse(bonusTile.classList.contains("category-tile-over"), "income tiles never get the over-budget border");
+        assertEqual(bonusTile.querySelector(".category-tile-amount-value").textContent, "+100");
+        assertTrue(bonusTile.querySelector(".category-tile-amounts").classList.contains("amount-income"));
+    });
+
+    test("hides an over-budget expense category when expenses overall stayed within budget", async function () {
+        var win = await freshApp(seededForReport({
+            categories: [
+                baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 3000 }),
+                baseCategory({ id: "rent", emoji: "🏠", name: "Rent", type: "expense", max: 1000 }),
+                baseCategory({ id: "groceries", emoji: "🛒", name: "Groceries", type: "expense", max: 2000 })
+            ],
+            transactions: [
+                baseTransaction({ categoryId: "salary", amount: 1000, datetime: monthsAgoDatetime(1) }),
+                baseTransaction({ categoryId: "rent", amount: 1200, datetime: monthsAgoDatetime(1) })
+            ]
+        }));
+        win.periodOffset = -1;
+
+        win.openReportModal();
+
+        assertNotEqual(win.reportProblemGridEl.style.display, "none");
+        var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
+        assertTrue(tileIds.indexOf("salary") !== -1, "income short of expectations is the actual cause, so it's shown");
+        assertTrue(tileIds.indexOf("rent") === -1, "over its own budget, but expenses overall stayed within budget, so it's hidden");
+    });
+
+    test("hides a short income category when income overall met or exceeded expectations", async function () {
+        var win = await freshApp(seededForReport({
+            categories: [
+                baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 2000 }),
+                baseCategory({ id: "bonus", emoji: "🎁", name: "Bonus", type: "income", max: 1000 }),
+                baseCategory({ id: "rent", emoji: "🏠", name: "Rent", type: "expense", max: 500 })
+            ],
+            transactions: [
+                baseTransaction({ categoryId: "salary", amount: 3000, datetime: monthsAgoDatetime(1) }),
+                baseTransaction({ categoryId: "rent", amount: 800, datetime: monthsAgoDatetime(1) })
+            ]
+        }));
+        win.periodOffset = -1;
+
+        win.openReportModal();
+
+        assertNotEqual(win.reportProblemGridEl.style.display, "none");
+        var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
+        assertTrue(tileIds.indexOf("rent") !== -1, "over budget is the actual cause, so it's shown");
+        assertTrue(tileIds.indexOf("bonus") === -1, "short of its own expectation, but income overall met or exceeded expectations, so it's hidden");
     });
 
     test("records the last second of the viewed period as the last-seen report, and persists it", async function () {

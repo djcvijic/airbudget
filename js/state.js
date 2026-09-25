@@ -339,14 +339,28 @@ function getSortedCategoryEntries(start, end) {
     return entries;
 }
 
-// Net recurring income per period if every category's budget/expected
-// income is hit exactly: expense budgets subtract, income expectations
-// add. Categories with no budget/expected amount set don't contribute.
-function getExpectedPeriodicIncome() {
-    return state.categories.reduce(function (sum, cat) {
+// Expected income and expense per period if every category's
+// budget/expected income is hit exactly. Categories with no budget/expected
+// amount set don't contribute to either side.
+function getExpectedPeriodTotals() {
+    var income = 0;
+    var expense = 0;
+    state.categories.forEach(function (cat) {
         if (cat.max == null) {
-            return sum;
+            return;
         }
-        return sum + (cat.type === "income" ? cat.max : -cat.max);
-    }, 0);
+        if (cat.type === "income") {
+            income += cat.max;
+        } else {
+            expense += cat.max;
+        }
+    });
+    return { income: income, expense: expense };
+}
+
+// Net recurring income per period if every category's budget/expected
+// income is hit exactly: expense budgets subtract, income expectations add.
+function getExpectedPeriodicIncome() {
+    var totals = getExpectedPeriodTotals();
+    return totals.income - totals.expense;
 }

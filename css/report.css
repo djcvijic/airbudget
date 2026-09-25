@@ -14,6 +14,28 @@
     font-size: 18px;
 }
 
+.report-equation {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: 6px;
+    justify-content: center;
+}
+
+.report-equation .balance-amount {
+    text-align: right;
+}
+
+.report-equation-operator {
+    color: #666;
+    align-self: end;
+}
+
+.report-equation-rule {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid #666;
+    margin: 2px 0;
+}
+
 .report-message {
     margin-top: 16px;
     font-size: 14px;

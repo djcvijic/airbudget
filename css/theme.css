@@ -719,7 +719,7 @@ body.show-to-top #to-top {
 
 @media screen and (max-width: 640px) {
     .app {
-        padding: 32px 24px;
+        padding: 32px 24px 72px;
     }
 
     .app-name {
