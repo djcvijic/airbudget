@@ -106,28 +106,13 @@ function updateTransactionAmountSign() {
 
 transactionCategorySelect.addEventListener("change", updateTransactionAmountSign);
 
-// formatDayHeader is defined in detail.js (loaded after this file), but
-// this only runs from a click/change handler, long after boot finishes.
 function updateTransactionDateDisplay() {
     var value = transactionDatetimeInput.value;
     transactionDateTextEl.textContent = value ? formatDayHeader(parseDateOnly(value)) : "";
 }
 
 transactionDateDisplayEl.addEventListener("click", function () {
-    var opened = false;
-    if (transactionDatetimeInput.showPicker) {
-        try {
-            transactionDatetimeInput.showPicker();
-            opened = true;
-        } catch (e) {
-            // Some mobile browsers throw here even though showPicker exists
-            // (e.g. treating this hidden proxy input as gesture-ineligible);
-            // fall through to focus() below instead of doing nothing.
-        }
-    }
-    if (!opened) {
-        transactionDatetimeInput.focus();
-    }
+    openNativeDatePicker(transactionDatetimeInput);
 });
 
 // The native picker's own "Clear" control would empty the input; a

@@ -30,12 +30,7 @@ var settingsOriginalPeriod = null;
 var settingsOriginalCurrency = null;
 var settingsUnsavedGuard = createUnsavedGuard(hasUnsavedSettingsChanges, settingsUnsavedModal);
 
-// The test harness flags itself via ?testMode=1 (see tests/helpers.js) so
-// the delete button can skip the 2s hold entirely and act like a normal
-// button, rather than each test burning real seconds waiting it out.
-var TEST_MODE = new URLSearchParams(location.search).has("testMode");
-var DELETE_HOLD_MS = 2000;
-var deleteHoldTimer = null;
+createHoldToConfirm(deleteConfirmButton, deleteConfirmModal, deleteAllData);
 
 function updatePeriodSelection(containerEl) {
     var labels = containerEl.querySelectorAll(".settings-period-option");
@@ -154,29 +149,6 @@ function openDeleteConfirmModal() {
     openModal(deleteConfirmModal);
 }
 
-function startDeleteHold() {
-    if (TEST_MODE) {
-        deleteAllData();
-        return;
-    }
-
-    deleteConfirmButton.classList.add("holding");
-    deleteHoldTimer = setTimeout(function () {
-        deleteConfirmButton.classList.remove("holding");
-        // Guard against a stray fire after the modal was already dismissed
-        // (close button, overlay click, Escape) while the hold was pending.
-        if (deleteConfirmModal.classList.contains("hidden")) {
-            return;
-        }
-        deleteAllData();
-    }, DELETE_HOLD_MS);
-}
-
-function cancelDeleteHold() {
-    clearTimeout(deleteHoldTimer);
-    deleteConfirmButton.classList.remove("holding");
-}
-
 function deleteAllData() {
     try {
         localStorage.removeItem(META_KEY);
@@ -196,45 +168,21 @@ function deleteAllData() {
 }
 
 function exportData() {
-    var blob = new Blob([JSON.stringify(state)], { type: "application/json" });
-    var url = URL.createObjectURL(blob);
-
-    var link = document.createElement("a");
-    link.href = url;
-    link.download = "airbudget-" + formatDateOnly(new Date()) + ".json";
-    link.click();
-
-    URL.revokeObjectURL(url);
+    exportJSON(state, "airbudget");
 }
 
 function openImportPicker() {
     importFileInput.click();
 }
 
+function isValidImport(imported) {
+    return !!imported && Array.isArray(imported.categories) && Array.isArray(imported.transactions);
+}
+
 // Overwrites the whole app state with the picked file's contents, no
-// merge — the file is expected to be a previous export() output.
+// merge. The file is expected to be a previous exportData() output.
 function importData() {
-    var file = importFileInput.files[0];
-    importFileInput.value = "";
-    if (!file) {
-        return;
-    }
-
-    var reader = new FileReader();
-    reader.onload = function () {
-        var imported;
-        try {
-            imported = JSON.parse(reader.result);
-        } catch (e) {
-            showToast("That file isn't valid JSON");
-            return;
-        }
-
-        if (!imported || !Array.isArray(imported.categories) || !Array.isArray(imported.transactions)) {
-            showToast("That file doesn't look like an airbudget export");
-            return;
-        }
-
+    importJSONFile(importFileInput, isValidImport, "That file doesn't look like an airbudget export", function (imported) {
         state = stateFromImport(imported);
         saveMeta();
         saveCategories();
@@ -243,11 +191,7 @@ function importData() {
 
         boot();
         showToast("Data imported");
-    };
-    reader.onerror = function () {
-        showToast("Couldn't read that file");
-    };
-    reader.readAsText(file);
+    });
 }
 
 importFileInput.addEventListener("change", importData);

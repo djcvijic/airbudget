@@ -115,6 +115,8 @@ function openGoalsScreen(forced) {
     goalsErrorEl.textContent = "";
     goalsBackButton.style.display = forced ? "none" : "";
     goalsOnboardingBackButton.style.display = forced ? "" : "none";
+    // Borrows the onboarding screen's own h1 look, so goals reads as one
+    // more step of the same flow when reached as a forced onboarding step.
     goalsTitleEl.classList.toggle("onboarding-heading", forced);
     goalsDoneButton.textContent = forced ? "Done" : "Apply";
 

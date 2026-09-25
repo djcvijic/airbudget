@@ -23,7 +23,7 @@ suite("detail view", function () {
         assertTrue(isActive(win.detailScreen));
         assertEqual(win.state.detailMode, "day");
 
-        var groups = win.detailListEl.querySelectorAll(".detail-group");
+        var groups = win.detailListEl.querySelectorAll(".collapsible-group");
         assertEqual(groups.length, 2, "two distinct days should produce two groups");
         assertFalse(groups[0].classList.contains("collapsed"), "day groups start expanded");
 
@@ -42,7 +42,7 @@ suite("detail view", function () {
         categoryButton.click();
 
         assertEqual(win.state.detailMode, "category");
-        var groups = win.detailListEl.querySelectorAll(".detail-group");
+        var groups = win.detailListEl.querySelectorAll(".collapsible-group");
         assertEqual(groups.length, 2);
         assertTrue(groups[0].classList.contains("collapsed"), "category groups start collapsed");
 
@@ -70,13 +70,13 @@ suite("detail view", function () {
         var win = await freshApp(seededForDetail());
         win.document.getElementById("open-detail-button").click();
 
-        var group = win.detailListEl.querySelector(".detail-group");
+        var group = win.detailListEl.querySelector(".collapsible-group");
         assertFalse(group.classList.contains("collapsed"));
 
-        group.querySelector(".detail-group-header").click();
+        group.querySelector(".collapsible-group-header").click();
         assertTrue(group.classList.contains("collapsed"));
 
-        group.querySelector(".detail-group-header").click();
+        group.querySelector(".collapsible-group-header").click();
         assertFalse(group.classList.contains("collapsed"));
     });
 

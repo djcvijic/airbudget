@@ -1,105 +1,14 @@
 /* Extra room below the .app's usual bottom padding so the floating
-   back-to-top button never sits over the last item once fully scrolled.
-   Smaller now that the button itself (main.css) is smaller. */
+   back-to-top button never sits over the last item once fully scrolled. */
 #detail-screen {
     padding-bottom: 60px;
-}
-
-.detail-mode-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-.detail-mode-label {
-    font-weight: bold;
-}
-
-.detail-mode-switch {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.detail-mode-option {
-    padding: 8px 16px;
-    font-size: 14px;
-}
-
-.detail-mode-thumb {
-    width: calc(50% - 4px);
-}
-
-.detail-mode-switch[data-mode="category"] .detail-mode-thumb {
-    transform: translateX(100%);
-}
-
-.detail-list {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
 }
 
 /* Keeps scrollIntoView() (used when jumping to a category from a dashboard
    tile's history button) from landing the group header underneath the
    fixed top bar. */
-.detail-group {
+.collapsible-group {
     scroll-margin-top: 80px;
-}
-
-.detail-group-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    width: 100%;
-    background: none;
-    border: none;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    padding: 0 0 4px 0;
-    margin-bottom: 8px;
-    border-bottom: 2px solid #eee;
-}
-
-.detail-group-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: bold;
-    font-size: 16px;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.detail-group-chevron {
-    flex-shrink: 0;
-    color: #666;
-    transition: transform 200ms ease;
-}
-
-.detail-group:not(.collapsed) .detail-group-chevron {
-    transform: rotate(90deg);
-}
-
-.detail-group-body {
-    display: grid;
-    grid-template-rows: 1fr;
-    transition: grid-template-rows 200ms ease;
-}
-
-.detail-group.collapsed .detail-group-body {
-    grid-template-rows: 0fr;
-}
-
-.detail-group-body-inner {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
 }
 
 .detail-transaction {

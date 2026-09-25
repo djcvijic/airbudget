@@ -28,7 +28,7 @@ body {
     margin: 0;
     min-height: 100vh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     background-color: white;
     font-family: "Work Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -56,7 +56,13 @@ button {
     width: 100%;
     max-width: 640px;
     margin: 0 auto;
-    padding: 48px 32px;
+    padding: 48px 32px 72px;
+}
+
+/* Screens with no .bottom-nav (state.js's showScreen toggles this) don't
+   need room reserved for it. */
+body.no-bottom-nav .app {
+    padding-bottom: 32px;
 }
 
 .app-header {
@@ -170,6 +176,19 @@ button {
     color: #000;
 }
 
+/* Sits inside a .screen-header, so spacing below comes from that header's
+   own margin-bottom, not redeclared here. width:100% is needed for
+   text-align:center to center in the full header row, not just the h1's
+   shrink-to-fit width. */
+.onboarding-heading {
+    width: 100%;
+    font-size: 28px;
+    font-weight: normal;
+    letter-spacing: 5px;
+    color: #0099ff;
+    text-align: center;
+}
+
 .balance-amount {
     font-weight: bold;
     font-size: 16px;
@@ -228,6 +247,107 @@ button {
     transition: transform 200ms ease, background-color 200ms ease;
 }
 
+/* Exactly-two-option segmented toggle: options split the toggle 50/50, and
+   the thumb slides to the right half once the second option is selected. */
+.segmented-toggle-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.segmented-toggle-2 .segmented-toggle-option {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.segmented-toggle-2 .segmented-toggle-thumb {
+    width: calc(50% - 4px);
+}
+
+.segmented-toggle-2:has(.segmented-toggle-option:last-of-type.selected) .segmented-toggle-thumb {
+    transform: translateX(100%);
+}
+
+/* A label next to a control (e.g. a segmented toggle), side by side. */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.toggle-row-label {
+    font-weight: bold;
+}
+
+.collapsible-group-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.collapsible-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    background: none;
+    border: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    padding: 0 0 4px 0;
+    margin-bottom: 8px;
+    border-bottom: 2px solid #eee;
+}
+
+.collapsible-group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.collapsible-group-chevron {
+    flex-shrink: 0;
+    color: #666;
+    transition: transform 200ms ease;
+}
+
+.collapsible-group:not(.collapsed) .collapsible-group-chevron {
+    transform: rotate(90deg);
+}
+
+.collapsible-group-count {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Animates open/shut via grid-template-rows (1fr/0fr) instead of height,
+   since height:auto can't be transitioned. */
+.collapsible-group-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 200ms ease;
+}
+
+.collapsible-group.collapsed .collapsible-group-body {
+    grid-template-rows: 0fr;
+}
+
+.collapsible-group-body-inner {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
 .btn {
     display: inline-block;
     font-size: 20px;
@@ -283,6 +403,56 @@ button {
     background-color: #111;
 }
 
+/* Hidden proxy, triggered via .click() instead of shown to the user. */
+#import-file-input {
+    display: none;
+}
+
+.settings-data-actions {
+    text-align: right;
+    margin-bottom: 16px;
+}
+
+.settings-data-actions .btn {
+    margin-left: 8px;
+}
+
+.settings-danger-zone {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 3px solid #ccc;
+    text-align: right;
+}
+
+/* Needs a press-and-hold confirm (theme.js's createHoldToConfirm) rather
+   than a plain click, since delete is irreversible. */
+.delete-confirm-button {
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+.delete-confirm-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.delete-confirm-button.holding .delete-confirm-fill {
+    width: 100%;
+    transition: width 2s linear;
+}
+
+.delete-confirm-label {
+    position: relative;
+}
+
 .btn-text {
     background: none;
     border: none;
@@ -293,6 +463,22 @@ button {
 }
 
 .btn-text:hover {
+    color: #0099ff;
+}
+
+/* A screen's own black delete icon, sitting in its .screen-actions row
+   alongside Cancel/Save. */
+.delete-icon-button {
+    display: inline-block;
+    background: none;
+    border: none;
+    color: #000;
+    font-size: 22px;
+    padding: 14px 18px;
+    cursor: pointer;
+}
+
+.delete-icon-button:hover {
     color: #0099ff;
 }
 
@@ -364,6 +550,22 @@ button {
 
 #to-top:hover {
     background-color: #e6f6ff;
+}
+
+/* Hidden by default; a screen opts in via body.show-to-top (state.js's
+   showScreen toggles this), raised to clear a fixed .bottom-nav instead of
+   the position above. */
+#to-top {
+    display: none !important;
+    bottom: 80px;
+}
+
+/* Smaller and filled, rather than the transparent default above. */
+body.show-to-top #to-top {
+    display: block !important;
+    padding: 10px 24px;
+    font-size: 15px;
+    background-color: white;
 }
 
 /* Dismissible pill banner: shared by every "there's something new" nudge

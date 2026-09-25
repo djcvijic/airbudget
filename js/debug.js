@@ -37,10 +37,6 @@ var DEBUG_COMMENT_POOL = [
     "forgot about this one"
 ];
 
-function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function randomDebugComment() {
     return Math.random() < 0.35 ? DEBUG_COMMENT_POOL[randomInt(0, DEBUG_COMMENT_POOL.length - 1)] : "";
 }
@@ -51,17 +47,6 @@ function randomAmount(min, max) {
 
 function randomDatetimeInRange(start, end) {
     return formatDateTime(new Date(randomInt(start.getTime(), end.getTime() - 1)));
-}
-
-function shuffled(array) {
-    var copy = array.slice();
-    for (var i = copy.length - 1; i > 0; i--) {
-        var j = randomInt(0, i);
-        var temp = copy[i];
-        copy[i] = copy[j];
-        copy[j] = temp;
-    }
-    return copy;
 }
 
 function fillRandomDebugData() {

@@ -13,11 +13,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="airbudget" />
     <link href="css/theme.css" rel="stylesheet" />
-    <link href="css/main.css" rel="stylesheet" />
     <link href="css/settings.css" rel="stylesheet" />
     <link href="css/categories.css" rel="stylesheet" />
     <link href="css/goals.css" rel="stylesheet" />
-    <link href="css/onboarding.css" rel="stylesheet" />
     <link href="css/main-view.css" rel="stylesheet" />
     <link href="css/transaction.css" rel="stylesheet" />
     <link href="css/detail.css" rel="stylesheet" />
@@ -29,13 +27,6 @@
 
 <body>
     <div class="app">
-        <div id="install-banner" class="banner">
-            <span id="install-banner-text" class="banner-text"></span>
-            <button id="install-banner-action-button" class="btn btn-text banner-action" type="button">Install</button>
-            <button id="install-banner-dismiss-button" class="btn btn-text banner-dismiss" type="button" aria-label="Dismiss install banner">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
         <div id="onboarding-screen" class="screen">
             <div class="screen-header">
                 <h1 class="onboarding-heading">Welcome</h1>
@@ -200,15 +191,15 @@
                     <div id="detail-period-label" class="screen-title screen-subtitle"></div>
                 </div>
             </div>
-            <div class="detail-mode-row">
-                <span class="detail-mode-label">Group by:</span>
-                <div id="detail-mode-switch" class="detail-mode-switch segmented-toggle">
+            <div class="toggle-row">
+                <span class="toggle-row-label">Group by:</span>
+                <div class="segmented-toggle segmented-toggle-2">
                     <button type="button" class="detail-mode-option segmented-toggle-option" data-mode="day">Day</button>
                     <button type="button" class="detail-mode-option segmented-toggle-option" data-mode="category">Category</button>
-                    <div class="detail-mode-thumb segmented-toggle-thumb"></div>
+                    <div class="segmented-toggle-thumb"></div>
                 </div>
             </div>
-            <div id="detail-list" class="detail-list"></div>
+            <div id="detail-list" class="collapsible-group-list"></div>
         </div>
 
         <div id="transaction-screen" class="screen">
@@ -261,7 +252,7 @@
             </div>
             <p id="transaction-error" class="modal-error"></p>
             <div class="screen-actions">
-                <button id="transaction-delete-button" class="transaction-delete-icon" type="button" aria-label="Delete">
+                <button id="transaction-delete-button" class="delete-icon-button" type="button" aria-label="Delete">
                     <i class="fa-solid fa-trash"></i>
                 </button>
                 <button id="transaction-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
@@ -396,7 +387,6 @@
     <script src="js/goals.js" type="application/javascript"></script>
     <script src="js/main-view.js" type="application/javascript"></script>
     <script src="js/report.js" type="application/javascript"></script>
-    <script src="js/install-prompt.js" type="application/javascript"></script>
     <script src="js/transaction.js" type="application/javascript"></script>
     <script src="js/detail.js" type="application/javascript"></script>
     <script src="js/debug.js" type="application/javascript"></script>

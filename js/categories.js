@@ -262,6 +262,8 @@ function openCategoriesScreen(forced) {
     categoriesOnboardingBackButton.style.display = forced ? "" : "none";
     categoriesAutoCreateButton.style.display = forced ? "" : "none";
     categoriesDescriptionEl.style.display = forced ? "" : "none";
+    // Borrows the onboarding screen's own h1 look, so categories reads as
+    // step two of one flow when reached as a forced onboarding step.
     categoriesTitleEl.classList.toggle("onboarding-heading", forced);
     categoriesDoneButton.textContent = forced ? "Next" : "Apply";
 

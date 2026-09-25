@@ -4,13 +4,8 @@
 
 var detailScreen = document.getElementById("detail-screen");
 var detailPeriodLabelEl = document.getElementById("detail-period-label");
-var detailModeSwitch = document.getElementById("detail-mode-switch");
 var detailModeButtons = document.querySelectorAll(".detail-mode-option");
 var detailListEl = document.getElementById("detail-list");
-
-function formatDayHeader(date) {
-    return date.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
-}
 
 function buildTransactionRow(t) {
     var category = getCategoryById(t.categoryId);
@@ -59,54 +54,14 @@ function buildTransactionRow(t) {
     return row;
 }
 
-// Builds a collapsible group: clicking the header toggles a "collapsed"
-// class on the group element, which CSS uses to hide the body. balance is
-// the group's net transaction sum (positive = spend, negative = income),
-// shown on the header using the same sign/color convention as individual
-// transaction amounts.
+// balance is the group's net transaction sum (positive = spend, negative =
+// income), shown on the header using the same sign/color convention as
+// individual transaction amounts.
 function buildDetailGroup(title, balance, elementId, collapsed) {
-    var groupEl = document.createElement("div");
-    groupEl.className = "detail-group" + (collapsed ? " collapsed" : "");
-    if (elementId) {
-        groupEl.id = elementId;
-    }
-
-    var header = document.createElement("button");
-    header.type = "button";
-    header.className = "detail-group-header";
-    header.addEventListener("click", function () {
-        groupEl.classList.toggle("collapsed");
-    });
-
-    var titleEl = document.createElement("span");
-    titleEl.className = "detail-group-title";
-
-    var chevronEl = document.createElement("i");
-    chevronEl.className = "fa-solid fa-angle-right detail-group-chevron";
-
-    var titleTextEl = document.createElement("span");
-    titleTextEl.textContent = title;
-
-    titleEl.appendChild(chevronEl);
-    titleEl.appendChild(titleTextEl);
-
     var balanceEl = document.createElement("span");
     renderSignedAmount(balanceEl, "detail-group-balance balance-amount", balance, balance < 0, formatCurrency);
 
-    header.appendChild(titleEl);
-    header.appendChild(balanceEl);
-
-    var bodyWrapper = document.createElement("div");
-    bodyWrapper.className = "detail-group-body";
-
-    var body = document.createElement("div");
-    body.className = "detail-group-body-inner";
-    bodyWrapper.appendChild(body);
-
-    groupEl.appendChild(header);
-    groupEl.appendChild(bodyWrapper);
-
-    return { el: groupEl, body: body };
+    return buildCollapsibleGroup(title, balanceEl, collapsed, elementId);
 }
 
 // Transactions arrive already sorted datetime desc, so grouping in
@@ -171,7 +126,6 @@ function renderDetailView() {
     var range = getPeriodRange(state.period, periodOffset);
     detailPeriodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
 
-    detailModeSwitch.dataset.mode = state.detailMode;
     detailModeButtons.forEach(function (button) {
         button.classList.toggle("selected", button.dataset.mode === state.detailMode);
     });

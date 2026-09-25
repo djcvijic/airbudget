@@ -11,6 +11,8 @@ function boot() {
 }
 
 function main() {
+    initInstallPrompt("airbudget");
+
     document.getElementById("onboarding-continue-button").addEventListener("click", applyOnboarding);
     document.getElementById("onboarding-import-button").addEventListener("click", openImportPicker);
 
@@ -37,9 +39,6 @@ function main() {
     document.getElementById("report-back-button").addEventListener("click", backFromReport);
     document.getElementById("report-banner-see-button").addEventListener("click", openMostRecentReport);
     document.getElementById("report-banner-dismiss-button").addEventListener("click", dismissReportBanner);
-
-    document.getElementById("install-banner-action-button").addEventListener("click", installApp);
-    document.getElementById("install-banner-dismiss-button").addEventListener("click", dismissInstallBanner);
 
     // Only one of settings/categories/goals can be the active screen at a
     // time, so nesting these guards is safe: whichever ones aren't active
@@ -100,15 +99,6 @@ function main() {
     document.getElementById("export-data-button").addEventListener("click", exportData);
     document.getElementById("import-data-button").addEventListener("click", openImportPicker);
     document.getElementById("delete-data-button").addEventListener("click", openDeleteConfirmModal);
-    var deleteConfirmButtonEl = document.getElementById("delete-confirm-button");
-    deleteConfirmButtonEl.addEventListener("mousedown", startDeleteHold);
-    deleteConfirmButtonEl.addEventListener("touchstart", startDeleteHold);
-    deleteConfirmButtonEl.addEventListener("mouseup", cancelDeleteHold);
-    deleteConfirmButtonEl.addEventListener("mouseleave", cancelDeleteHold);
-    deleteConfirmButtonEl.addEventListener("touchend", cancelDeleteHold);
-    deleteConfirmButtonEl.addEventListener("contextmenu", function (e) {
-        e.preventDefault();
-    });
 
     function dismissModals() {
         settingsUnsavedGuard.clearPending();
@@ -127,32 +117,9 @@ function main() {
         }
     });
 
-    document.addEventListener("keydown", function (e) {
-        if (e.altKey && e.metaKey && (e.code === "KeyR" || e.key.toLowerCase() === "r")) {
-            e.preventDefault();
-            fillRandomDebugData();
-            return;
-        }
-
-        if (e.key === "Escape" && !modalOverlay.classList.contains("hidden")) {
-            dismissModals();
-        }
-    });
+    wireGlobalShortcuts(fillRandomDebugData, dismissModals);
 
     boot();
 }
 
 main();
-
-// Skipped on localhost: the service worker is cache-first, so during local
-// dev it would keep serving pre-edit files after every change instead of
-// the fresh ones, unless CACHE_NAME is bumped on every single edit.
-if (location.hostname !== "localhost" && "serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-        navigator.serviceWorker.register("sw.js");
-    });
-}
-
-if (navigator.storage && navigator.storage.persist) {
-    navigator.storage.persist();
-}
