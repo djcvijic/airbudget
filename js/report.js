@@ -46,9 +46,9 @@ function openMostRecentReport() {
     openReportModal();
 }
 
-// Flags an expense over budget and an income short of its expected amount,
-// each treating an unset budget/expectation as zero so unbudgeted-but-spent
-// and unexpected-shortfall fall out of the same comparison.
+// Flags an expense over budget and an income short of its expected amount.
+// Only called with a set budget/expectation — the || 0 fallback is for the
+// tests, which also exercise unbudgeted entries directly.
 function isReportProblem(entry) {
     return entry.type === "expense" ? entry.spend > (entry.max || 0) : -entry.spend < (entry.max || 0);
 }
@@ -149,16 +149,18 @@ function openReportModal() {
     reportProblemGridEl.style.display = onTrack ? "none" : "";
     reportAccuracyMessageEl.style.display = onTrack ? "none" : "";
 
-    // Only shows a type's problem categories when that type actually
-    // caused the shortfall, so a flag on the other side isn't just noise.
+    // Unbudgeted categories have no threshold of their own to fail, so they
+    // only show when their type overall caused the shortfall.
     var expensesOverBudget = actualExpense > expectedTotals.expense;
     var incomeUnderExpected = actualIncome < expectedTotals.income;
 
     reportProblemGridEl.innerHTML = "";
     if (!onTrack) {
         entries.filter(function (entry) {
-            var typeIsResponsible = entry.type === "expense" ? expensesOverBudget : incomeUnderExpected;
-            return typeIsResponsible && isReportProblem(entry);
+            if (entry.max != null) {
+                return isReportProblem(entry);
+            }
+            return entry.type === "expense" ? expensesOverBudget : incomeUnderExpected;
         }).forEach(function (entry) {
             reportProblemGridEl.appendChild(buildReportProblemTile(entry));
         });

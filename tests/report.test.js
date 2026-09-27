@@ -173,7 +173,7 @@ suite("main view: report", function () {
         win.openReportModal();
 
         var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
-        assertTrue(tileIds.indexOf("freelance") === -1, "income with no expected amount is never flagged, since received income can't go negative");
+        assertTrue(tileIds.indexOf("freelance") !== -1, "unbudgeted income category shown because income overall is responsible for the shortfall");
         assertTrue(tileIds.indexOf("bonus") !== -1, "income below its expected amount is flagged");
         assertTrue(tileIds.indexOf("dividends") !== -1, "income that never arrived at all is flagged");
         assertTrue(tileIds.indexOf("salary") === -1, "income that met its expected amount is not flagged");
@@ -184,7 +184,7 @@ suite("main view: report", function () {
         assertTrue(bonusTile.querySelector(".category-tile-amounts").classList.contains("amount-income"));
     });
 
-    test("hides an over-budget expense category when expenses overall stayed within budget", async function () {
+    test("shows a budgeted category over or under its own target even when its type isn't responsible for the overall shortfall", async function () {
         var win = await freshApp(seededForReport({
             categories: [
                 baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 3000 }),
@@ -202,30 +202,32 @@ suite("main view: report", function () {
 
         assertNotEqual(win.reportProblemGridEl.style.display, "none");
         var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
-        assertTrue(tileIds.indexOf("salary") !== -1, "income short of expectations is the actual cause, so it's shown");
-        assertTrue(tileIds.indexOf("rent") === -1, "over its own budget, but expenses overall stayed within budget, so it's hidden");
+        assertTrue(tileIds.indexOf("salary") !== -1, "short of its own expected amount");
+        assertTrue(tileIds.indexOf("rent") !== -1, "over its own budget, even though total expenses stayed within the overall budget");
+        assertTrue(tileIds.indexOf("groceries") === -1, "never spent, so not over its own budget");
     });
 
-    test("hides a short income category when income overall met or exceeded expectations", async function () {
+    test("gates unbudgeted categories on whether their own type is responsible for the shortfall", async function () {
         var win = await freshApp(seededForReport({
             categories: [
-                baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 2000 }),
-                baseCategory({ id: "bonus", emoji: "🎁", name: "Bonus", type: "income", max: 1000 }),
-                baseCategory({ id: "rent", emoji: "🏠", name: "Rent", type: "expense", max: 500 })
+                baseCategory({ id: "salary", emoji: "💰", name: "Salary", type: "income", max: 3000 }),
+                baseCategory({ id: "rent", emoji: "🏠", name: "Rent", type: "expense", max: 1000 }),
+                baseCategory({ id: "groceries", emoji: "🛒", name: "Groceries", type: "expense", max: 2000 }),
+                baseCategory({ id: "coffee", emoji: "☕", name: "Coffee", type: "expense", max: null }),
+                baseCategory({ id: "bonus", emoji: "🎁", name: "Bonus", type: "income", max: null })
             ],
             transactions: [
-                baseTransaction({ categoryId: "salary", amount: 3000, datetime: monthsAgoDatetime(1) }),
-                baseTransaction({ categoryId: "rent", amount: 800, datetime: monthsAgoDatetime(1) })
+                baseTransaction({ categoryId: "salary", amount: 1000, datetime: monthsAgoDatetime(1) }),
+                baseTransaction({ categoryId: "rent", amount: 1200, datetime: monthsAgoDatetime(1) })
             ]
         }));
         win.periodOffset = -1;
 
         win.openReportModal();
 
-        assertNotEqual(win.reportProblemGridEl.style.display, "none");
         var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
-        assertTrue(tileIds.indexOf("rent") !== -1, "over budget is the actual cause, so it's shown");
-        assertTrue(tileIds.indexOf("bonus") === -1, "short of its own expectation, but income overall met or exceeded expectations, so it's hidden");
+        assertTrue(tileIds.indexOf("coffee") === -1, "unbudgeted expense category hidden, since expenses overall stayed within budget");
+        assertTrue(tileIds.indexOf("bonus") !== -1, "unbudgeted income category shown, since income overall fell short, even though it received nothing itself");
     });
 
     test("records the last second of the viewed period as the last-seen report, and persists it", async function () {
