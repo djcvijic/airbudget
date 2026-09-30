@@ -147,6 +147,39 @@ suite("state.js: getCategorySpend sign convention", function () {
         var range = win.getPeriodRange("monthly", 0);
         assertClose(win.getCategorySpend(cat.id, range.start, range.end), 0);
     });
+
+    test("a soft-deleted category's transactions are excluded from range reads", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "expense", deleted: true });
+        win.state.categories = [cat];
+        win.state.transactions = [
+            baseTransaction({ categoryId: cat.id, amount: 999, datetime: nowDatetime() })
+        ];
+
+        var range = win.getPeriodRange("monthly", 0);
+        assertEqual(win.getTransactionsInRange(range.start, range.end).length, 0);
+        assertClose(win.getCategorySpend(cat.id, range.start, range.end), 0);
+    });
+});
+
+suite("state.js: categoryHasTransactions", function () {
+    test("true once any transaction references the category, regardless of date", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "expense" });
+        win.state.categories = [cat];
+        win.state.transactions = [baseTransaction({ categoryId: cat.id, datetime: "2000-01-01T00:00" })];
+
+        assertTrue(win.categoryHasTransactions(cat.id));
+    });
+
+    test("false for a category with no transactions", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var cat = baseCategory({ type: "expense" });
+        win.state.categories = [cat];
+        win.state.transactions = [];
+
+        assertFalse(win.categoryHasTransactions(cat.id));
+    });
 });
 
 suite("state.js: getSortedCategoryEntries", function () {
@@ -182,6 +215,19 @@ suite("state.js: getSortedCategoryEntries", function () {
 
         assertFalse(entries[0].overMax);
     });
+
+    test("a soft-deleted category never appears", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var groceries = baseCategory({ id: "a", type: "expense" });
+        var old = baseCategory({ id: "b", type: "expense", deleted: true });
+        win.state.categories = [groceries, old];
+
+        var range = win.getPeriodRange("monthly", 0);
+        var entries = win.getSortedCategoryEntries(range.start, range.end);
+
+        assertEqual(entries.length, 1);
+        assertEqual(entries[0].id, groceries.id);
+    });
 });
 
 suite("state.js: getExpectedPeriodicIncome", function () {
@@ -201,6 +247,16 @@ suite("state.js: getExpectedPeriodicIncome", function () {
         win.state.categories = [
             baseCategory({ id: "salary", type: "income", max: 1000 }),
             baseCategory({ id: "misc", type: "expense", max: null })
+        ];
+
+        assertEqual(win.getExpectedPeriodicIncome(), 1000);
+    });
+
+    test("a soft-deleted category's budget/expected amount doesn't contribute", async function () {
+        var win = await freshApp({ period: "weekly", currency: "USD" });
+        win.state.categories = [
+            baseCategory({ id: "salary", type: "income", max: 1000 }),
+            baseCategory({ id: "rent", type: "expense", max: 400, deleted: true })
         ];
 
         assertEqual(win.getExpectedPeriodicIncome(), 1000);
@@ -335,6 +391,17 @@ suite("transaction.js: sortedTransactionCategories (frecency)", function () {
 
         var sorted = win.sortedTransactionCategories();
         assertEqual(sorted[0].id, zebra.id, "the more recently created category ranks first despite losing alphabetically");
+    });
+
+    test("a soft-deleted category never appears in the picker", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var groceries = baseCategory({ id: "a", name: "Groceries" });
+        var old = baseCategory({ id: "b", name: "Old", deleted: true });
+        win.state.categories = [groceries, old];
+
+        var sorted = win.sortedTransactionCategories();
+        assertEqual(sorted.length, 1);
+        assertEqual(sorted[0].id, groceries.id);
     });
 
     test("a handful of old transactions decay below a single recent one", async function () {

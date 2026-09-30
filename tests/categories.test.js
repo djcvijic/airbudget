@@ -94,13 +94,109 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertFalse(win.categoriesDoneButton.disabled);
     });
 
-    test("existing categories get no delete button", async function () {
+    test("a category with no transactions is removed immediately, with no confirmation", async function () {
         var win = await openReopenedCategories();
-        var rows = win.categoryRowsEl.querySelectorAll(".category-row");
-        rows.forEach(function (row) {
-            assertTrue(row.dataset.id.length > 0);
-            assertTrue(row.querySelector(".category-row-delete") === null);
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+
+        row.querySelector(".category-row-delete").click();
+
+        assertTrue(isHidden(win.categoryDeleteConfirmModal), "no transactions means nothing to confirm");
+        assertTrue(win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]') === null);
+        assertFalse(win.categoriesDoneButton.disabled);
+    });
+
+    test("a category with transactions asks for confirmation before its row is removed", async function () {
+        var win = await freshApp({
+            period: "monthly",
+            currency: "USD",
+            categories: seededTwoCategories().categories,
+            transactions: [baseTransaction({ categoryId: "cat-groceries" })]
         });
+        win.document.getElementById("open-categories-button").click();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+
+        row.querySelector(".category-row-delete").click();
+
+        assertFalse(isHidden(win.categoryDeleteConfirmModal));
+        assertTrue(win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]') !== null,
+            "nothing is removed until confirmed");
+
+        win.document.getElementById("category-delete-confirm-button").click();
+
+        assertTrue(win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]') === null);
+        assertTrue(isHidden(win.categoryDeleteConfirmModal));
+        assertFalse(win.categoriesDoneButton.disabled);
+    });
+
+    test("applying a deletion soft-deletes the category and keeps its transactions in storage", async function () {
+        var win = await freshApp({
+            period: "monthly",
+            currency: "USD",
+            categories: seededTwoCategories().categories,
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", amount: 42 })]
+        });
+        win.document.getElementById("open-categories-button").click();
+
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        row.querySelector(".category-row-delete").click();
+        win.document.getElementById("category-delete-confirm-button").click();
+        win.categoriesDoneButton.click();
+
+        var deleted = win.state.categories.filter(function (c) { return c.id === "cat-groceries"; })[0];
+        assertTrue(deleted.deleted, "soft-deleted rather than removed from storage");
+        var transaction = win.state.transactions.filter(function (t) { return t.id === "txn-1"; })[0];
+        assertTrue(!!transaction, "its transactions are preserved, not deleted");
+    });
+
+    test("a soft-deleted category never appears when the screen is reopened", async function () {
+        var win = await freshApp({
+            period: "monthly",
+            currency: "USD",
+            categories: [
+                baseCategory({ id: "cat-groceries", emoji: "🛒", name: "Groceries", type: "expense", max: 200 }),
+                baseCategory({ id: "cat-salary", emoji: "💰", name: "Salary", type: "income", deleted: true })
+            ]
+        });
+        win.document.getElementById("open-categories-button").click();
+
+        assertTrue(win.categoryRowsEl.querySelector('.category-row[data-id="cat-salary"]') === null);
+    });
+
+    test("a soft-deleted category survives a later, unrelated apply", async function () {
+        var win = await freshApp({
+            period: "monthly",
+            currency: "USD",
+            categories: [
+                baseCategory({ id: "cat-groceries", emoji: "🛒", name: "Groceries", type: "expense", max: 200 }),
+                baseCategory({ id: "cat-salary", emoji: "💰", name: "Salary", type: "income", deleted: true })
+            ]
+        });
+        win.document.getElementById("open-categories-button").click();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        setValue(row.querySelector(".category-row-name"), "Food & Drink");
+
+        win.categoriesDoneButton.click();
+
+        var salary = win.state.categories.filter(function (c) { return c.id === "cat-salary"; })[0];
+        assertTrue(!!salary && salary.deleted, "still present and still deleted after an unrelated edit");
+    });
+
+    test("deleting the only remaining category blocks Apply with an error", async function () {
+        var win = await freshApp({
+            period: "monthly",
+            currency: "USD",
+            categories: [baseCategory({ id: "cat-groceries", emoji: "🛒", name: "Groceries", type: "expense", max: 200 })],
+            transactions: [baseTransaction({ categoryId: "cat-groceries" })]
+        });
+        win.document.getElementById("open-categories-button").click();
+        var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
+        row.querySelector(".category-row-delete").click();
+        win.document.getElementById("category-delete-confirm-button").click();
+
+        win.categoriesDoneButton.click();
+
+        assertTrue(win.categoriesErrorEl.textContent.indexOf("at least one category") !== -1);
+        assertTrue(isActive(win.categoriesScreen));
     });
 
     test("clearing a category's emoji blocks Apply with an error", async function () {

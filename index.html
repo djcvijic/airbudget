@@ -100,8 +100,9 @@
             </p>
             <div id="category-rows" class="category-rows"></div>
             <div class="categories-add-row">
-                <button id="add-category-button" class="btn categories-full-button" type="button" title="Add category" aria-label="Add category">
+                <button id="add-category-button" class="btn categories-full-button" type="button" title="New Category" aria-label="New Category">
                     <i class="fa-solid fa-plus"></i>
+                    <span>New Category</span>
                 </button>
             </div>
             <button id="categories-auto-create-button" class="btn categories-full-button" type="button">Auto-create</button>
@@ -359,6 +360,17 @@
             <div class="modal-actions">
                 <button id="categories-unsaved-back-button" class="btn btn-secondary-pink" type="button">Back</button>
                 <button id="categories-unsaved-discard-button" class="btn btn-primary" type="button">Discard</button>
+            </div>
+        </div>
+
+        <div id="category-delete-confirm-modal" class="modal hidden">
+            <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-title">Delete this category?</div>
+            <div class="modal-description">
+                It will be hidden everywhere in the app, along with its transactions. This cannot be undone.
+            </div>
+            <div class="modal-actions">
+                <button id="category-delete-confirm-button" class="btn btn-danger" type="button">Delete</button>
             </div>
         </div>
 

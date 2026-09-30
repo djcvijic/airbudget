@@ -159,6 +159,16 @@ function getCategoryById(id) {
     return state.categories.filter(function (c) { return c.id === id; })[0];
 }
 
+function isVisibleCategory(category) {
+    return !category.deleted;
+}
+
+// All-time, not range-bound: decides whether deleting a category can drop
+// it outright or must soft-delete to keep its history (categories.js).
+function categoryHasTransactions(categoryId) {
+    return state.transactions.some(function (t) { return t.categoryId === categoryId; });
+}
+
 // Weeks start Monday. Returns { start, end } as Date objects; end is
 // exclusive (the start of the following period), so filtering can use
 // datetime >= start && datetime < end.
@@ -271,10 +281,17 @@ function renderSignedAmount(el, baseClassName, amount, isIncome, formatFn) {
     el.textContent = (isIncome ? "+" : "-") + formatFn(Math.abs(amount));
 }
 
+// The single choke point for reading transactions, so a soft-deleted
+// category's transactions (kept in storage forever) never surface
+// anywhere that reads through here.
 function getTransactionsInRange(start, end) {
     return state.transactions.filter(function (t) {
         var d = new Date(t.datetime);
-        return d >= start && d < end;
+        if (d < start || d >= end) {
+            return false;
+        }
+        var category = getCategoryById(t.categoryId);
+        return !category || !category.deleted;
     }).sort(function (a, b) {
         return new Date(b.datetime) - new Date(a.datetime);
     });
@@ -330,7 +347,7 @@ function compareByFrecency(scores) {
 
 function getSortedCategoryEntries(start, end) {
     var scores = categoryFrecencyScores();
-    var entries = state.categories.map(function (cat) {
+    var entries = state.categories.filter(isVisibleCategory).map(function (cat) {
         var spend = getCategorySpend(cat.id, start, end);
         return {
             id: cat.id,
@@ -356,7 +373,7 @@ function getExpectedPeriodTotals() {
     var income = 0;
     var expense = 0;
     state.categories.forEach(function (cat) {
-        if (cat.max == null) {
+        if (cat.deleted || cat.max == null) {
             return;
         }
         if (cat.type === "income") {

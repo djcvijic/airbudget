@@ -96,6 +96,14 @@
     font-size: 20px;
 }
 
+#add-category-button {
+    height: 94px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
 .categories-full-button:hover {
     background-color: #e6f6ff;
 }

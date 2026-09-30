@@ -24,6 +24,7 @@ function main() {
     document.getElementById("categories-done-button").addEventListener("click", applyCategories);
     document.getElementById("categories-unsaved-back-button").addEventListener("click", dismissModals);
     document.getElementById("categories-unsaved-discard-button").addEventListener("click", revertCategories);
+    document.getElementById("category-delete-confirm-button").addEventListener("click", confirmCategoryDelete);
 
     document.getElementById("goals-back-button").addEventListener("click", backFromGoals);
     document.getElementById("goals-onboarding-back-button").addEventListener("click", backFromGoals);

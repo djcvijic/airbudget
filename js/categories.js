@@ -1,4 +1,4 @@
-// Categories screen: add and edit categories (no delete). Reused for
+// Categories screen: add, edit, and soft-delete categories. Reused for
 // onboarding step 2 (forced: no back/revert, requires >=1 valid category)
 // and later reopen from the dashboard (edit rows in place; leaving with
 // unapplied changes warns, same as the settings screen).
@@ -16,11 +16,13 @@ var categoriesAutoCreateButton = document.getElementById("categories-auto-create
 var categoriesDoneButton = document.getElementById("categories-done-button");
 var categoriesDescriptionEl = document.getElementById("categories-description");
 var categoriesUnsavedModal = document.getElementById("categories-unsaved-modal");
+var categoryDeleteConfirmModal = document.getElementById("category-delete-confirm-modal");
 
 var categoriesForced = false;
 var categoriesAutoCreated = false;
 var categoriesOriginalSnapshot = null;
 var categoriesUnsavedGuard = createUnsavedGuard(hasUnsavedCategoriesChanges, categoriesUnsavedModal);
+var categoryPendingDeleteRow = null;
 
 var categoriesDraft = createStepDraft();
 
@@ -143,21 +145,28 @@ function buildCategoryRow(category) {
     typeRow.appendChild(incomeButton);
     typeRow.appendChild(thumb);
 
-    // An unapplied row (no id yet, whether a blank placeholder or a filled
-    // template from "Create automatically") isn't a real category yet, so
-    // it gets a delete control. Existing categories can't be deleted, so
-    // saved rows get no trailing control at all.
-    if (!category || !category.id) {
-        var deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.className = "category-row-delete";
+    var deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "category-row-delete";
+    deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
+
+    if (!category || !category.id || !categoryHasTransactions(category.id)) {
+        // Nothing references this category yet, so removing it is immediate,
+        // with no confirmation, and it's gone for good (see applyCategories).
         deleteButton.title = "Remove this category";
-        deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
         deleteButton.addEventListener("click", function () {
             row.remove();
         });
-        fields.appendChild(deleteButton);
+    } else {
+        // Has transaction history, so removing it only soft-deletes (see
+        // applyCategories) and asks for confirmation first.
+        deleteButton.title = "Delete this category";
+        deleteButton.addEventListener("click", function () {
+            categoryPendingDeleteRow = row;
+            openModal(categoryDeleteConfirmModal);
+        });
     }
+    fields.appendChild(deleteButton);
 
     typeLine.appendChild(typeRow);
     typeLine.appendChild(maxInput);
@@ -169,9 +178,20 @@ function buildCategoryRow(category) {
 
 function renderCategoryRows() {
     categoryRowsEl.innerHTML = "";
-    state.categories.forEach(function (category) {
+    state.categories.filter(isVisibleCategory).forEach(function (category) {
         categoryRowsEl.appendChild(buildCategoryRow(category));
     });
+}
+
+// Only removes the row; applyCategories decides soft- vs hard-delete later,
+// based on which rows are still present.
+function confirmCategoryDelete() {
+    if (categoryPendingDeleteRow) {
+        categoryPendingDeleteRow.remove();
+        categoryPendingDeleteRow = null;
+    }
+    closeModals();
+    updateCategoriesActionButtons();
 }
 
 function addCategoryRow() {
@@ -303,6 +323,7 @@ function openCategoriesScreen(forced) {
 function applyCategories() {
     var rows = categoryRowsEl.querySelectorAll(".category-row");
     var updated = [];
+    var presentIds = {};
 
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
@@ -310,11 +331,9 @@ function applyCategories() {
         var emoji = row.querySelector(".category-row-emoji").value.trim();
         var name = row.querySelector(".category-row-name").value.trim();
 
-        // Only an untouched "add category" placeholder row (no id yet) can be
-        // silently skipped. A row that already has an id is an existing
-        // category with transaction history; categories can't be deleted, so
-        // clearing its fields must fail validation below instead of quietly
-        // dropping it and orphaning its transactions.
+        // Only an untouched placeholder row (no id) can be silently skipped;
+        // a row with an id must fail validation below instead — removing a
+        // saved category is the trash icon's job, not blanking its fields.
         if (!row.dataset.id && !emoji && !name && maxRaw === "") {
             continue;
         }
@@ -341,6 +360,10 @@ function applyCategories() {
             ? parseInt(row.dataset.createdAt, 10)
             : (row.dataset.id ? null : Date.now());
 
+        if (row.dataset.id) {
+            presentIds[row.dataset.id] = true;
+        }
+
         updated.push({
             id: row.dataset.id || generateId("cat"),
             emoji: emoji,
@@ -355,6 +378,28 @@ function applyCategories() {
         categoriesErrorEl.textContent = "Add at least one category.";
         return;
     }
+
+    // A category missing from the rows above was removed this session, or
+    // was already soft-deleted. One with transaction history is carried
+    // forward as deleted, to persist forever; one with none is just dropped.
+    state.categories.forEach(function (cat) {
+        if (presentIds[cat.id]) {
+            return;
+        }
+        if (cat.deleted) {
+            updated.push(cat);
+        } else if (categoryHasTransactions(cat.id)) {
+            updated.push({
+                id: cat.id,
+                emoji: cat.emoji,
+                name: cat.name,
+                max: cat.max,
+                type: cat.type,
+                createdAt: cat.createdAt,
+                deleted: true
+            });
+        }
+    });
 
     state.categories = updated;
     var wasForced = categoriesForced;
