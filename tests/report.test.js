@@ -273,14 +273,24 @@ suite("main view: report", function () {
 
 suite("main view: report banner", function () {
     test("shows on the dashboard when the most recent period's report hasn't been seen", async function () {
-        var win = await freshApp(seededForReport({}));
+        var win = await freshApp(seededForReport({
+            transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
+        }));
 
         assertEqual(win.reportBannerEl.style.display, "flex");
         assertTrue(win.mainViewScreen.contains(win.reportBannerEl), "only ever shown on the main screen");
     });
 
-    test("hides once the most recent period's report has been seen", async function () {
+    test("doesn't show when the most recent period has no transactions at all", async function () {
         var win = await freshApp(seededForReport({}));
+
+        assertEqual(win.reportBannerEl.style.display, "none");
+    });
+
+    test("hides once the most recent period's report has been seen", async function () {
+        var win = await freshApp(seededForReport({
+            transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
+        }));
         var range = win.getPeriodRange(win.state.period, -1);
         win.state.lastSeenReport = win.formatDateTime(new Date(range.end.getTime() - 1000));
 
@@ -290,7 +300,9 @@ suite("main view: report banner", function () {
     });
 
     test("the X dismisses it and marks the most recent report as seen, without opening it", async function () {
-        var win = await freshApp(seededForReport({}));
+        var win = await freshApp(seededForReport({
+            transactions: [baseTransaction({ categoryId: "rent", amount: 500, datetime: monthsAgoDatetime(1) })]
+        }));
         var range = win.getPeriodRange(win.state.period, -1);
         var expected = win.formatDateTime(new Date(range.end.getTime() - 1000));
 

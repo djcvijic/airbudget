@@ -19,10 +19,13 @@ function lastSecondOfPeriod(range) {
     return new Date(range.end.getTime() - 1000);
 }
 
-// The most recent report is always last period relative to today, not a
-// stored value, so it naturally advances once the current period rolls over.
+// Skips periods with no transactions, so a fresh account shows no banner.
 function hasUnseenReport() {
-    var lastSecond = lastSecondOfPeriod(getPeriodRange(state.period, -1));
+    var range = getPeriodRange(state.period, -1);
+    if (getTransactionsInRange(range.start, range.end).length === 0) {
+        return false;
+    }
+    var lastSecond = lastSecondOfPeriod(range);
     return !state.lastSeenReport || new Date(state.lastSeenReport) < lastSecond;
 }
 
