@@ -64,7 +64,8 @@ function fillRandomDebugData() {
             emoji: pick.emoji,
             name: pick.name,
             max: randomAmount(1000, 20000),
-            type: isIncome ? "income" : "expense"
+            type: isIncome ? "income" : "expense",
+            createdAt: Date.now() - randomInt(0, 300) * 86400000
         };
     });
 

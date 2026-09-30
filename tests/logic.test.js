@@ -327,6 +327,16 @@ suite("transaction.js: sortedTransactionCategories (frecency)", function () {
         assertEqual(sorted[2].id, zebra.id, "zero-usage tie broken alphabetically: Mango before Zebra");
     });
 
+    test("createdAt tie-breaks before name when frecency scores are equal", async function () {
+        var win = await freshApp({ period: "monthly", currency: "USD" });
+        var apple = baseCategory({ id: "a", name: "Apple", createdAt: 1000 });
+        var zebra = baseCategory({ id: "b", name: "Zebra", createdAt: 2000 });
+        win.state.categories = [apple, zebra];
+
+        var sorted = win.sortedTransactionCategories();
+        assertEqual(sorted[0].id, zebra.id, "the more recently created category ranks first despite losing alphabetically");
+    });
+
     test("a handful of old transactions decay below a single recent one", async function () {
         var win = await freshApp({ period: "daily", currency: "USD" });
         var recent = baseCategory({ id: "recent", name: "Recent" });

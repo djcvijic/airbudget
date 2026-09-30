@@ -131,15 +131,7 @@ transactionDatetimeInput.addEventListener("change", function () {
 // Ranks categories for the picker by the same frecency score as the
 // dashboard grid and the detail view's category grouping (state.js).
 function sortedTransactionCategories() {
-    var scores = categoryFrecencyScores();
-
-    return state.categories.slice().sort(function (a, b) {
-        var scoreDiff = (scores[b.id] || 0) - (scores[a.id] || 0);
-        if (scoreDiff !== 0) {
-            return scoreDiff;
-        }
-        return a.name.localeCompare(b.name);
-    });
+    return state.categories.slice().sort(compareByFrecency(categoryFrecencyScores()));
 }
 
 function buildTransactionCategoryOptions() {

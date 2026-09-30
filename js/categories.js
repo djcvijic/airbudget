@@ -65,6 +65,9 @@ function buildCategoryRow(category) {
     if (category && category.id) {
         row.dataset.id = category.id;
     }
+    if (category && category.createdAt) {
+        row.dataset.createdAt = category.createdAt;
+    }
     row.dataset.type = (category && category.type === "income") ? "income" : "expense";
 
     var fields = document.createElement("div");
@@ -250,7 +253,8 @@ function captureCategoriesDraft() {
             emoji: row.querySelector(".category-row-emoji").value,
             name: row.querySelector(".category-row-name").value,
             max: maxRaw === "" ? null : parseFloat(maxRaw),
-            type: row.dataset.type
+            type: row.dataset.type,
+            createdAt: row.dataset.createdAt ? parseInt(row.dataset.createdAt, 10) : null
         };
     }));
 }
@@ -331,12 +335,19 @@ function applyCategories() {
             }
         }
 
+        // Existing categories saved before this field lack createdAt;
+        // treat that as unknown rather than defaulting it to now.
+        var createdAt = row.dataset.createdAt
+            ? parseInt(row.dataset.createdAt, 10)
+            : (row.dataset.id ? null : Date.now());
+
         updated.push({
             id: row.dataset.id || generateId("cat"),
             emoji: emoji,
             name: name,
             max: max,
-            type: type
+            type: type,
+            createdAt: createdAt
         });
     }
 

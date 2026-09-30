@@ -313,6 +313,21 @@ function categoryFrecencyScores() {
     return scores;
 }
 
+// Extracted so transaction.js's category picker doesn't duplicate this sort.
+function compareByFrecency(scores) {
+    return function (a, b) {
+        var scoreDiff = (scores[b.id] || 0) - (scores[a.id] || 0);
+        if (scoreDiff !== 0) {
+            return scoreDiff;
+        }
+        var createdDiff = (b.createdAt || 0) - (a.createdAt || 0);
+        if (createdDiff !== 0) {
+            return createdDiff;
+        }
+        return a.name.localeCompare(b.name);
+    };
+}
+
 function getSortedCategoryEntries(start, end) {
     var scores = categoryFrecencyScores();
     var entries = state.categories.map(function (cat) {
@@ -323,19 +338,14 @@ function getSortedCategoryEntries(start, end) {
             emoji: cat.emoji,
             type: cat.type,
             max: cat.max,
+            createdAt: cat.createdAt,
             spend: spend,
             // Income has no over-budget warning: more income than expected
             // isn't a problem, only more expense than budgeted is.
             overMax: cat.type === "expense" && cat.max != null && spend > cat.max
         };
     });
-    entries.sort(function (a, b) {
-        var scoreDiff = (scores[b.id] || 0) - (scores[a.id] || 0);
-        if (scoreDiff !== 0) {
-            return scoreDiff;
-        }
-        return a.name.localeCompare(b.name);
-    });
+    entries.sort(compareByFrecency(scores));
     return entries;
 }
 
