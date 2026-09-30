@@ -70,37 +70,33 @@
     <div id="results"></div>
 
     <script>
-        // Each script is independently cached, so a reload alone doesn't
-        // guarantee fresh files. document.write cache-busts them while
-        // preserving load order, same as static script tags.
-        var testScriptCacheBust = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
-        [
-            "runner.js",
-            "helpers.js",
-            "logic.test.js",
-            "onboarding.test.js",
-            "categories.test.js",
-            "transaction.test.js",
-            "detail.test.js",
-            "settings.test.js",
-            "goals.test.js",
-            "report.test.js"
-        ].forEach(function (src) {
-            document.write('<script src="' + src + '?v=' + testScriptCacheBust + '"><\/script>');
-        });
-    </script>
-    <script>
-        // The app under test registers a cache-first service worker. Any
+        // sw.js registers with scope "/", covering /tests/ too — a
         // registration left over from manually using the app in this same
-        // browser would otherwise serve stale JS/HTML to every test.
+        // browser can intercept and serve a stale response for this page's
+        // own script tags below, intermittently. Must be cleared before
+        // loading anything else, not after.
         //
         // A leftover service worker isn't the only staleness risk: Chrome's
         // plain HTTP disk cache survives unregistering one. If another
         // project was ever served from this same origin, its same-named
-        // files can still be cached and served here with no error.
-        // Force-refresh every asset index.html references, parsed from
-        // index.html itself so the list can't go stale, before any test
-        // loads the app.
+        // files can still be cached and served here with no error. Force-
+        // refresh every asset index.html references, parsed from index.html
+        // itself so the list can't go stale, before any test loads the app.
+        //
+        // Scripts load via createElement rather than document.write: write
+        // only guarantees in-order execution during the page's initial
+        // synchronous parse, so anything delaying that (a slow extension,
+        // this very async chain) can make it silently no-op.
+        function loadScript(src) {
+            return new Promise(function (resolve, reject) {
+                var el = document.createElement("script");
+                el.src = src;
+                el.onload = resolve;
+                el.onerror = reject;
+                document.body.appendChild(el);
+            });
+        }
+
         Promise.resolve()
             .then(function () {
                 if (!("serviceWorker" in navigator)) {
@@ -119,6 +115,26 @@
                 });
             })
             .then(function () {
+                var testScriptCacheBust = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+                var scripts = [
+                    "runner.js",
+                    "helpers.js",
+                    "logic.test.js",
+                    "onboarding.test.js",
+                    "categories.test.js",
+                    "transaction.test.js",
+                    "detail.test.js",
+                    "settings.test.js",
+                    "goals.test.js",
+                    "report.test.js"
+                ];
+                return scripts.reduce(function (chain, src) {
+                    return chain.then(function () {
+                        return loadScript(src + "?v=" + testScriptCacheBust);
+                    });
+                }, Promise.resolve());
+            })
+            .then(function () {
                 var indexUrl = new URL("../index.html", location.href);
                 return fetch(indexUrl, { cache: "reload" })
                     .then(function (r) { return r.text(); })
@@ -134,7 +150,9 @@
                         }));
                     });
             })
-            .then(runTests);
+            .then(function () {
+                runTests();
+            });
     </script>
 </body>
 

@@ -28,16 +28,13 @@ function showToast(message) {
 
 // Shared by every screen that edits state in place and must not lose it to
 // an accidental Back/nav click: hasChangesFn decides dirtiness, modalEl is
-// that screen's own "Unapplied changes" confirm modal. Calls openModal()
-// only inside goFrom(), which only ever runs from a click handler, long
-// after state.js has loaded — so this file itself can load before state.js
-// even though it references a global state.js defines.
+// that screen's own "Unapplied changes" confirm modal.
 function createUnsavedGuard(hasChangesFn, modalEl) {
     var pendingNavigation = null;
 
     return {
         goFrom: function (screenEl, navigateFn) {
-            if (!screenEl.classList.contains("active") || !hasChangesFn()) {
+            if (screenEl.id !== currentScreenId || !hasChangesFn()) {
                 navigateFn();
                 return;
             }
@@ -209,19 +206,19 @@ function initInstallPrompt(appName) {
     var textEl = document.createElement("span");
     textEl.className = "banner-text";
 
-    var actionButton = document.createElement("button");
-    actionButton.type = "button";
-    actionButton.className = "btn btn-text banner-action";
-    actionButton.textContent = "Install";
-
     var dismissButton = document.createElement("button");
     dismissButton.type = "button";
-    dismissButton.className = "btn btn-text banner-dismiss";
+    dismissButton.className = "btn-text banner-dismiss";
     dismissButton.setAttribute("aria-label", "Dismiss install banner");
 
     var dismissIcon = document.createElement("i");
     dismissIcon.className = "fa-solid fa-xmark";
     dismissButton.appendChild(dismissIcon);
+
+    var actionButton = document.createElement("button");
+    actionButton.type = "button";
+    actionButton.className = "banner-action";
+    actionButton.textContent = "Install";
 
     bannerEl.appendChild(textEl);
     bannerEl.appendChild(actionButton);
@@ -355,9 +352,16 @@ function setActiveNavButton(buttonId) {
 
 var bottomNavEl = document.getElementById("bottom-nav");
 
+// The single place a screen transition happens, so it's the single place
+// that updates currentScreenId: everything else that needs to know which
+// screen is active reads that instead of asking the DOM.
+var currentScreenId = null;
+
 // Each app keeps its own showScreen(screen) wrapper around this for its own
 // nav-button map, visibility check, and any extra screen-specific toggling.
 function setActiveScreen(screen, navButtonIdByScreenId, isBottomNavVisibleFn) {
+    currentScreenId = screen.id;
+
     document.querySelectorAll(".screen").forEach(function (s) {
         s.classList.remove("active");
     });
@@ -370,6 +374,15 @@ function setActiveScreen(screen, navButtonIdByScreenId, isBottomNavVisibleFn) {
     setActiveNavButton(navButtonIdByScreenId[screen.id]);
 
     window.scrollTo(0, 0);
+}
+
+// Skips re-navigating (and re-running navigateFn's guard/reset logic) when
+// the tapped tab is already showing.
+function wireNavButton(buttonId, screenId, navigateFn) {
+    document.getElementById(buttonId).addEventListener("click", function () {
+        if (currentScreenId === screenId) return;
+        navigateFn();
+    });
 }
 
 function backToTop() {

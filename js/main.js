@@ -51,34 +51,34 @@ function main() {
         });
     }
 
-    document.getElementById("open-home-button").addEventListener("click", function () {
+    wireNavButton("open-home-button", "main-view-screen", function () {
         goToScreen(goToMainView);
     });
-    document.getElementById("open-transaction-button").addEventListener("click", function () {
+    wireNavButton("open-transaction-button", "transaction-screen", function () {
         goToScreen(function () {
             openTransactionScreen();
         });
     });
     document.getElementById("transaction-back-button").addEventListener("click", cancelTransaction);
     document.getElementById("transaction-cancel-button").addEventListener("click", cancelTransaction);
-    document.getElementById("open-settings-button").addEventListener("click", function () {
+    wireNavButton("open-settings-button", "settings-screen", function () {
         goToScreen(openSettingsScreen);
     });
     document.getElementById("settings-back-button").addEventListener("click", backFromSettings);
     document.getElementById("settings-cancel-button").addEventListener("click", backFromSettings);
     document.getElementById("settings-unsaved-back-button").addEventListener("click", dismissModals);
     document.getElementById("settings-unsaved-discard-button").addEventListener("click", revertSettings);
-    document.getElementById("open-categories-button").addEventListener("click", function () {
+    wireNavButton("open-categories-button", "categories-screen", function () {
         goToScreen(function () {
             openCategoriesScreen(false);
         });
     });
-    document.getElementById("open-goals-button").addEventListener("click", function () {
+    wireNavButton("open-goals-button", "goals-screen", function () {
         goToScreen(function () {
             openGoalsScreen(false);
         });
     });
-    document.getElementById("open-detail-button").addEventListener("click", function () {
+    wireNavButton("open-detail-button", "detail-screen", function () {
         goToScreen(function () {
             openDetailView();
         });

@@ -26,6 +26,36 @@
 </head>
 
 <body>
+    <div id="bottom-nav" class="bottom-nav">
+        <div class="bottom-nav-logo">airbudget</div>
+        <div class="bottom-nav-row">
+            <button id="open-home-button" class="btn btn-text" type="button" title="Home">
+                <i class="fa-solid fa-house"></i>
+                <span class="bottom-nav-label">Home</span>
+            </button>
+            <button id="open-transaction-button" class="btn btn-text" type="button" title="Transaction">
+                <i class="fa-solid fa-plus"></i>
+                <span class="bottom-nav-label">Transaction</span>
+            </button>
+            <button id="open-detail-button" class="btn btn-text" type="button" title="History">
+                <i class="fa-solid fa-receipt"></i>
+                <span class="bottom-nav-label">History</span>
+            </button>
+            <button id="open-goals-button" class="btn btn-text" type="button" title="Goals">
+                <i class="fa-solid fa-star"></i>
+                <span class="bottom-nav-label">Goals</span>
+            </button>
+            <button id="open-categories-button" class="btn btn-text" type="button" title="Categories">
+                <i class="fa-solid fa-tags"></i>
+                <span class="bottom-nav-label">Categories</span>
+            </button>
+            <button id="open-settings-button" class="btn btn-text" type="button" title="Settings">
+                <i class="fa-solid fa-gear"></i>
+                <span class="bottom-nav-label">Settings</span>
+            </button>
+        </div>
+    </div>
+
     <div class="app">
         <div id="onboarding-screen" class="screen">
             <div class="screen-header">
@@ -121,8 +151,8 @@
         <div id="main-view-screen" class="screen">
             <div id="report-banner" class="banner">
                 <span id="report-banner-text" class="banner-text">A new report is ready.</span>
-                <button id="report-banner-see-button" class="btn btn-text banner-action" type="button">See report</button>
-                <button id="report-banner-dismiss-button" class="btn btn-text banner-dismiss" type="button" aria-label="Dismiss report banner">
+                <button id="report-banner-see-button" class="banner-action" type="button">See report</button>
+                <button id="report-banner-dismiss-button" class="btn-text banner-dismiss" type="button" aria-label="Dismiss report banner">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -367,17 +397,6 @@
             </div>
         </div>
 
-    </div>
-
-    <div id="bottom-nav" class="bottom-nav">
-        <div class="bottom-nav-row">
-            <button id="open-home-button" class="btn btn-text" type="button" title="Home"><i class="fa-solid fa-house"></i></button>
-            <button id="open-transaction-button" class="btn btn-text" type="button" title="New transaction"><i class="fa-solid fa-plus"></i></button>
-            <button id="open-detail-button" class="btn btn-text" type="button" title="All transactions"><i class="fa-solid fa-receipt"></i></button>
-            <button id="open-goals-button" class="btn btn-text" type="button" title="Goals"><i class="fa-solid fa-star"></i></button>
-            <button id="open-categories-button" class="btn btn-text" type="button" title="Categories"><i class="fa-solid fa-tags"></i></button>
-            <button id="open-settings-button" class="btn btn-text" type="button" title="Settings"><i class="fa-solid fa-gear"></i></button>
-        </div>
     </div>
 
     <div id="to-top"><i class="fa-solid fa-angle-up"></i> Back to top</div>
