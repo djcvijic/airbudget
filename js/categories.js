@@ -19,19 +19,15 @@ var categoriesUnsavedModal = document.getElementById("categories-unsaved-modal")
 var categoryDeleteConfirmModal = document.getElementById("category-delete-confirm-modal");
 
 var categoriesForced = false;
-var categoriesAutoCreated = false;
 var categoriesOriginalSnapshot = null;
 var categoriesUnsavedGuard = createUnsavedGuard(hasUnsavedCategoriesChanges, categoriesUnsavedModal);
 var categoryPendingDeleteRow = null;
 
 var categoriesDraft = createStepDraft();
 
-// Templates for "Create automatically", added as unapplied rows the user
-// can still edit or remove before Apply. Salary is the one income entry
-// and stays first; the rest are common expense categories, already listed
-// alphabetically here rather than sorted at use time.
 var CATEGORY_TEMPLATES = [
     { emoji: "💰", name: "Salary", type: "income" },
+    { emoji: "🤑", name: "Deposits", type: "income" },
     { emoji: "💸", name: "Bills", type: "expense" },
     { emoji: "🎉", name: "Entertainment", type: "expense" },
     { emoji: "🎁", name: "Gifts", type: "expense" },
@@ -42,7 +38,11 @@ var CATEGORY_TEMPLATES = [
     { emoji: "🍕", name: "Ordering in", type: "expense" },
     { emoji: "🛍️", name: "Shopping", type: "expense" },
     { emoji: "💳", name: "Subscriptions", type: "expense" },
-    { emoji: "🚌", name: "Transportation", type: "expense" }
+    { emoji: "🚌", name: "Transportation", type: "expense" },
+    { emoji: "🐾", name: "Pets", type: "expense" },
+    { emoji: "🏃", name: "Fitness", type: "expense" },
+    { emoji: "👶", name: "Kids", type: "expense" },
+    { emoji: "🚗", name: "Car", type: "expense" }
 ];
 
 // Truncates to the first grapheme cluster, so a single emoji (which can
@@ -200,16 +200,7 @@ function addCategoryRow() {
     row.querySelector(".category-row-emoji").focus();
 }
 
-// Appends one row per template, alphabetically, after whatever rows are
-// already there. Only usable once per visit to the screen — the button is
-// removed right after, and shown again the next time the screen opens.
 function createCategoriesAutomatically() {
-    if (categoriesAutoCreated) {
-        return;
-    }
-    categoriesAutoCreated = true;
-    categoriesAutoCreateButton.style.display = "none";
-
     CATEGORY_TEMPLATES.forEach(function (template) {
         categoryRowsEl.appendChild(buildCategoryRow(template));
     });
@@ -250,6 +241,8 @@ function hasUnsavedCategoriesChanges() {
 
 // Forced mode's Apply is never disabled; reopened mode disables it once clean.
 function updateCategoriesActionButtons() {
+    categoriesAutoCreateButton.style.display = categoryRowsEl.children.length === 0 ? "" : "none";
+
     if (categoriesForced) {
         categoriesCancelButton.style.display = "none";
         categoriesDoneButton.style.display = "";
@@ -284,7 +277,6 @@ function openCategoriesScreen(forced) {
     categoriesErrorEl.textContent = "";
     categoriesBackButton.style.display = forced ? "none" : "";
     categoriesOnboardingBackButton.style.display = forced ? "" : "none";
-    categoriesAutoCreateButton.style.display = forced ? "" : "none";
     categoriesDescriptionEl.style.display = forced ? "" : "none";
     // Borrows the onboarding screen's own h1 look, so categories reads as
     // step two of one flow when reached as a forced onboarding step.
@@ -297,20 +289,7 @@ function openCategoriesScreen(forced) {
         draftRows.forEach(function (draftCategory) {
             categoryRowsEl.appendChild(buildCategoryRow(draftCategory));
         });
-        if (categoriesAutoCreated) {
-            categoriesAutoCreateButton.style.display = "none";
-        }
-    } else if (forced && state.categories.length > 0) {
-        // Returning here via goals.js's onboarding back button, after
-        // categories were already applied (which clears categoriesDraft) —
-        // re-render what was saved without resetting auto-create, which
-        // may already have been used.
-        renderCategoryRows();
-        if (categoriesAutoCreated) {
-            categoriesAutoCreateButton.style.display = "none";
-        }
     } else {
-        categoriesAutoCreated = false;
         renderCategoryRows();
     }
 

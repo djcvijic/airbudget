@@ -251,18 +251,20 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertTrue(win.toastEl.textContent.length > 0);
     });
 
-    test("auto-create adds every template once, then hides itself", async function () {
+    test("auto-create is hidden with any categories, reappears at zero, and adds every template", async function () {
         var win = await openReopenedCategories();
-        var before = win.categoryRowsEl.querySelectorAll(".category-row").length;
+        assertEqual(win.categoriesAutoCreateButton.style.display, "none", "hidden while categories exist");
+
+        win.categoryRowsEl.querySelectorAll(".category-row-delete").forEach(function (button) {
+            button.click();
+        });
+        assertEqual(win.categoryRowsEl.querySelectorAll(".category-row").length, 0);
+        assertNotEqual(win.categoriesAutoCreateButton.style.display, "none", "visible again once empty");
 
         win.categoriesAutoCreateButton.click();
-        var afterFirst = win.categoryRowsEl.querySelectorAll(".category-row").length;
-        assertEqual(afterFirst, before + win.CATEGORY_TEMPLATES.length);
-        assertEqual(win.categoriesAutoCreateButton.style.display, "none");
 
-        win.categoriesAutoCreateButton.click();
-        var afterSecond = win.categoryRowsEl.querySelectorAll(".category-row").length;
-        assertEqual(afterSecond, afterFirst, "a hidden button click must not add rows again");
+        assertEqual(win.categoryRowsEl.querySelectorAll(".category-row").length, win.CATEGORY_TEMPLATES.length);
+        assertEqual(win.categoriesAutoCreateButton.style.display, "none", "hidden again once templates are added");
     });
 
     test("auto-create button goes from visible to hidden on click, in forced mode", async function () {
