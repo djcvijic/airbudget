@@ -97,8 +97,8 @@
 .transaction-numpad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    max-width: 280px;
+    gap: 5px;
+    max-width: 300px;
     margin: 20px auto 0;
 }
 
@@ -107,10 +107,10 @@
     border: 2px solid #0099ff;
     border-radius: 0;
     font-family: inherit;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: bold;
     color: inherit;
-    padding: 6px 4px;
+    padding: 8px 5px;
     cursor: pointer;
 }
 
