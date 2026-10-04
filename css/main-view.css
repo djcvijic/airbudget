@@ -46,9 +46,18 @@
     width: 100%;
 }
 
-.total-progress {
+.main-view-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     margin-bottom: 24px;
-    text-align: center;
+}
+
+.total-progress {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
 }
 
 .total-progress-label {
@@ -57,15 +66,29 @@
     margin-right: 6px;
 }
 
-.category-grid {
+.category-tiles-view-toggle {
+    flex-shrink: 0;
+}
+
+.category-tiles-view-toggle .segmented-toggle-option {
+    padding: 10px 14px;
+    font-size: 18px;
+}
+
+.category-tile-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
 }
 
+.category-tile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .category-tile {
     position: relative;
-    aspect-ratio: 1;
     display: flex;
     flex-direction: column;
     border: 2px solid #ccc;
@@ -123,6 +146,14 @@
     text-align: center;
 }
 
+.category-tile-name {
+    display: none;
+}
+
+.category-tile-amount-max {
+    display: none;
+}
+
 .category-tile-progress-track {
     width: 100%;
     margin-top: 6px;
@@ -154,6 +185,10 @@
     border-top: 1px solid #eee;
 }
 
+.category-tile-divider-before {
+    display: none;
+}
+
 .category-tile-history-zone {
     display: flex;
     align-items: center;
@@ -169,4 +204,76 @@
 
 .category-tile-history-zone:hover {
     color: #0099ff;
+}
+
+.category-tile-list .category-tile {
+    flex-direction: row;
+    align-items: stretch;
+    text-align: left;
+    padding: 6px 8px;
+}
+
+.category-tile-list .category-tile-add-zone {
+    flex: 0 0 auto;
+    width: 38px;
+}
+
+.category-tile-list .category-tile-emoji {
+    font-size: 24px;
+}
+
+.category-tile-list .category-tile-info {
+    flex: 1;
+    min-width: 0;
+    align-self: center;
+    text-align: left;
+}
+
+.category-tile-list .category-tile-name {
+    display: block;
+    font-weight: bold;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.category-tile-list .category-tile-progress-track {
+    margin-top: 4px;
+}
+
+.category-tile-list .category-tile-amounts {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-top: 2px;
+}
+
+.category-tile-list .category-tile-amount-value,
+.category-tile-list .category-tile-amount-currency,
+.category-tile-list .category-tile-amount-max {
+    white-space: nowrap;
+}
+
+.category-tile-list .category-tile-amount-max {
+    display: inline;
+}
+
+.category-tile-list .category-tile-divider {
+    margin: -6px 0 -6px 6px;
+    border-top: none;
+    border-left: 1px solid #eee;
+}
+
+.category-tile-list .category-tile-divider-before {
+    display: block;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.category-tile-list .category-tile-history-zone {
+    flex: 0 0 auto;
+    width: 50px;
+    margin: -6px -8px -6px 0;
+    padding: 0;
 }

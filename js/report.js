@@ -10,7 +10,7 @@ var reportExpectedValueEl = document.getElementById("report-expected-value");
 var reportActualValueEl = document.getElementById("report-actual-value");
 var reportOnTrackMessageEl = document.getElementById("report-on-track-message");
 var reportBelowTargetMessageEl = document.getElementById("report-below-target-message");
-var reportProblemGridEl = document.getElementById("report-problem-grid");
+var reportProblemTilesEl = document.getElementById("report-problem-tiles");
 var reportRealityCheckMessageEl = document.getElementById("report-reality-check-message");
 var reportAccuracyMessageEl = document.getElementById("report-accuracy-message");
 var reportBannerEl = document.getElementById("report-banner");
@@ -108,6 +108,10 @@ function buildReportProblemTile(entry) {
     emojiZone.appendChild(emojiEl);
     tile.appendChild(emojiZone);
 
+    var dividerBefore = document.createElement("div");
+    dividerBefore.className = "category-tile-divider category-tile-divider-before";
+    tile.appendChild(dividerBefore);
+
     tile.appendChild(buildTileInfo(entry));
 
     return tile;
@@ -149,7 +153,7 @@ function openReportModal() {
     reportOnTrackMessageEl.style.display = onTrack ? "" : "none";
     reportRealityCheckMessageEl.style.display = onTrack ? "" : "none";
     reportBelowTargetMessageEl.style.display = onTrack ? "none" : "";
-    reportProblemGridEl.style.display = onTrack ? "none" : "";
+    reportProblemTilesEl.style.display = onTrack ? "none" : "";
     reportAccuracyMessageEl.style.display = onTrack ? "none" : "";
 
     // Unbudgeted categories have no threshold of their own to fail, so they
@@ -157,7 +161,8 @@ function openReportModal() {
     var expensesOverBudget = actualExpense > expectedTotals.expense;
     var incomeUnderExpected = actualIncome < expectedTotals.income;
 
-    reportProblemGridEl.innerHTML = "";
+    applyCategoryTilesViewMode(reportProblemTilesEl);
+    reportProblemTilesEl.innerHTML = "";
     if (!onTrack) {
         entries.filter(function (entry) {
             if (entry.max != null) {
@@ -165,7 +170,7 @@ function openReportModal() {
             }
             return entry.type === "expense" ? expensesOverBudget : incomeUnderExpected;
         }).forEach(function (entry) {
-            reportProblemGridEl.appendChild(buildReportProblemTile(entry));
+            reportProblemTilesEl.appendChild(buildReportProblemTile(entry));
         });
     }
 

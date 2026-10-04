@@ -10,7 +10,7 @@ var CATEGORIES_KEY = "airbudget-categories-v1";
 var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
-    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", goalAmount: null, goalSetDate: null, lastSeenReport: null };
+    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", goalAmount: null, goalSetDate: null, lastSeenReport: null };
 }
 
 function readJSON(key, fallback) {
@@ -33,6 +33,7 @@ function loadState() {
         categories: readJSON(CATEGORIES_KEY, []),
         transactions: readJSON(TRANSACTIONS_KEY, []),
         detailMode: "day",
+        categoryTilesViewMode: meta.categoryTilesViewMode || "grid",
         goalAmount: meta.goalAmount != null ? meta.goalAmount : null,
         goalSetDate: meta.goalSetDate || null,
         lastSeenReport: meta.lastSeenReport || null
@@ -68,6 +69,7 @@ function saveMeta() {
     return persist(META_KEY, {
         period: state.period,
         currency: state.currency,
+        categoryTilesViewMode: state.categoryTilesViewMode,
         goalAmount: state.goalAmount,
         goalSetDate: state.goalSetDate,
         lastSeenReport: state.lastSeenReport
@@ -94,6 +96,7 @@ window.addEventListener("storage", function (e) {
         var meta = readJSON(META_KEY, {});
         state.period = meta.period || null;
         state.currency = meta.currency || null;
+        state.categoryTilesViewMode = meta.categoryTilesViewMode || "grid";
         state.goalAmount = meta.goalAmount != null ? meta.goalAmount : null;
         state.goalSetDate = meta.goalSetDate || null;
         state.lastSeenReport = meta.lastSeenReport || null;
@@ -314,7 +317,7 @@ function getCategorySpend(categoryId, start, end) {
 // Frecency: each transaction contributes a weight that halves every
 // half-life (the current period's length), so recent activity dominates
 // but old activity still counts for something rather than a hard cutoff.
-// Shared by the dashboard grid, the detail view's category-mode grouping,
+// Shared by the dashboard's category tiles, the detail view's category-mode grouping,
 // and the transaction screen's category picker, so all three rank
 // categories the same way.
 function categoryFrecencyScores() {

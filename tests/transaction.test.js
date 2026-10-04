@@ -15,7 +15,7 @@ function seededForTransactions(overrides) {
 }
 
 function tileAddZone(win, categoryId) {
-    var tile = win.categoryGridEl.querySelector('.category-tile[data-id="' + categoryId + '"]');
+    var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="' + categoryId + '"]');
     return tile.querySelector(".category-tile-add-zone");
 }
 
@@ -174,7 +174,7 @@ suite("transaction screen", function () {
         assertClose(win.state.transactions[0].amount, 42.5);
         assertEqual(win.state.transactions[0].comment, "weekly shop");
 
-        var tile = win.categoryGridEl.querySelector('.category-tile[data-id="cat-groceries"]');
+        var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="cat-groceries"]');
         var amountText = tile.querySelector(".category-tile-amount-value").textContent;
         assertEqual(amountText, "-42.50");
         assertTrue(win.toastEl.textContent.length > 0);
@@ -204,7 +204,7 @@ suite("transaction screen", function () {
 
         assertEqual(win.state.transactions[0].amount, 1500, "amount is stored unsigned");
 
-        var tile = win.categoryGridEl.querySelector('.category-tile[data-id="cat-salary"]');
+        var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="cat-salary"]');
         assertTrue(tile.querySelector(".category-tile-amounts").className.indexOf("amount-income") !== -1);
     });
 

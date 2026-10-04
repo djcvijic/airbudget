@@ -89,7 +89,7 @@ suite("main view: report", function () {
         assertNotEqual(win.reportOnTrackMessageEl.style.display, "none");
         assertNotEqual(win.reportRealityCheckMessageEl.style.display, "none");
         assertEqual(win.reportBelowTargetMessageEl.style.display, "none");
-        assertEqual(win.reportProblemGridEl.style.display, "none");
+        assertEqual(win.reportProblemTilesEl.style.display, "none");
         assertEqual(win.reportAccuracyMessageEl.style.display, "none");
     });
 
@@ -108,14 +108,14 @@ suite("main view: report", function () {
         assertEqual(win.reportOnTrackMessageEl.style.display, "none");
         assertEqual(win.reportRealityCheckMessageEl.style.display, "none");
         assertNotEqual(win.reportBelowTargetMessageEl.style.display, "none");
-        assertNotEqual(win.reportProblemGridEl.style.display, "none");
+        assertNotEqual(win.reportProblemTilesEl.style.display, "none");
         assertNotEqual(win.reportAccuracyMessageEl.style.display, "none");
 
-        var tiles = win.reportProblemGridEl.querySelectorAll(".category-tile");
+        var tiles = win.reportProblemTilesEl.querySelectorAll(".category-tile");
         assertEqual(tiles.length, 1);
         assertEqual(tiles[0].dataset.id, "groceries");
         assertTrue(tiles[0].querySelector(".category-tile-add-icon") === null, "no plus icon");
-        assertTrue(tiles[0].querySelector(".category-tile-divider") === null, "no bottom divider");
+        assertTrue(tiles[0].querySelector(".category-tile-divider:not(.category-tile-divider-before)") === null, "no bottom divider");
         assertTrue(tiles[0].querySelector(".category-tile-history-zone") === null, "no receipt zone");
     });
 
@@ -142,11 +142,11 @@ suite("main view: report", function () {
 
         win.openReportModal();
 
-        var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
+        var tileIds = Array.from(win.reportProblemTilesEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
         assertEqual(tileIds.join(","), expectedIds.join(","));
         assertTrue(tileIds.indexOf("coffee") !== -1, "the unbudgeted category with spend must be included");
 
-        var coffeeTile = win.reportProblemGridEl.querySelector('.category-tile[data-id="coffee"]');
+        var coffeeTile = win.reportProblemTilesEl.querySelector('.category-tile[data-id="coffee"]');
         assertFalse(coffeeTile.classList.contains("category-tile-over"), "an unbudgeted category was never actually over its budget");
     });
 
@@ -172,13 +172,13 @@ suite("main view: report", function () {
 
         win.openReportModal();
 
-        var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
+        var tileIds = Array.from(win.reportProblemTilesEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
         assertTrue(tileIds.indexOf("freelance") !== -1, "unbudgeted income category shown because income overall is responsible for the shortfall");
         assertTrue(tileIds.indexOf("bonus") !== -1, "income below its expected amount is flagged");
         assertTrue(tileIds.indexOf("dividends") !== -1, "income that never arrived at all is flagged");
         assertTrue(tileIds.indexOf("salary") === -1, "income that met its expected amount is not flagged");
 
-        var bonusTile = win.reportProblemGridEl.querySelector('.category-tile[data-id="bonus"]');
+        var bonusTile = win.reportProblemTilesEl.querySelector('.category-tile[data-id="bonus"]');
         assertFalse(bonusTile.classList.contains("category-tile-over"), "income tiles never get the over-budget border");
         assertEqual(bonusTile.querySelector(".category-tile-amount-value").textContent, "+100");
         assertTrue(bonusTile.querySelector(".category-tile-amounts").classList.contains("amount-income"));
@@ -200,8 +200,8 @@ suite("main view: report", function () {
 
         win.openReportModal();
 
-        assertNotEqual(win.reportProblemGridEl.style.display, "none");
-        var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
+        assertNotEqual(win.reportProblemTilesEl.style.display, "none");
+        var tileIds = Array.from(win.reportProblemTilesEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
         assertTrue(tileIds.indexOf("salary") !== -1, "short of its own expected amount");
         assertTrue(tileIds.indexOf("rent") !== -1, "over its own budget, even though total expenses stayed within the overall budget");
         assertTrue(tileIds.indexOf("groceries") === -1, "never spent, so not over its own budget");
@@ -225,7 +225,7 @@ suite("main view: report", function () {
 
         win.openReportModal();
 
-        var tileIds = Array.from(win.reportProblemGridEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
+        var tileIds = Array.from(win.reportProblemTilesEl.querySelectorAll(".category-tile")).map(function (t) { return t.dataset.id; });
         assertTrue(tileIds.indexOf("coffee") === -1, "unbudgeted expense category hidden, since expenses overall stayed within budget");
         assertTrue(tileIds.indexOf("bonus") !== -1, "unbudgeted income category shown, since income overall fell short, even though it received nothing itself");
     });

@@ -93,7 +93,7 @@ suite("detail view", function () {
 
     test("a tile's history zone always opens category mode regardless of the current mode", async function () {
         var win = await freshApp(seededForDetail());
-        var tile = win.categoryGridEl.querySelector('.category-tile[data-id="cat-groceries"]');
+        var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="cat-groceries"]');
         tile.querySelector(".category-tile-history-zone").click();
 
         assertTrue(isActive(win.detailScreen));

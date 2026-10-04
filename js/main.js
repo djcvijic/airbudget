@@ -33,6 +33,11 @@ function main() {
     document.getElementById("goals-unsaved-back-button").addEventListener("click", dismissModals);
     document.getElementById("goals-unsaved-discard-button").addEventListener("click", revertGoals);
 
+    categoryTilesViewModeButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            setCategoryTilesViewMode(button.dataset.view);
+        });
+    });
     document.getElementById("period-prev-button").addEventListener("click", goToPreviousPeriod);
     document.getElementById("period-next-button").addEventListener("click", goToNextPeriod);
     document.getElementById("period-current-button").addEventListener("click", goToCurrentPeriod);

@@ -83,7 +83,7 @@ suite("settings screen", function () {
         assertEqual(win.state.period, "weekly");
         assertEqual(win.state.currency, "GBP");
 
-        var tile = win.categoryGridEl.querySelector(".category-tile-amount-currency");
+        var tile = win.categoryTilesEl.querySelector(".category-tile-amount-currency");
         assertEqual(tile.textContent, "GBP");
         assertTrue(win.toastEl.textContent.length > 0);
     });

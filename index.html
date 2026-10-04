@@ -173,11 +173,22 @@
                 </button>
                 <button id="open-report-button" class="btn btn-primary report-button" type="button">See report</button>
             </div>
-            <div class="total-progress">
-                <span class="total-progress-label">Balance:</span>
-                <span id="total-progress-amount" class="total-progress-amount"></span>
+            <div class="main-view-toolbar">
+                <div class="total-progress">
+                    <span class="total-progress-label">Balance:</span>
+                    <span id="total-progress-amount" class="total-progress-amount"></span>
+                </div>
+                <div class="segmented-toggle segmented-toggle-2 category-tiles-view-toggle">
+                    <button type="button" class="category-tiles-view-option segmented-toggle-option" data-view="grid" aria-label="Grid view" title="Grid view">
+                        <i class="fa-solid fa-table-cells"></i>
+                    </button>
+                    <button type="button" class="category-tiles-view-option segmented-toggle-option" data-view="list" aria-label="List view" title="List view">
+                        <i class="fa-solid fa-list"></i>
+                    </button>
+                    <div class="segmented-toggle-thumb"></div>
+                </div>
             </div>
-            <div id="category-grid" class="category-grid"></div>
+            <div id="category-tiles" class="category-tile-grid"></div>
         </div>
 
         <div id="settings-screen" class="screen">
@@ -324,7 +335,7 @@
                 categories fixed costs / fixed incomes, then it is
                 recommended to set budgets for them more realistically.
             </p>
-            <div id="report-problem-grid" class="category-grid report-problem-grid"></div>
+            <div id="report-problem-tiles" class="category-tile-grid report-problem-tiles"></div>
             <p id="report-reality-check-message" class="report-message">
                 If this doesn't line up with reality, try setting up budgets
                 for all categories, and track every penny coming in and out

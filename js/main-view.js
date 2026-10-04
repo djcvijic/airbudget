@@ -13,7 +13,8 @@ var periodPrevButton = document.getElementById("period-prev-button");
 var periodNextButton = document.getElementById("period-next-button");
 var periodCurrentRow = document.getElementById("period-current-row");
 var totalProgressAmountEl = document.getElementById("total-progress-amount");
-var categoryGridEl = document.getElementById("category-grid");
+var categoryTilesEl = document.getElementById("category-tiles");
+var categoryTilesViewModeButtons = document.querySelectorAll(".category-tiles-view-option");
 
 var periodOffset = 0;
 
@@ -36,7 +37,7 @@ function formatCompactAmount(amount) {
     return amount.toFixed(abs > 99.99 ? 0 : 2);
 }
 
-// Shared by the dashboard grid and the report's inert problem tiles
+// Shared by the dashboard's category tiles and the report's inert problem tiles
 // (report.js): both show the same progress bar and amount readout for a
 // category entry, and only the emoji zone and trailing controls differ.
 function buildTileShell(entry) {
@@ -49,6 +50,11 @@ function buildTileShell(entry) {
 function buildTileInfo(entry) {
     var infoEl = document.createElement("div");
     infoEl.className = "category-tile-info";
+
+    var nameEl = document.createElement("div");
+    nameEl.className = "category-tile-name";
+    nameEl.textContent = entry.name;
+    infoEl.appendChild(nameEl);
 
     var track = document.createElement("div");
     track.className = "category-tile-progress-track";
@@ -76,7 +82,16 @@ function buildTileInfo(entry) {
     amountCurrencyEl.textContent = state.currency;
 
     amountsEl.appendChild(amountValueEl);
+
+    if (entry.max != null) {
+        var amountMaxEl = document.createElement("div");
+        amountMaxEl.className = "category-tile-amount-max";
+        amountMaxEl.textContent = "/ " + formatCompactAmount(entry.max);
+        amountsEl.appendChild(amountMaxEl);
+    }
+
     amountsEl.appendChild(amountCurrencyEl);
+
     infoEl.appendChild(amountsEl);
 
     return infoEl;
@@ -100,6 +115,10 @@ function buildCategoryTile(entry) {
     addZone.appendChild(addIcon);
     addZone.appendChild(emojiEl);
     tile.appendChild(addZone);
+
+    var dividerBefore = document.createElement("div");
+    dividerBefore.className = "category-tile-divider category-tile-divider-before";
+    tile.appendChild(dividerBefore);
 
     tile.appendChild(buildTileInfo(entry));
 
@@ -128,6 +147,12 @@ function buildCategoryTile(entry) {
     return tile;
 }
 
+function applyCategoryTilesViewMode(el) {
+    var isListView = state.categoryTilesViewMode === "list";
+    el.classList.toggle("category-tile-list", isListView);
+    el.classList.toggle("category-tile-grid", !isListView);
+}
+
 function renderMainView() {
     updateReportBanner();
 
@@ -140,10 +165,24 @@ function renderMainView() {
     var entries = getSortedCategoryEntries(range.start, range.end);
     renderTotalProgress(entries);
 
-    categoryGridEl.innerHTML = "";
-    entries.forEach(function (entry) {
-        categoryGridEl.appendChild(buildCategoryTile(entry));
+    categoryTilesViewModeButtons.forEach(function (button) {
+        button.classList.toggle("selected", button.dataset.view === state.categoryTilesViewMode);
     });
+    applyCategoryTilesViewMode(categoryTilesEl);
+
+    categoryTilesEl.innerHTML = "";
+    entries.forEach(function (entry) {
+        categoryTilesEl.appendChild(buildCategoryTile(entry));
+    });
+}
+
+function setCategoryTilesViewMode(view) {
+    if (view === state.categoryTilesViewMode) {
+        return;
+    }
+    state.categoryTilesViewMode = view;
+    saveMeta();
+    renderMainView();
 }
 
 function goToMainView() {
@@ -151,7 +190,7 @@ function goToMainView() {
     renderMainView();
 }
 
-function handleCategoryGridClick(event) {
+function handleCategoryTileClick(event) {
     var tile = event.target.closest(".category-tile");
     if (!tile) {
         return;
@@ -194,4 +233,4 @@ function goToCurrentPeriod() {
     renderMainView();
 }
 
-categoryGridEl.addEventListener("click", handleCategoryGridClick);
+categoryTilesEl.addEventListener("click", handleCategoryTileClick);
