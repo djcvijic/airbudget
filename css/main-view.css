@@ -103,8 +103,8 @@
 
 .category-tile-warning {
     position: absolute;
-    bottom: 6px;
-    right: 6px;
+    bottom: 0;
+    right: 0;
     color: #CD2553;
     font-size: 13px;
 }
@@ -143,6 +143,7 @@
 }
 
 .category-tile-info {
+    position: relative;
     text-align: center;
 }
 

@@ -120,7 +120,17 @@ function buildCategoryTile(entry) {
     dividerBefore.className = "category-tile-divider category-tile-divider-before";
     tile.appendChild(dividerBefore);
 
-    tile.appendChild(buildTileInfo(entry));
+    var infoEl = buildTileInfo(entry);
+
+    if (entry.overMax) {
+        var warningEl = document.createElement("div");
+        warningEl.className = "category-tile-warning";
+        warningEl.title = "Over budget";
+        warningEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        infoEl.appendChild(warningEl);
+    }
+
+    tile.appendChild(infoEl);
 
     var divider = document.createElement("div");
     divider.className = "category-tile-divider";
@@ -130,18 +140,6 @@ function buildCategoryTile(entry) {
     historyZone.type = "button";
     historyZone.className = "category-tile-history-zone";
     historyZone.innerHTML = '<i class="fa-solid fa-receipt"></i>';
-
-    // Nested inside the history zone (not a separate element) so clicking
-    // the warning icon also opens history, same as clicking anywhere else
-    // in that zone.
-    if (entry.overMax) {
-        var warningEl = document.createElement("div");
-        warningEl.className = "category-tile-warning";
-        warningEl.title = "Over budget";
-        warningEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-        historyZone.appendChild(warningEl);
-    }
-
     tile.appendChild(historyZone);
 
     return tile;
