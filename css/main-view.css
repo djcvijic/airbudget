@@ -203,7 +203,11 @@
     cursor: pointer;
 }
 
-.category-tile-history-zone:hover {
+.category-tile-history-zone.is-disabled {
+    cursor: default;
+}
+
+.category-tile-history-zone:hover:not(.is-disabled) {
     color: #0099ff;
 }
 

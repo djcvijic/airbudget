@@ -350,6 +350,7 @@ function compareByFrecency(scores) {
 
 function getSortedCategoryEntries(start, end) {
     var scores = categoryFrecencyScores();
+    var transactionsInRange = getTransactionsInRange(start, end);
     var entries = state.categories.filter(isVisibleCategory).map(function (cat) {
         var spend = getCategorySpend(cat.id, start, end);
         return {
@@ -360,6 +361,7 @@ function getSortedCategoryEntries(start, end) {
             max: cat.max,
             createdAt: cat.createdAt,
             spend: spend,
+            hasTransactions: transactionsInRange.some(function (t) { return t.categoryId === cat.id; }),
             // Income has no over-budget warning: more income than expected
             // isn't a problem, only more expense than budgeted is.
             overMax: cat.type === "expense" && cat.max != null && spend > cat.max

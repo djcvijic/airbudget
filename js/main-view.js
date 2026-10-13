@@ -143,9 +143,10 @@ function buildCategoryTile(entry) {
     historyZone.type = "button";
     historyZone.className = "category-tile-history-zone";
     historyZone.innerHTML = '<i class="fa-solid fa-receipt"></i>';
-    historyZone.addEventListener("click", function () {
+    wireSoftDisableClick(historyZone, "No transactions in this period", function () {
         openDetailView("category", entry.id);
     });
+    historyZone.setSoftDisabled(!entry.hasTransactions);
     tile.appendChild(historyZone);
 
     return tile;
