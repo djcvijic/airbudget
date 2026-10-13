@@ -111,9 +111,13 @@ function updateTransactionDateDisplay() {
     transactionDateTextEl.textContent = value ? formatDayHeader(parseDateOnly(value)) : "";
 }
 
-transactionDateDisplayEl.addEventListener("click", function () {
+function openTransactionDatePicker() {
     openNativeDatePicker(transactionDatetimeInput);
-});
+}
+
+// One for keyboard (Tab+Enter), one for real clicks — both needed.
+transactionDateDisplayEl.addEventListener("click", openTransactionDatePicker);
+transactionDatetimeInput.addEventListener("click", openTransactionDatePicker);
 
 // The native picker's own "Clear" control would empty the input; a
 // transaction always needs a date, so an empty value is rejected and

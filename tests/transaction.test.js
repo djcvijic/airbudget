@@ -45,6 +45,18 @@ suite("transaction screen", function () {
         assertEqual(win.document.activeElement.id, win.transactionDatetimeInput.id);
     });
 
+    test("clicking the invisible date input directly also opens the picker", async function () {
+        var win = await freshApp(seededForTransactions());
+        win.document.getElementById("open-transaction-button").click();
+        win.transactionDatetimeInput.showPicker = function () {
+            throw new Error("not allowed in this browser");
+        };
+
+        win.transactionDatetimeInput.click();
+
+        assertEqual(win.document.activeElement.id, win.transactionDatetimeInput.id);
+    });
+
     test("expense category shows a minus sign, income shows a plus sign", async function () {
         var win = await freshApp(seededForTransactions());
         win.document.getElementById("open-transaction-button").click();
