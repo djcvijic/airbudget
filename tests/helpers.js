@@ -81,6 +81,16 @@ function isDisabled(el) {
     return el.classList.contains("is-disabled");
 }
 
+function tileAddZone(win, categoryId) {
+    var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="' + categoryId + '"]');
+    return tile.querySelector(".category-tile-add-zone");
+}
+
+function tileHistoryZone(win, categoryId) {
+    var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="' + categoryId + '"]');
+    return tile.querySelector(".category-tile-history-zone");
+}
+
 function baseCategory(overrides) {
     var category = {
         id: "cat-" + Math.random().toString(36).slice(2, 8),

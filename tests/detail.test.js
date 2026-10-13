@@ -100,21 +100,6 @@ suite("detail view", function () {
         assertEqual(win.state.detailMode, "category");
     });
 
-    test("a tile's history zone is soft-disabled when the category has no transactions in the current period", async function () {
-        var win = await freshApp({
-            period: "monthly",
-            currency: "USD",
-            categories: [baseCategory({ id: "cat-rent", emoji: "🏠", name: "Rent", type: "expense", max: 1000 })],
-            transactions: []
-        });
-        var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="cat-rent"]');
-
-        tile.querySelector(".category-tile-history-zone").click();
-
-        assertTrue(isActive(win.mainViewScreen), "history zone while disabled must not navigate away");
-        assertTrue(win.toastEl.textContent.length > 0);
-    });
-
     test("the selected grouping does not survive a reload", async function () {
         var win = await freshApp(seededForDetail());
         win.document.getElementById("open-detail-button").click();

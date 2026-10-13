@@ -14,11 +14,6 @@ function seededForTransactions(overrides) {
     return state;
 }
 
-function tileAddZone(win, categoryId) {
-    var tile = win.categoryTilesEl.querySelector('.category-tile[data-id="' + categoryId + '"]');
-    return tile.querySelector(".category-tile-add-zone");
-}
-
 suite("transaction screen", function () {
     test("opening via a tile presets that category and starts the amount empty", async function () {
         var win = await freshApp(seededForTransactions());
@@ -28,17 +23,6 @@ suite("transaction screen", function () {
         assertEqual(win.transactionCategorySelect.value, "cat-groceries");
         assertEqual(win.transactionAmountDisplayEl.textContent, "0.00 USD");
         assertTrue(win.transactionAmountDisplayEl.classList.contains("transaction-amount-display-empty"));
-    });
-
-    test("tapping a tile's add-zone on a past period shows a toast instead of opening the transaction screen", async function () {
-        var win = await freshApp(seededForTransactions());
-        win.periodOffset = -1;
-        win.renderMainView();
-
-        tileAddZone(win, "cat-groceries").click();
-
-        assertTrue(isActive(win.mainViewScreen));
-        assertTrue(win.toastEl.textContent.length > 0);
     });
 
     test("opening via the bottom-nav button has no preset category", async function () {
