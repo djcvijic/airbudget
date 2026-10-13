@@ -25,7 +25,16 @@ suite("categories screen: reopened (non-forced) editing", function () {
         assertEqual(win.categoriesOnboardingBackButton.style.display, "none");
         assertNotEqual(win.categoriesCancelButton.style.display, "none");
         assertNotEqual(win.categoriesDoneButton.style.display, "none");
-        assertTrue(win.categoriesDoneButton.disabled);
+        assertTrue(isDisabled(win.categoriesDoneButton));
+    });
+
+    test("clicking Apply while clean shows a toast explaining why instead of applying", async function () {
+        var win = await openReopenedCategories();
+
+        win.categoriesDoneButton.click();
+
+        assertTrue(isActive(win.categoriesScreen), "Apply while disabled must not navigate away");
+        assertTrue(win.toastEl.textContent.length > 0);
     });
 
     test("editing a row enables Apply", async function () {
@@ -33,7 +42,7 @@ suite("categories screen: reopened (non-forced) editing", function () {
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         setValue(row.querySelector(".category-row-name"), "Changed Name");
 
-        assertFalse(win.categoriesDoneButton.disabled);
+        assertFalse(isDisabled(win.categoriesDoneButton));
     });
 
     test("editing back to the original values disables Apply again", async function () {
@@ -43,7 +52,7 @@ suite("categories screen: reopened (non-forced) editing", function () {
         setValue(nameInput, "Changed Name");
         setValue(nameInput, "Groceries");
 
-        assertTrue(win.categoriesDoneButton.disabled);
+        assertTrue(isDisabled(win.categoriesDoneButton));
     });
 
     test("clicking Cancel with no changes navigates back with no warning", async function () {
@@ -85,13 +94,13 @@ suite("categories screen: reopened (non-forced) editing", function () {
         var win = await openReopenedCategories();
         var row = win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]');
         setValue(row.querySelector(".category-row-name"), "Changed Name");
-        assertFalse(win.categoriesDoneButton.disabled);
+        assertFalse(isDisabled(win.categoriesDoneButton));
 
         win.openCategoriesScreen(true);
 
         assertEqual(win.categoriesCancelButton.style.display, "none");
         assertNotEqual(win.categoriesDoneButton.style.display, "none");
-        assertFalse(win.categoriesDoneButton.disabled);
+        assertFalse(isDisabled(win.categoriesDoneButton));
     });
 
     test("a category with no transactions is removed immediately, with no confirmation", async function () {
@@ -102,7 +111,7 @@ suite("categories screen: reopened (non-forced) editing", function () {
 
         assertTrue(isHidden(win.categoryDeleteConfirmModal), "no transactions means nothing to confirm");
         assertTrue(win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]') === null);
-        assertFalse(win.categoriesDoneButton.disabled);
+        assertFalse(isDisabled(win.categoriesDoneButton));
     });
 
     test("a category with transactions asks for confirmation before its row is removed", async function () {
@@ -125,7 +134,7 @@ suite("categories screen: reopened (non-forced) editing", function () {
 
         assertTrue(win.categoryRowsEl.querySelector('.category-row[data-id="cat-groceries"]') === null);
         assertTrue(isHidden(win.categoryDeleteConfirmModal));
-        assertFalse(win.categoriesDoneButton.disabled);
+        assertFalse(isDisabled(win.categoriesDoneButton));
     });
 
     test("applying a deletion soft-deletes the category and keeps its transactions in storage", async function () {

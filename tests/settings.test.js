@@ -22,7 +22,17 @@ suite("settings screen", function () {
 
         assertNotEqual(win.settingsCancelButton.style.display, "none");
         assertNotEqual(win.settingsApplyButton.style.display, "none");
-        assertTrue(win.settingsApplyButton.disabled);
+        assertTrue(isDisabled(win.settingsApplyButton));
+    });
+
+    test("clicking Apply while clean shows a toast explaining why instead of applying", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+
+        win.settingsApplyButton.click();
+
+        assertTrue(isActive(win.settingsScreen), "Apply while disabled must not navigate away");
+        assertTrue(win.toastEl.textContent.length > 0);
     });
 
     test("changing a value enables Apply", async function () {
@@ -30,7 +40,7 @@ suite("settings screen", function () {
         win.document.getElementById("open-settings-button").click();
         setValue(win.settingsCurrencySelect, "EUR");
 
-        assertFalse(win.settingsApplyButton.disabled);
+        assertFalse(isDisabled(win.settingsApplyButton));
     });
 
     test("unapplied changes trigger a warning when leaving", async function () {

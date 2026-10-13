@@ -21,7 +21,7 @@ suite("goals screen", function () {
         assertEqual(win.goalsLastSetEl.textContent, "Last set on: " + win.formatDatePart(win.parseDateOnly("2026-01-15"), true));
         assertNotEqual(win.goalsCancelButton.style.display, "none");
         assertNotEqual(win.goalsDoneButton.style.display, "none");
-        assertTrue(win.goalsDoneButton.disabled);
+        assertTrue(isDisabled(win.goalsDoneButton));
     });
 
     test("opens with no goal set yet showing an empty field and no last-set line", async function () {
@@ -33,13 +33,24 @@ suite("goals screen", function () {
         assertEqual(win.goalsResultsEl.style.display, "none");
     });
 
+    test("clicking Apply while clean shows a toast explaining why instead of applying", async function () {
+        var win = await freshApp(seededForGoals({ goalAmount: 500, goalSetDate: "2026-01-15" }));
+        win.document.getElementById("open-goals-button").click();
+
+        win.goalsDoneButton.click();
+
+        assertTrue(isActive(win.goalsScreen), "Apply while disabled must not navigate away");
+        assertTrue(win.toastEl.textContent.length > 0);
+        assertEqual(win.state.goalAmount, 500);
+    });
+
     test("editing the amount enables Apply and hides the last-set line", async function () {
         var win = await freshApp(seededForGoals({ goalAmount: 500, goalSetDate: "2026-01-15" }));
         win.document.getElementById("open-goals-button").click();
 
         setValue(win.goalsAmountInput, "750");
 
-        assertFalse(win.goalsDoneButton.disabled);
+        assertFalse(isDisabled(win.goalsDoneButton));
         assertEqual(win.goalsLastSetEl.textContent, "");
     });
 
@@ -53,7 +64,7 @@ suite("goals screen", function () {
         assertEqual(win.state.goalAmount, 1200);
         assertEqual(win.state.goalSetDate, win.formatDateOnly(new Date()));
         assertTrue(win.toastEl.textContent.length > 0);
-        assertTrue(win.goalsDoneButton.disabled, "back to a clean, disabled Apply after applying");
+        assertTrue(isDisabled(win.goalsDoneButton), "back to a clean, disabled Apply after applying");
         assertTrue(win.goalsLastSetEl.textContent.length > 0);
     });
 

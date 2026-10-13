@@ -246,12 +246,12 @@ function updateCategoriesActionButtons() {
     if (categoriesForced) {
         categoriesCancelButton.style.display = "none";
         categoriesDoneButton.style.display = "";
-        categoriesDoneButton.disabled = false;
+        categoriesDoneButton.setSoftDisabled(false);
         return;
     }
     categoriesCancelButton.style.display = "";
     categoriesDoneButton.style.display = "";
-    categoriesDoneButton.disabled = !hasUnsavedCategoriesChanges();
+    categoriesDoneButton.setSoftDisabled(!hasUnsavedCategoriesChanges());
 }
 
 // Captures the current rows (full fidelity, not just for diffing) so

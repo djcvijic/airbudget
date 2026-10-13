@@ -77,6 +77,10 @@ function isHidden(el) {
     return el.classList.contains("hidden");
 }
 
+function isDisabled(el) {
+    return el.classList.contains("is-disabled");
+}
+
 function baseCategory(overrides) {
     var category = {
         id: "cat-" + Math.random().toString(36).slice(2, 8),

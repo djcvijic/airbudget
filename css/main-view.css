@@ -121,11 +121,11 @@
     cursor: pointer;
 }
 
-.category-tile-add-zone:disabled {
+.category-tile-add-zone.is-disabled {
     cursor: default;
 }
 
-.category-tile-add-zone:hover:not(:disabled) .category-tile-emoji {
+.category-tile-add-zone:hover:not(.is-disabled) .category-tile-emoji {
     transform: scale(1.08);
 }
 

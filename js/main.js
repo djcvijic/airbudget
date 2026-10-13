@@ -21,7 +21,7 @@ function main() {
     document.getElementById("categories-back-button").addEventListener("click", backFromCategories);
     document.getElementById("categories-onboarding-back-button").addEventListener("click", backFromCategories);
     document.getElementById("categories-cancel-button").addEventListener("click", backFromCategories);
-    document.getElementById("categories-done-button").addEventListener("click", applyCategories);
+    wireSoftDisableClick(categoriesDoneButton, "No changes to apply", applyCategories);
     document.getElementById("categories-unsaved-back-button").addEventListener("click", dismissModals);
     document.getElementById("categories-unsaved-discard-button").addEventListener("click", revertCategories);
     document.getElementById("category-delete-confirm-button").addEventListener("click", confirmCategoryDelete);
@@ -29,7 +29,7 @@ function main() {
     document.getElementById("goals-back-button").addEventListener("click", backFromGoals);
     document.getElementById("goals-onboarding-back-button").addEventListener("click", backFromGoals);
     document.getElementById("goals-cancel-button").addEventListener("click", backFromGoals);
-    document.getElementById("goals-done-button").addEventListener("click", applyGoals);
+    wireSoftDisableClick(goalsDoneButton, "No changes to apply", applyGoals);
     document.getElementById("goals-unsaved-back-button").addEventListener("click", dismissModals);
     document.getElementById("goals-unsaved-discard-button").addEventListener("click", revertGoals);
 
@@ -97,7 +97,7 @@ function main() {
         });
     });
 
-    document.getElementById("settings-apply-button").addEventListener("click", applySettings);
+    wireSoftDisableClick(settingsApplyButton, "No changes to apply", applySettings);
     document.getElementById("transaction-apply-button").addEventListener("click", applyTransaction);
     document.getElementById("transaction-delete-button").addEventListener("click", openTransactionDeleteConfirmModal);
     document.getElementById("transaction-delete-confirm-button").addEventListener("click", deleteCurrentTransaction);

@@ -30,6 +30,17 @@ suite("transaction screen", function () {
         assertTrue(win.transactionAmountDisplayEl.classList.contains("transaction-amount-display-empty"));
     });
 
+    test("tapping a tile's add-zone on a past period shows a toast instead of opening the transaction screen", async function () {
+        var win = await freshApp(seededForTransactions());
+        win.periodOffset = -1;
+        win.renderMainView();
+
+        tileAddZone(win, "cat-groceries").click();
+
+        assertTrue(isActive(win.mainViewScreen));
+        assertTrue(win.toastEl.textContent.length > 0);
+    });
+
     test("opening via the bottom-nav button has no preset category", async function () {
         var win = await freshApp(seededForTransactions());
         win.document.getElementById("open-transaction-button").click();

@@ -2,8 +2,8 @@
 // zones — the emoji/plus area adds a transaction (only when periodOffset is
 // 0, otherwise the period is read-only) and the receipt area below the
 // divider always opens that category's history — with the progress bar and
-// amount in between not clickable at all. Calls openTransactionScreen()/
-// openDetailView() only inside a function body (the click handler), so
+// amount in between not clickable at all. Each zone's listener calls
+// openTransactionScreen()/openDetailView() only inside its own callback, so
 // transaction.js/detail.js just need to load before a click happens, not
 // before this file parses.
 
@@ -103,7 +103,10 @@ function buildCategoryTile(entry) {
     var addZone = document.createElement("button");
     addZone.type = "button";
     addZone.className = "category-tile-add-zone";
-    addZone.disabled = periodOffset !== 0;
+    wireSoftDisableClick(addZone, "Switch to the current period to add a transaction", function () {
+        openTransactionScreen(entry.id);
+    });
+    addZone.setSoftDisabled(periodOffset !== 0);
 
     var addIcon = document.createElement("i");
     addIcon.className = "fa-solid fa-plus category-tile-add-icon";
@@ -140,6 +143,9 @@ function buildCategoryTile(entry) {
     historyZone.type = "button";
     historyZone.className = "category-tile-history-zone";
     historyZone.innerHTML = '<i class="fa-solid fa-receipt"></i>';
+    historyZone.addEventListener("click", function () {
+        openDetailView("category", entry.id);
+    });
     tile.appendChild(historyZone);
 
     return tile;
@@ -188,26 +194,6 @@ function goToMainView() {
     renderMainView();
 }
 
-function handleCategoryTileClick(event) {
-    var tile = event.target.closest(".category-tile");
-    if (!tile) {
-        return;
-    }
-
-    var categoryId = tile.dataset.id;
-
-    if (event.target.closest(".category-tile-history-zone")) {
-        openDetailView("category", categoryId);
-        return;
-    }
-
-    if (!event.target.closest(".category-tile-add-zone") || periodOffset !== 0) {
-        return;
-    }
-
-    openTransactionScreen(categoryId);
-}
-
 function goToPreviousPeriod() {
     var target = findAdjacentPeriodOffset(state.period, periodOffset, -1);
     if (target === null) {
@@ -230,5 +216,3 @@ function goToCurrentPeriod() {
     periodOffset = 0;
     renderMainView();
 }
-
-categoryTilesEl.addEventListener("click", handleCategoryTileClick);

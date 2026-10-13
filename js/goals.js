@@ -36,12 +36,12 @@ function updateGoalsActionButtons() {
     if (goalsForced) {
         goalsCancelButton.style.display = "none";
         goalsDoneButton.style.display = "";
-        goalsDoneButton.disabled = false;
+        goalsDoneButton.setSoftDisabled(false);
         return;
     }
     goalsCancelButton.style.display = "";
     goalsDoneButton.style.display = "";
-    goalsDoneButton.disabled = !hasUnsavedGoalsChanges();
+    goalsDoneButton.setSoftDisabled(!hasUnsavedGoalsChanges());
 }
 
 // Hidden while the input is dirty, since it would otherwise describe a

@@ -26,6 +26,23 @@ function showToast(message) {
     }, 2000);
 }
 
+function setSoftDisabled(el, isDisabled) {
+    el.classList.toggle("is-disabled", isDisabled);
+}
+
+function wireSoftDisableClick(el, message, actionFn) {
+    el.addEventListener("click", function () {
+        if (el.classList.contains("is-disabled")) {
+            showToast(message);
+            return;
+        }
+        actionFn();
+    });
+    el.setSoftDisabled = function (isDisabled) {
+        setSoftDisabled(el, isDisabled);
+    };
+}
+
 // Shared by every screen that edits state in place and must not lose it to
 // an accidental Back/nav click: hasChangesFn decides dirtiness, modalEl is
 // that screen's own "Unapplied changes" confirm modal.

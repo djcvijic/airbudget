@@ -372,11 +372,11 @@ body.no-bottom-nav .app {
     color: white;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover:not(.is-disabled) {
     background-color: #a91d44;
 }
 
-.btn-primary:disabled {
+.btn-primary.is-disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }

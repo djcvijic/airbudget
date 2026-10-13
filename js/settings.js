@@ -108,7 +108,7 @@ function hasUnsavedSettingsChanges() {
 }
 
 function updateSettingsActionButtons() {
-    settingsApplyButton.disabled = !hasUnsavedSettingsChanges();
+    settingsApplyButton.setSoftDisabled(!hasUnsavedSettingsChanges());
 }
 
 function resolvePendingSettingsNavigation() {
