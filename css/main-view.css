@@ -31,7 +31,6 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
     margin-bottom: 8px;
 }
 
@@ -43,7 +42,9 @@
 }
 
 .report-button {
+    display: none;
     width: 100%;
+    margin-bottom: 8px;
 }
 
 .main-view-toolbar {

@@ -12,6 +12,7 @@ var periodLabelEl = document.getElementById("period-label");
 var periodPrevButton = document.getElementById("period-prev-button");
 var periodNextButton = document.getElementById("period-next-button");
 var periodCurrentRow = document.getElementById("period-current-row");
+var openReportButton = document.getElementById("open-report-button");
 var totalProgressAmountEl = document.getElementById("total-progress-amount");
 var categoryTilesEl = document.getElementById("category-tiles");
 var categoryTilesViewModeButtons = document.querySelectorAll(".category-tiles-view-option");
@@ -164,6 +165,7 @@ function renderMainView() {
     var range = getPeriodRange(state.period, periodOffset);
     periodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     periodCurrentRow.style.display = periodOffset === 0 ? "none" : "flex";
+    openReportButton.style.display = periodOffset < 0 ? "block" : "none";
     periodPrevButton.style.visibility = findAdjacentPeriodOffset(state.period, periodOffset, -1) === null ? "hidden" : "";
     periodNextButton.style.visibility = findAdjacentPeriodOffset(state.period, periodOffset, 1) === null ? "hidden" : "";
 
