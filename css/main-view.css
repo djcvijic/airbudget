@@ -152,7 +152,7 @@
     display: none;
 }
 
-.category-tile-amount-max {
+.category-tile-amount-currency {
     display: none;
 }
 
@@ -261,6 +261,7 @@
     white-space: nowrap;
 }
 
+.category-tile-list .category-tile-amount-currency,
 .category-tile-list .category-tile-amount-max {
     display: inline;
 }
