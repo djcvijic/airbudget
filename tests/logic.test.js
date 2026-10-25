@@ -8,9 +8,7 @@ suite("state.js: getPeriodRange", function () {
         assertEqual(range.start.getMonth(), today.getMonth());
         assertEqual(range.start.getDate(), today.getDate());
         assertEqual(range.start.getHours(), 0);
-
-        var oneDayMs = 24 * 60 * 60 * 1000;
-        assertEqual(range.end.getTime() - range.start.getTime(), oneDayMs);
+        assertEqual(win.daysBetween(range.end, range.start), 1);
     });
 
     test("daily offset -1 is exactly one day before offset 0", async function () {
@@ -27,7 +25,7 @@ suite("state.js: getPeriodRange", function () {
         var range = win.getPeriodRange("weekly", 0);
 
         assertEqual(range.start.getDay(), 1, "week must start on Monday");
-        assertEqual(range.end.getTime() - range.start.getTime(), 7 * 24 * 60 * 60 * 1000);
+        assertEqual(win.daysBetween(range.end, range.start), 7);
 
         var today = new Date();
         assertTrue(today >= range.start && today < range.end, "today must fall inside its own week");
@@ -38,7 +36,7 @@ suite("state.js: getPeriodRange", function () {
         var thisWeek = win.getPeriodRange("weekly", 0);
         var nextWeek = win.getPeriodRange("weekly", 1);
 
-        assertEqual(nextWeek.start.getTime() - thisWeek.start.getTime(), 7 * 24 * 60 * 60 * 1000);
+        assertEqual(win.daysBetween(nextWeek.start, thisWeek.start), 7);
     });
 
     test("monthly offset 0 spans the calendar month", async function () {
