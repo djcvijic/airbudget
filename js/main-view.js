@@ -116,6 +116,14 @@ function buildCategoryTile(entry) {
     emojiEl.className = "category-tile-emoji";
     emojiEl.textContent = entry.emoji;
 
+    if (entry.overMax) {
+        var warningEl = document.createElement("div");
+        warningEl.className = "category-tile-warning";
+        warningEl.title = "Over budget";
+        warningEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        addZone.appendChild(warningEl);
+    }
+
     addZone.appendChild(addIcon);
     addZone.appendChild(emojiEl);
     tile.appendChild(addZone);
@@ -125,15 +133,6 @@ function buildCategoryTile(entry) {
     tile.appendChild(dividerBefore);
 
     var infoEl = buildTileInfo(entry);
-
-    if (entry.overMax) {
-        var warningEl = document.createElement("div");
-        warningEl.className = "category-tile-warning";
-        warningEl.title = "Over budget";
-        warningEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-        infoEl.appendChild(warningEl);
-    }
-
     tile.appendChild(infoEl);
 
     var divider = document.createElement("div");

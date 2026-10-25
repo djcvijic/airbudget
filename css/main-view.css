@@ -104,8 +104,8 @@
 
 .category-tile-warning {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    top: 0;
+    left: 0;
     color: #CD2553;
     font-size: 13px;
 }
