@@ -1,6 +1,71 @@
 /* Reusable theme: fonts, colors, buttons, screen chrome, floating widgets,
    modal dialogs. No app-specific content. */
 
+:root {
+    --color-bg: white;
+    --color-surface: white;
+    --color-text: #000;
+    --color-text-muted: #666;
+    --color-text-faint: #999;
+    --color-border: #ccc;
+    --color-divider: #eee;
+    --color-blue-bg: #e6f6ff;
+    --color-pink-bg: #fbe6ec;
+    --color-danger-border: #111;
+    --color-danger-hover: #111;
+    --color-success: #1a8a4a;
+    --color-input-bg: #f5f5f5;
+    --color-toast-bg: #222;
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --color-shadow: rgba(0, 0, 0, 0.25);
+    color-scheme: light;
+}
+
+/* data-theme (set by settings.js) forces a theme regardless of the OS
+   preference; with no attribute, the OS preference via the media query
+   below decides. */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --color-bg: #121212;
+        --color-surface: #1e1e1e;
+        --color-text: #f0f0f0;
+        --color-text-muted: #999;
+        --color-text-faint: #777;
+        --color-border: #444;
+        --color-divider: #333;
+        --color-blue-bg: #16314a;
+        --color-pink-bg: #3a1620;
+        --color-danger-border: #555;
+        --color-danger-hover: #444;
+        --color-success: #3ddc84;
+        --color-input-bg: #2a2a2a;
+        --color-toast-bg: #2e2e2e;
+        --color-overlay: rgba(0, 0, 0, 0.7);
+        --color-shadow: rgba(0, 0, 0, 0.5);
+        color-scheme: dark;
+    }
+}
+
+:root[data-theme="dark"] {
+    --color-bg: #121212;
+    --color-surface: #1e1e1e;
+    --color-text: #f0f0f0;
+    --color-text-muted: #999;
+    --color-text-faint: #777;
+    --color-border: #444;
+    --color-divider: #333;
+    --color-blue-bg: #16314a;
+    --color-pink-bg: #3a1620;
+    --color-danger-border: #555;
+    --color-danger-hover: #444;
+    --color-success: #3ddc84;
+    --color-input-bg: #2a2a2a;
+    --color-toast-bg: #2e2e2e;
+    --color-overlay: rgba(0, 0, 0, 0.7);
+    --color-shadow: rgba(0, 0, 0, 0.5);
+    color-scheme: dark;
+}
+
 @font-face {
     font-family: "Work Sans";
     src: url("../fonts/WorkSans-Regular.woff2");
@@ -30,9 +95,9 @@ body {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    background-color: white;
+    background-color: var(--color-bg);
     font-family: "Work Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #000;
+    color: var(--color-text);
 }
 
 h1 {
@@ -181,7 +246,7 @@ body.no-bottom-nav .app {
 
 .screen-subtitle {
     font-size: 20px;
-    color: #000;
+    color: var(--color-text);
 }
 
 /* Sits inside a .screen-header, so spacing below comes from that header's
@@ -223,7 +288,7 @@ body.no-bottom-nav .app {
 
 .segmented-toggle {
     position: relative;
-    background-color: #eee;
+    background-color: var(--color-divider);
     border-radius: 999px;
     padding: 4px;
 }
@@ -235,7 +300,7 @@ body.no-bottom-nav .app {
     border: none;
     font-family: inherit;
     font-weight: bold;
-    color: #666;
+    color: var(--color-text-muted);
     text-align: center;
     cursor: pointer;
     transition: color 150ms ease;
@@ -306,7 +371,7 @@ body.no-bottom-nav .app {
     cursor: pointer;
     padding: 0 0 4px 0;
     margin-bottom: 8px;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--color-divider);
 }
 
 .collapsible-group-title {
@@ -323,7 +388,7 @@ body.no-bottom-nav .app {
 
 .collapsible-group-chevron {
     flex-shrink: 0;
-    color: #666;
+    color: var(--color-text-muted);
     transition: transform 200ms ease;
 }
 
@@ -334,7 +399,7 @@ body.no-bottom-nav .app {
 .collapsible-group-count {
     flex-shrink: 0;
     font-size: 14px;
-    color: #666;
+    color: var(--color-text-muted);
 }
 
 /* Animates open/shut via grid-template-rows (1fr/0fr) instead of height,
@@ -388,7 +453,7 @@ body.no-bottom-nav .app {
 }
 
 .btn-secondary:hover {
-    background-color: #e6f6ff;
+    background-color: var(--color-blue-bg);
 }
 
 .btn-secondary-pink {
@@ -398,17 +463,17 @@ body.no-bottom-nav .app {
 }
 
 .btn-secondary-pink:hover {
-    background-color: #fbe6ec;
+    background-color: var(--color-pink-bg);
 }
 
 .btn-danger {
     background-color: #333;
     color: white;
-    border: 2px dashed #111;
+    border: 2px dashed var(--color-danger-border);
 }
 
 .btn-danger:hover {
-    background-color: #111;
+    background-color: var(--color-danger-hover);
 }
 
 /* Hidden proxy, triggered via .click() instead of shown to the user. */
@@ -428,7 +493,7 @@ body.no-bottom-nav .app {
 .settings-danger-zone {
     margin-top: 24px;
     padding-top: 20px;
-    border-top: 3px solid #ccc;
+    border-top: 3px solid var(--color-border);
     text-align: right;
 }
 
@@ -464,7 +529,7 @@ body.no-bottom-nav .app {
 .btn-text {
     background: none;
     border: none;
-    color: #666;
+    color: var(--color-text-muted);
     font-size: 16px;
     font-weight: bold;
     padding: 16px 8px;
@@ -480,7 +545,7 @@ body.no-bottom-nav .app {
     display: inline-block;
     background: none;
     border: none;
-    color: #000;
+    color: var(--color-text);
     font-size: 22px;
     padding: 14px 18px;
     cursor: pointer;
@@ -518,7 +583,7 @@ body.no-bottom-nav .app {
     bottom: 88px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #222;
+    background-color: var(--color-toast-bg);
     color: white;
     font-weight: bold;
     text-align: center;
@@ -557,7 +622,7 @@ body.no-bottom-nav .app {
 }
 
 #to-top:hover {
-    background-color: #e6f6ff;
+    background-color: var(--color-blue-bg);
 }
 
 /* Hidden by default; a screen opts in via body.show-to-top (state.js's
@@ -573,7 +638,7 @@ body.show-to-top #to-top {
     display: block !important;
     padding: 10px 24px;
     font-size: 15px;
-    background-color: white;
+    background-color: var(--color-surface);
 }
 
 /* Dismissible pill banner: shared by every "there's something new" nudge
@@ -586,7 +651,7 @@ body.show-to-top #to-top {
     margin-bottom: 16px;
     padding: 12px 14px;
     border-radius: 8px;
-    background-color: #e6f6ff;
+    background-color: var(--color-blue-bg);
     border: 2px solid #0099ff;
     font-size: 14px;
 }
@@ -610,7 +675,7 @@ body.show-to-top #to-top {
 
 .banner-dismiss {
     flex-shrink: 0;
-    color: #666;
+    color: var(--color-text-muted);
     padding: 4px 8px;
 }
 
@@ -620,7 +685,7 @@ body.show-to-top #to-top {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--color-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -638,10 +703,10 @@ body.show-to-top #to-top {
     max-width: 480px;
     max-height: calc(100vh - 48px);
     overflow-y: auto;
-    background-color: white;
+    background-color: var(--color-surface);
     border-radius: 8px;
     padding: 32px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 32px var(--color-shadow);
 }
 
 .modal.hidden {
@@ -654,7 +719,7 @@ body.show-to-top #to-top {
     right: 16px;
     background: none;
     border: none;
-    color: #666;
+    color: var(--color-text-muted);
     font-size: 24px;
     line-height: 1;
     cursor: pointer;
@@ -684,7 +749,9 @@ body.show-to-top #to-top {
     font-size: 16px;
     padding: 12px 14px;
     border-radius: 8px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
 }
 
 .modal-input:focus {
@@ -725,7 +792,7 @@ body.show-to-top #to-top {
 
 .modal-copied {
     margin-top: 8px;
-    color: #1a8a4a;
+    color: var(--color-success);
     font-size: 14px;
     font-weight: bold;
     min-height: 1.2em;

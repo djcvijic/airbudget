@@ -111,6 +111,7 @@ function fillRandomDebugData() {
         });
     });
 
+    applyTheme(state.theme);
     saveMeta();
     saveCategories();
     saveTransactions();

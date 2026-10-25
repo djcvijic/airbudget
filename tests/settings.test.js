@@ -16,6 +16,15 @@ suite("settings screen", function () {
         assertEqual(win.settingsCurrencySelect.value, "USD");
     });
 
+    test("opens preselected to the current theme", async function () {
+        var seeded = seededForSettings();
+        seeded.theme = "dark";
+        var win = await freshApp(seeded);
+        win.document.getElementById("open-settings-button").click();
+
+        assertEqual(win.settingsThemeOptionsEl.querySelector("input:checked").value, "dark");
+    });
+
     test("opens clean: Cancel and Apply are both shown, Apply disabled", async function () {
         var win = await freshApp(seededForSettings());
         win.document.getElementById("open-settings-button").click();
@@ -96,6 +105,36 @@ suite("settings screen", function () {
         var tile = win.categoryTilesEl.querySelector(".category-tile-amount-currency");
         assertEqual(tile.textContent, "GBP");
         assertTrue(win.toastEl.textContent.length > 0);
+    });
+
+    test("applying a theme change saves it and sets the forced data-theme attribute", async function () {
+        var win = await freshApp(seededForSettings());
+        win.document.getElementById("open-settings-button").click();
+
+        var darkRadio = win.settingsThemeOptionsEl.querySelector('input[value="dark"]');
+        darkRadio.checked = true;
+        darkRadio.dispatchEvent(new Event("change", { bubbles: true }));
+
+        win.document.getElementById("settings-apply-button").click();
+
+        assertEqual(win.state.theme, "dark");
+        assertEqual(win.document.documentElement.dataset.theme, "dark");
+    });
+
+    test("applying the system theme clears the forced data-theme attribute", async function () {
+        var seeded = seededForSettings();
+        seeded.theme = "dark";
+        var win = await freshApp(seeded);
+        win.document.getElementById("open-settings-button").click();
+
+        var systemRadio = win.settingsThemeOptionsEl.querySelector('input[value="system"]');
+        systemRadio.checked = true;
+        systemRadio.dispatchEvent(new Event("change", { bubbles: true }));
+
+        win.document.getElementById("settings-apply-button").click();
+
+        assertEqual(win.state.theme, "system");
+        assertEqual(win.document.documentElement.dataset.theme, undefined);
     });
 
     test("clicking Cancel with no changes navigates back with no warning", async function () {

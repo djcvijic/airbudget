@@ -10,7 +10,7 @@ var CATEGORIES_KEY = "airbudget-categories-v1";
 var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
-    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", goalAmount: null, goalSetDate: null, lastSeenReport: null };
+    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", theme: "light", goalAmount: null, goalSetDate: null, lastSeenReport: null };
 }
 
 function readJSON(key, fallback) {
@@ -34,6 +34,7 @@ function loadState() {
         transactions: readJSON(TRANSACTIONS_KEY, []),
         detailMode: "day",
         categoryTilesViewMode: meta.categoryTilesViewMode || "grid",
+        theme: meta.theme || "light",
         goalAmount: meta.goalAmount != null ? meta.goalAmount : null,
         goalSetDate: meta.goalSetDate || null,
         lastSeenReport: meta.lastSeenReport || null
@@ -70,6 +71,7 @@ function saveMeta() {
         period: state.period,
         currency: state.currency,
         categoryTilesViewMode: state.categoryTilesViewMode,
+        theme: state.theme,
         goalAmount: state.goalAmount,
         goalSetDate: state.goalSetDate,
         lastSeenReport: state.lastSeenReport
@@ -97,6 +99,8 @@ window.addEventListener("storage", function (e) {
         state.period = meta.period || null;
         state.currency = meta.currency || null;
         state.categoryTilesViewMode = meta.categoryTilesViewMode || "grid";
+        state.theme = meta.theme || "light";
+        applyTheme(state.theme);
         state.goalAmount = meta.goalAmount != null ? meta.goalAmount : null;
         state.goalSetDate = meta.goalSetDate || null;
         state.lastSeenReport = meta.lastSeenReport || null;

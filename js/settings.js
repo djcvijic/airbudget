@@ -14,9 +14,16 @@ var PERIODS = [
     { value: "yearly", label: "Yearly" }
 ];
 
+var THEMES = [
+    { value: "light", label: "Light" },
+    { value: "system", label: "System" },
+    { value: "dark", label: "Dark" }
+];
+
 var settingsScreen = document.getElementById("settings-screen");
 var settingsPeriodOptionsEl = document.getElementById("settings-period-options");
 var settingsCurrencySelect = document.getElementById("settings-currency-select");
+var settingsThemeOptionsEl = document.getElementById("settings-theme-options");
 var settingsErrorEl = document.getElementById("settings-error");
 var settingsCancelButton = document.getElementById("settings-cancel-button");
 var settingsApplyButton = document.getElementById("settings-apply-button");
@@ -28,7 +35,20 @@ var deleteConfirmButton = document.getElementById("delete-confirm-button");
 
 var settingsOriginalPeriod = null;
 var settingsOriginalCurrency = null;
+var settingsOriginalTheme = null;
 var settingsUnsavedGuard = createUnsavedGuard(hasUnsavedSettingsChanges, settingsUnsavedModal);
+
+// Read by theme.css's [data-theme] selectors; "system" removes the attribute
+// to let its prefers-color-scheme fallback decide instead.
+function applyTheme(value) {
+    if (value === "system") {
+        delete document.documentElement.dataset.theme;
+    } else {
+        document.documentElement.dataset.theme = value;
+    }
+}
+
+applyTheme(state.theme);
 
 createHoldToConfirm(deleteConfirmButton, deleteConfirmModal, deleteAllData);
 
@@ -72,6 +92,44 @@ function buildPeriodOptions(containerEl) {
     });
 }
 
+function updateThemeSelection(containerEl) {
+    var labels = containerEl.querySelectorAll(".settings-period-option");
+    labels.forEach(function (label) {
+        var input = label.querySelector("input");
+        label.classList.toggle("selected", input.checked);
+    });
+}
+
+function selectThemeOption(containerEl, theme) {
+    var radios = containerEl.querySelectorAll("input");
+    radios.forEach(function (input) {
+        input.checked = input.value === theme;
+    });
+    updateThemeSelection(containerEl);
+}
+
+function buildThemeOptions(containerEl) {
+    THEMES.forEach(function (theme) {
+        var label = document.createElement("label");
+        label.className = "settings-period-option";
+
+        var input = document.createElement("input");
+        input.type = "radio";
+        input.name = containerEl.id;
+        input.value = theme.value;
+        input.addEventListener("change", function () {
+            updateThemeSelection(containerEl);
+        });
+
+        var span = document.createElement("span");
+        span.textContent = theme.label;
+
+        label.appendChild(input);
+        label.appendChild(span);
+        containerEl.appendChild(label);
+    });
+}
+
 function buildCurrencyOptions(selectEl) {
     CURRENCIES.forEach(function (currency) {
         var option = document.createElement("option");
@@ -83,6 +141,7 @@ function buildCurrencyOptions(selectEl) {
 
 buildPeriodOptions(settingsPeriodOptionsEl);
 buildCurrencyOptions(settingsCurrencySelect);
+buildThemeOptions(settingsThemeOptionsEl);
 
 settingsScreen.addEventListener("change", updateSettingsActionButtons);
 
@@ -93,8 +152,11 @@ function openSettingsScreen() {
 
     settingsCurrencySelect.value = state.currency;
 
+    selectThemeOption(settingsThemeOptionsEl, state.theme);
+
     settingsOriginalPeriod = state.period;
     settingsOriginalCurrency = state.currency;
+    settingsOriginalTheme = state.theme;
     updateSettingsActionButtons();
 
     showScreen(settingsScreen);
@@ -103,8 +165,11 @@ function openSettingsScreen() {
 function hasUnsavedSettingsChanges() {
     var selectedInput = settingsPeriodOptionsEl.querySelector("input:checked");
     var selectedPeriod = selectedInput ? selectedInput.value : null;
+    var selectedThemeInput = settingsThemeOptionsEl.querySelector("input:checked");
+    var selectedTheme = selectedThemeInput ? selectedThemeInput.value : null;
     return selectedPeriod !== settingsOriginalPeriod
-        || settingsCurrencySelect.value !== settingsOriginalCurrency;
+        || settingsCurrencySelect.value !== settingsOriginalCurrency
+        || selectedTheme !== settingsOriginalTheme;
 }
 
 function updateSettingsActionButtons() {
@@ -124,6 +189,8 @@ function applySettings() {
 
     state.period = selectedInput.value;
     state.currency = settingsCurrencySelect.value;
+    state.theme = settingsThemeOptionsEl.querySelector("input:checked").value;
+    applyTheme(state.theme);
     if (saveMeta()) {
         showToast("Settings saved");
     }
@@ -160,6 +227,7 @@ function deleteAllData() {
     }
 
     state = defaultState();
+    applyTheme(state.theme);
     periodOffset = 0;
     showToast("All data deleted");
 
@@ -184,6 +252,7 @@ function isValidImport(imported) {
 function importData() {
     importJSONFile(importFileInput, isValidImport, "That file doesn't look like an airbudget export", function (imported) {
         state = stateFromImport(imported);
+        applyTheme(state.theme);
         saveMeta();
         saveCategories();
         saveTransactions();

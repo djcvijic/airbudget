@@ -7,7 +7,7 @@
 .settings-period-option {
     text-align: center;
     padding: 10px 12px;
-    border: 2px solid #ccc;
+    border: 2px solid var(--color-border);
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
@@ -20,5 +20,11 @@
 .settings-period-option.selected {
     border-color: #0099ff;
     color: #0099ff;
-    background-color: #e6f6ff;
+    background-color: var(--color-blue-bg);
+}
+
+.settings-theme-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
 }

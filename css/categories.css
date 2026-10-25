@@ -68,7 +68,7 @@
 .category-row-delete {
     background: none;
     border: none;
-    color: #000;
+    color: var(--color-text);
     font-size: 18px;
     padding: 6px 8px;
     cursor: pointer;
@@ -104,5 +104,5 @@
 }
 
 .categories-full-button:hover {
-    background-color: #e6f6ff;
+    background-color: var(--color-blue-bg);
 }

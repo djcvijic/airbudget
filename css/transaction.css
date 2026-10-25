@@ -71,13 +71,13 @@
 }
 
 .transaction-amount-display-empty {
-    color: #999;
+    color: var(--color-text-faint);
 }
 
 .transaction-amount-paste {
     background: none;
     border: none;
-    color: #000;
+    color: var(--color-text);
     font-size: 20px;
     padding: 6px 8px;
     cursor: pointer;
@@ -115,5 +115,5 @@
 }
 
 .transaction-numpad-button:hover {
-    background-color: #f5f5f5;
+    background-color: var(--color-input-bg);
 }
