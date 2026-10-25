@@ -25,20 +25,23 @@ function readJSON(key, fallback) {
     }
 }
 
-function loadState() {
+var META_FIELDS = ["period", "currency", "categoryTilesViewMode", "theme", "goalAmount", "goalSetDate", "lastSeenReport"];
+
+function loadMeta() {
+    var defaults = defaultState();
     var meta = readJSON(META_KEY, {});
-    return {
-        period: meta.period || null,
-        currency: meta.currency || null,
+    var result = {};
+    META_FIELDS.forEach(function (key) {
+        result[key] = meta[key] != null ? meta[key] : defaults[key];
+    });
+    return result;
+}
+
+function loadState() {
+    return Object.assign(defaultState(), loadMeta(), {
         categories: readJSON(CATEGORIES_KEY, []),
-        transactions: readJSON(TRANSACTIONS_KEY, []),
-        detailMode: "day",
-        categoryTilesViewMode: meta.categoryTilesViewMode || "grid",
-        theme: meta.theme || "light",
-        goalAmount: meta.goalAmount != null ? meta.goalAmount : null,
-        goalSetDate: meta.goalSetDate || null,
-        lastSeenReport: meta.lastSeenReport || null
-    };
+        transactions: readJSON(TRANSACTIONS_KEY, [])
+    });
 }
 
 // Copies each defaultState() field from the imported file when present.
@@ -67,15 +70,11 @@ function persist(key, value) {
 }
 
 function saveMeta() {
-    return persist(META_KEY, {
-        period: state.period,
-        currency: state.currency,
-        categoryTilesViewMode: state.categoryTilesViewMode,
-        theme: state.theme,
-        goalAmount: state.goalAmount,
-        goalSetDate: state.goalSetDate,
-        lastSeenReport: state.lastSeenReport
+    var meta = {};
+    META_FIELDS.forEach(function (key) {
+        meta[key] = state[key];
     });
+    return persist(META_KEY, meta);
 }
 
 function saveCategories() {
@@ -95,15 +94,8 @@ var state = loadState();
 // the one that wrote the change.
 window.addEventListener("storage", function (e) {
     if (e.key === META_KEY) {
-        var meta = readJSON(META_KEY, {});
-        state.period = meta.period || null;
-        state.currency = meta.currency || null;
-        state.categoryTilesViewMode = meta.categoryTilesViewMode || "grid";
-        state.theme = meta.theme || "light";
+        Object.assign(state, loadMeta());
         applyTheme(state.theme);
-        state.goalAmount = meta.goalAmount != null ? meta.goalAmount : null;
-        state.goalSetDate = meta.goalSetDate || null;
-        state.lastSeenReport = meta.lastSeenReport || null;
     } else if (e.key === CATEGORIES_KEY) {
         state.categories = readJSON(CATEGORIES_KEY, []);
     } else if (e.key === TRANSACTIONS_KEY) {

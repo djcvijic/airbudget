@@ -9,12 +9,12 @@ var APP_STORAGE_KEYS = [APP_META_KEY, APP_CATEGORIES_KEY, APP_TRANSACTIONS_KEY];
 
 function seedState(partial) {
     localStorage.setItem(APP_META_KEY, JSON.stringify({
-        period: partial.period || null,
-        currency: partial.currency || null,
-        theme: partial.theme || "light",
-        goalAmount: partial.goalAmount != null ? partial.goalAmount : null,
-        goalSetDate: partial.goalSetDate || null,
-        lastSeenReport: partial.lastSeenReport || null
+        period: partial.period,
+        currency: partial.currency,
+        theme: partial.theme,
+        goalAmount: partial.goalAmount,
+        goalSetDate: partial.goalSetDate,
+        lastSeenReport: partial.lastSeenReport
     }));
     localStorage.setItem(APP_CATEGORIES_KEY, JSON.stringify(partial.categories || []));
     localStorage.setItem(APP_TRANSACTIONS_KEY, JSON.stringify(partial.transactions || []));
