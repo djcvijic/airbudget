@@ -1,8 +1,10 @@
 // Service worker for offline/installable PWA support. Cache-first for the
 // app shell listed below; anything else falls back to the network. Bump
-// CACHE_NAME by hand when shipping a change, so old caches get cleaned up
-// on the next visit instead of serving stale files forever.
-var CACHE_NAME = "airbudget-v36";
+// APP_VERSION in js/version.js by hand when shipping a change, so old
+// caches get cleaned up on the next visit instead of serving stale files
+// forever.
+importScripts("js/version.js");
+var CACHE_NAME = "airbudget-v" + APP_VERSION;
 
 var APP_SHELL = [
     "index.html",
@@ -15,6 +17,7 @@ var APP_SHELL = [
     "css/transaction.css",
     "css/detail.css",
     "css/report.css",
+    "js/version.js",
     "js/theme.js",
     "js/currencies-data.js",
     "js/state.js",

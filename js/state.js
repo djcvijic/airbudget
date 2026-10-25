@@ -10,7 +10,7 @@ var CATEGORIES_KEY = "airbudget-categories-v1";
 var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
-    return { period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", theme: "light", goalAmount: null, goalSetDate: null, lastSeenReport: null };
+    return { schemaVersion: APP_VERSION, period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", theme: "light", goalAmount: null, goalSetDate: null, lastSeenReport: null };
 }
 
 function readJSON(key, fallback) {
@@ -25,7 +25,7 @@ function readJSON(key, fallback) {
     }
 }
 
-var META_FIELDS = ["period", "currency", "categoryTilesViewMode", "theme", "goalAmount", "goalSetDate", "lastSeenReport"];
+var META_FIELDS = ["schemaVersion", "period", "currency", "categoryTilesViewMode", "theme", "goalAmount", "goalSetDate", "lastSeenReport"];
 
 function loadMeta() {
     var defaults = defaultState();
