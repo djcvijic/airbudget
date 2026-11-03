@@ -94,6 +94,30 @@
     font-size: 20px;
 }
 
+.transaction-comment-field {
+    position: relative;
+}
+
+.transaction-comment-suggestion {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 6px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
 .transaction-numpad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

@@ -53,17 +53,29 @@ function wait(ms) {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
 
+function testsMatchingGrepParams(allTests) {
+    var grepTerms = new URLSearchParams(location.search).getAll("grep").map(function (s) { return s.toLowerCase(); });
+    if (!grepTerms.length) {
+        return allTests;
+    }
+    return allTests.filter(function (t) {
+        var haystack = (t.suite + " " + t.name).toLowerCase();
+        return grepTerms.some(function (term) { return haystack.indexOf(term) !== -1; });
+    });
+}
+
 async function runTests() {
     var resultsEl = document.getElementById("results");
     var summaryEl = document.getElementById("summary");
     resultsEl.innerHTML = "";
 
+    var toRun = testsMatchingGrepParams(tests);
     var passed = 0;
     var failed = 0;
     var lastSuite = null;
 
-    for (var i = 0; i < tests.length; i++) {
-        var t = tests[i];
+    for (var i = 0; i < toRun.length; i++) {
+        var t = toRun[i];
 
         if (t.suite !== lastSuite) {
             lastSuite = t.suite;
@@ -90,7 +102,7 @@ async function runTests() {
         resultsEl.appendChild(row);
     }
 
-    summaryEl.textContent = passed + " passed, " + failed + " failed, " + tests.length + " total";
+    summaryEl.textContent = passed + " passed, " + failed + " failed, " + toRun.length + " total";
     summaryEl.className = failed > 0 ? "fail" : "pass";
-    window.testRunSummary = { passed: passed, failed: failed, total: tests.length };
+    window.testRunSummary = { passed: passed, failed: failed, total: toRun.length };
 }

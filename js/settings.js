@@ -196,7 +196,7 @@ function applySettings() {
     }
 
     closeModals();
-    resolvePendingSettingsNavigation();
+    openSettingsScreen();
 }
 
 function revertSettings() {

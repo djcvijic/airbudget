@@ -74,7 +74,7 @@ suite("transaction screen", function () {
         var win = await freshApp(seededForTransactions());
         win.document.getElementById("open-transaction-button").click();
 
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         assertTrue(win.transactionErrorEl.textContent.length > 0);
         assertEqual(win.state.transactions.length, 0);
@@ -173,7 +173,7 @@ suite("transaction screen", function () {
         typeTransactionAmount(win, "42.5");
         setValue(win.transactionCommentInput, "weekly shop");
 
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         assertTrue(isActive(win.mainViewScreen));
         assertEqual(win.state.transactions.length, 1);
@@ -195,7 +195,7 @@ suite("transaction screen", function () {
         var originalSetItem = win.localStorage.setItem;
         win.localStorage.setItem = function () { throw new Error("quota"); };
 
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         win.localStorage.setItem = originalSetItem;
 
@@ -207,7 +207,7 @@ suite("transaction screen", function () {
         tileAddZone(win, "cat-salary").click();
         typeTransactionAmount(win, "1500");
 
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         assertEqual(win.state.transactions[0].amount, 1500, "amount is stored unsigned");
 
@@ -237,7 +237,7 @@ suite("transaction screen", function () {
         assertEqual(win.transactionCategorySelect.value, "cat-groceries");
         assertEqual(win.transactionAmountDisplayEl.textContent, "42 USD");
         assertEqual(win.transactionCommentInput.value, "existing");
-        assertEqual(win.transactionApplyButton.textContent, "Save");
+        assertEqual(win.transactionSaveButton.textContent, "Save");
         assertNotEqual(win.transactionDeleteButton.style.display, "none");
     });
 
@@ -249,7 +249,7 @@ suite("transaction screen", function () {
 
         clearTransactionAmount(win);
         typeTransactionAmount(win, "99");
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         assertEqual(win.state.transactions.length, 1);
         assertEqual(win.state.transactions[0].id, "txn-1");
@@ -269,7 +269,7 @@ suite("transaction screen", function () {
         var originalSetItem = win.localStorage.setItem;
         win.localStorage.setItem = function () { throw new Error("quota"); };
 
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         win.localStorage.setItem = originalSetItem;
 
@@ -339,11 +339,65 @@ suite("transaction screen", function () {
         assertEqual(win.transactionAmountValue, "", "the previous edit's amount must not carry over");
 
         typeTransactionAmount(win, "500");
-        win.document.getElementById("transaction-apply-button").click();
+        win.document.getElementById("transaction-save-button").click();
 
         assertEqual(win.state.transactions.length, 2, "the original transaction stays and a new one is added");
         assertEqual(win.state.transactions[0].id, "txn-1");
         assertClose(win.state.transactions[0].amount, 42, "the earlier edit session must not leak into this save");
         assertTrue(isActive(win.mainViewScreen));
+    });
+
+    test("typing a character shows the most recent matching comment above the field", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [
+                baseTransaction({ categoryId: "cat-groceries", comment: "Bus ticket", datetime: daysAgoDatetime(5) }),
+                baseTransaction({ categoryId: "cat-groceries", comment: "Bus pass", datetime: daysAgoDatetime(1) })
+            ]
+        }));
+        tileAddZone(win, "cat-groceries").click();
+
+        setValue(win.transactionCommentInput, "b");
+
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "block");
+        assertEqual(win.transactionCommentSuggestionEl.textContent, "Bus pass");
+    });
+
+    test("the suggestion only shows for a genuine word-start match, and hides otherwise", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ categoryId: "cat-groceries", comment: "Lunch with friends" })]
+        }));
+        tileAddZone(win, "cat-groceries").click();
+
+        setValue(win.transactionCommentInput, "lu");
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "block", "a matching word-start shows it");
+
+        setValue(win.transactionCommentInput, "");
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "none", "clearing the field hides it");
+
+        setValue(win.transactionCommentInput, "unch");
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "none", "a mid-word match doesn't count");
+
+        setValue(win.transactionCommentInput, "zz");
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "none", "no match at all stays hidden");
+
+        setValue(win.transactionCommentInput, "Lunch with friends");
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "none", "typing it out in full hides it again");
+    });
+
+    test("tapping the suggestion fills the comment field, and reopening the screen doesn't leak it into a new session", async function () {
+        var win = await freshApp(seededForTransactions({
+            transactions: [baseTransaction({ id: "txn-1", categoryId: "cat-groceries", comment: "Bus pass" })]
+        }));
+        tileAddZone(win, "cat-groceries").click();
+        setValue(win.transactionCommentInput, "b");
+
+        win.transactionCommentSuggestionEl.click();
+
+        assertEqual(win.transactionCommentInput.value, "Bus pass");
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "none");
+
+        win.openEditTransactionScreen("txn-1");
+
+        assertEqual(win.transactionCommentSuggestionEl.style.display, "none");
     });
 });

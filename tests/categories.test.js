@@ -254,7 +254,7 @@ suite("categories screen: reopened (non-forced) editing", function () {
 
         win.categoriesDoneButton.click();
 
-        assertTrue(isActive(win.mainViewScreen));
+        assertTrue(isActive(win.categoriesScreen));
         var saved = win.state.categories.filter(function (c) { return c.id === "cat-groceries"; })[0];
         assertEqual(saved.name, "Food & Drink");
         assertTrue(win.toastEl.textContent.length > 0);

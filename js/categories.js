@@ -395,7 +395,7 @@ function applyCategories() {
         // this file, but this only runs from a click, long after boot.
         openGoalsScreen(true);
     } else {
-        resolvePendingCategoriesNavigation();
+        openCategoriesScreen(false);
     }
 }
 

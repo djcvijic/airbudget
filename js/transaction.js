@@ -25,8 +25,9 @@ var transactionAmountSignEl = document.getElementById("transaction-amount-sign")
 var transactionNumpadEl = document.getElementById("transaction-numpad");
 var transactionAmountPasteButton = document.getElementById("transaction-amount-paste-button");
 var transactionCommentInput = document.getElementById("transaction-comment-input");
+var transactionCommentSuggestionEl = document.getElementById("transaction-comment-suggestion");
 var transactionErrorEl = document.getElementById("transaction-error");
-var transactionApplyButton = document.getElementById("transaction-apply-button");
+var transactionSaveButton = document.getElementById("transaction-save-button");
 var transactionDeleteButton = document.getElementById("transaction-delete-button");
 var transactionDeleteConfirmModal = document.getElementById("transaction-delete-confirm-modal");
 
@@ -95,6 +96,53 @@ transactionAmountPasteButton.addEventListener("click", async function () {
     updateTransactionAmountDisplay();
 });
 
+function hideTransactionCommentSuggestion() {
+    transactionCommentSuggestionEl.style.display = "none";
+    transactionCommentSuggestionEl.textContent = "";
+}
+
+// datetime is ISO-like so string comparison sorts by recency; prefix match
+// (not substring) so "unch" doesn't match "Lunch".
+function updateTransactionCommentSuggestion() {
+    var typed = transactionCommentInput.value.trim();
+    if (!typed) {
+        hideTransactionCommentSuggestion();
+        return;
+    }
+
+    var typedLower = typed.toLowerCase();
+    var bestComment = null;
+    var bestDatetime = null;
+
+    state.transactions.forEach(function (t) {
+        if (!t.comment || t.comment.toLowerCase() === typedLower) {
+            return;
+        }
+        var isMatch = t.comment.toLowerCase().split(/\s+/).some(function (word) {
+            return word.indexOf(typedLower) === 0;
+        });
+        if (isMatch && (bestDatetime === null || t.datetime > bestDatetime)) {
+            bestComment = t.comment;
+            bestDatetime = t.datetime;
+        }
+    });
+
+    if (bestComment) {
+        transactionCommentSuggestionEl.textContent = bestComment;
+        transactionCommentSuggestionEl.style.display = "block";
+    } else {
+        hideTransactionCommentSuggestion();
+    }
+}
+
+transactionCommentInput.addEventListener("input", updateTransactionCommentSuggestion);
+
+transactionCommentSuggestionEl.addEventListener("click", function () {
+    transactionCommentInput.value = transactionCommentSuggestionEl.textContent;
+    hideTransactionCommentSuggestion();
+    transactionCommentInput.focus();
+});
+
 var editingTransactionId = null;
 
 function updateTransactionAmountSign() {
@@ -157,6 +205,7 @@ function buildTransactionCategoryOptions() {
 
 function populateTransactionForm(categoryId, dateOnly, timeOfDay, amount, comment) {
     transactionErrorEl.textContent = "";
+    hideTransactionCommentSuggestion();
     var range = getPeriodRange(state.period, periodOffset);
     transactionPeriodLabelEl.textContent = formatPeriodLabel(range.start, range.end);
     buildTransactionCategoryOptions();

@@ -98,13 +98,14 @@ suite("settings screen", function () {
 
         win.document.getElementById("settings-apply-button").click();
 
-        assertTrue(isActive(win.mainViewScreen));
+        assertTrue(isActive(win.settingsScreen));
         assertEqual(win.state.period, "weekly");
         assertEqual(win.state.currency, "GBP");
+        assertTrue(win.toastEl.textContent.length > 0);
 
+        win.document.getElementById("open-home-button").click();
         var tile = win.categoryTilesEl.querySelector(".category-tile-amount-currency");
         assertEqual(tile.textContent, "GBP");
-        assertTrue(win.toastEl.textContent.length > 0);
     });
 
     test("applying a theme change saves it and sets the forced data-theme attribute", async function () {

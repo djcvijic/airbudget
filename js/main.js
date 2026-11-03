@@ -98,7 +98,7 @@ function main() {
     });
 
     wireSoftDisableClick(settingsApplyButton, "No changes to apply", applySettings);
-    document.getElementById("transaction-apply-button").addEventListener("click", applyTransaction);
+    document.getElementById("transaction-save-button").addEventListener("click", applyTransaction);
     document.getElementById("transaction-delete-button").addEventListener("click", openTransactionDeleteConfirmModal);
     document.getElementById("transaction-delete-confirm-button").addEventListener("click", deleteCurrentTransaction);
 

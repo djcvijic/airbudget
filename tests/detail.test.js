@@ -141,7 +141,7 @@ suite("detail view", function () {
         row.click();
 
         assertTrue(isActive(win.transactionScreen));
-        assertEqual(win.transactionApplyButton.textContent, "Save");
+        assertEqual(win.transactionSaveButton.textContent, "Save");
         assertNotEqual(win.transactionDeleteButton.style.display, "none");
     });
 });

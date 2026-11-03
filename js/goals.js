@@ -167,11 +167,7 @@ function applyGoals() {
         return;
     }
 
-    goalsOriginalAmount = goalsAmountInput.value;
-    updateGoalsActionButtons();
-    updateGoalsLastSet();
-    updateGoalsResults();
-    resolvePendingGoalsNavigation();
+    openGoalsScreen(false);
 }
 
 function resolvePendingGoalsNavigation() {

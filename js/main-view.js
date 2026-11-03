@@ -104,10 +104,9 @@ function buildCategoryTile(entry) {
     var addZone = document.createElement("button");
     addZone.type = "button";
     addZone.className = "category-tile-add-zone";
-    wireSoftDisableClick(addZone, "Switch to the current period to add a transaction", function () {
+    addZone.addEventListener("click", function () {
         openTransactionScreen(entry.id);
     });
-    addZone.setSoftDisabled(periodOffset !== 0);
 
     var addIcon = document.createElement("i");
     addIcon.className = "fa-solid fa-plus category-tile-add-icon";
