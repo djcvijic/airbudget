@@ -176,6 +176,13 @@
     color: var(--color-text-muted);
 }
 
+.category-tile-grid .category-tile-amounts {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(3 * 1.3em);
+}
+
 .category-tile-divider {
     margin: 6px -8px 0 -8px;
     border-top: 1px solid var(--category-tile-divider);

@@ -77,6 +77,15 @@ exactly how `importData()` lost `goalAmount`/`goalSetDate`/`lastSeenReport`
 on every import until `stateFromImport()` fixed it by deriving the
 importable field set from `defaultState()` itself.
 
+## State schema versioning
+
+`schemaVersion` in `defaultState()` identifies the shape of stored state.
+Whenever a change alters that shape (a field renamed, removed, or given
+new meaning), write a migration that transforms the old shape into the
+new one, run it before the state is used, and bump `schemaVersion` to
+match. Skipping the bump leaves existing users' stored data in the old
+shape indefinitely, with no way to detect it needs migrating.
+
 ## CSS breakpoints
 
 `theme.css` is the only stylesheet that defines `@media` breakpoints.

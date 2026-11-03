@@ -10,7 +10,7 @@ var CATEGORIES_KEY = "airbudget-categories-v1";
 var TRANSACTIONS_KEY = "airbudget-transactions-v1";
 
 function defaultState() {
-    return { schemaVersion: APP_VERSION, period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", theme: "light", goalAmount: null, goalSetDate: null, lastSeenReport: null };
+    return { schemaVersion: 39, period: null, currency: null, categories: [], transactions: [], detailMode: "day", categoryTilesViewMode: "grid", theme: "light", goalAmount: null, goalSetDate: null, lastSeenReport: null };
 }
 
 function readJSON(key, fallback) {
