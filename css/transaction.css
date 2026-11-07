@@ -109,8 +109,8 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-family: inherit;
-    font-size: 14px;
-    padding: 6px 10px;
+    font-size: 16px;
+    padding: 12px 14px;
     border-radius: 8px;
     border: 2px solid var(--color-border);
     background-color: var(--color-surface);

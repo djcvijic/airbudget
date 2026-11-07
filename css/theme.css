@@ -587,13 +587,26 @@ body.no-bottom-nav .app {
     color: white;
     font-weight: bold;
     text-align: center;
-    padding: 14px 28px;
+    padding: 18px 34px;
     border-radius: 8px;
-    font-size: 16px;
+    border: 1px solid #888;
+    font-size: 24px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 200ms;
     z-index: 10;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .toast {
+        background-color: white;
+        color: #000;
+    }
+}
+
+:root[data-theme="dark"] .toast {
+    background-color: white;
+    color: #000;
 }
 
 .toast.visible {
