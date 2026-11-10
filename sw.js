@@ -1,7 +1,7 @@
 // Service worker for offline/installable PWA support: cache-first below,
 // network otherwise. Bump CACHE_NAME as a literal on each change; browsers
 // only byte-compare this file, so a value from importScripts won't update.
-var CACHE_NAME = "airbudget-v40";
+var CACHE_NAME = "airbudget-v41";
 
 var APP_SHELL = [
     "index.html",

@@ -11,11 +11,17 @@
     --color-divider: #eee;
     --color-blue-bg: #e6f6ff;
     --color-pink-bg: #fbe6ec;
-    --color-danger-border: #111;
-    --color-danger-hover: #111;
+    --color-pink-accent: #CD2553;
+    --color-pink-accent-hover: #a91d44;
+    --color-accent-blue: #0099ff;
     --color-success: #1a8a4a;
     --color-input-bg: #f5f5f5;
     --color-toast-bg: #222;
+    --color-toast-text-dark: #000;
+    --color-danger-bg: #333;
+    --color-danger-bg-hover: #222;
+    --color-medium-gray: #888;
+    --color-nav-active-bg: rgba(255, 255, 255, 0.25);
     --color-overlay: rgba(0, 0, 0, 0.5);
     --color-shadow: rgba(0, 0, 0, 0.25);
     color-scheme: light;
@@ -35,11 +41,11 @@
         --color-divider: #333;
         --color-blue-bg: #16314a;
         --color-pink-bg: #3a1620;
-        --color-danger-border: #555;
-        --color-danger-hover: #444;
         --color-success: #3ddc84;
         --color-input-bg: #2a2a2a;
         --color-toast-bg: #2e2e2e;
+        --color-danger-bg: #ccc;
+        --color-danger-bg-hover: #bbb;
         --color-overlay: rgba(0, 0, 0, 0.7);
         --color-shadow: rgba(0, 0, 0, 0.5);
         color-scheme: dark;
@@ -56,11 +62,11 @@
     --color-divider: #333;
     --color-blue-bg: #16314a;
     --color-pink-bg: #3a1620;
-    --color-danger-border: #555;
-    --color-danger-hover: #444;
     --color-success: #3ddc84;
     --color-input-bg: #2a2a2a;
     --color-toast-bg: #2e2e2e;
+    --color-danger-bg: #ccc;
+    --color-danger-bg-hover: #bbb;
     --color-overlay: rgba(0, 0, 0, 0.7);
     --color-shadow: rgba(0, 0, 0, 0.5);
     color-scheme: dark;
@@ -105,7 +111,7 @@ h1 {
     font-size: 28px;
     font-weight: normal;
     letter-spacing: 5px;
-    color: #0099ff;
+    color: var(--color-accent-blue);
     text-align: center;
 }
 
@@ -139,7 +145,7 @@ body.no-bottom-nav .app {
     font-size: 40px;
     font-weight: bold;
     font-family: "Ubuntu Mono", "Courier New", Courier, monospace;
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 .app-tagline {
@@ -158,7 +164,7 @@ body.no-bottom-nav .app {
     left: 0;
     right: 0;
     height: 64px;
-    background-color: #0099ff;
+    background-color: var(--color-accent-blue);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -183,7 +189,7 @@ body.no-bottom-nav .app {
 }
 
 .bottom-nav-row .btn-text:hover {
-    color: #e6f6ff;
+    color: var(--color-blue-bg);
 }
 
 .bottom-nav-label {
@@ -195,7 +201,7 @@ body.no-bottom-nav .app {
 }
 
 .bottom-nav-row .btn-text.active {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: var(--color-nav-active-bg);
     border-radius: 8px;
 }
 
@@ -230,7 +236,7 @@ body.no-bottom-nav .app {
 .screen-title {
     font-size: 24px;
     font-weight: bold;
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 /* A title with a second, lighter line (e.g. a period label) needs top
@@ -258,7 +264,7 @@ body.no-bottom-nav .app {
     font-size: 28px;
     font-weight: normal;
     letter-spacing: 5px;
-    color: #0099ff;
+    color: var(--color-accent-blue);
     text-align: center;
 }
 
@@ -269,11 +275,11 @@ body.no-bottom-nav .app {
 }
 
 .amount-spend {
-    color: #CD2553;
+    color: var(--color-pink-accent);
 }
 
 .amount-income {
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 .field {
@@ -316,7 +322,7 @@ body.no-bottom-nav .app {
     bottom: 4px;
     left: 4px;
     border-radius: 999px;
-    background-color: #0099ff;
+    background-color: var(--color-accent-blue);
     transition: transform 200ms ease, background-color 200ms ease;
 }
 
@@ -433,12 +439,12 @@ body.no-bottom-nav .app {
 }
 
 .btn-primary {
-    background-color: #CD2553;
+    background-color: var(--color-pink-accent);
     color: white;
 }
 
 .btn-primary:hover:not(.is-disabled) {
-    background-color: #a91d44;
+    background-color: var(--color-pink-accent-hover);
 }
 
 .btn-primary.is-disabled {
@@ -448,8 +454,8 @@ body.no-bottom-nav .app {
 
 .btn-secondary {
     background-color: transparent;
-    color: #0099ff;
-    border-color: #0099ff;
+    color: var(--color-accent-blue);
+    border-color: var(--color-accent-blue);
 }
 
 .btn-secondary:hover {
@@ -458,8 +464,8 @@ body.no-bottom-nav .app {
 
 .btn-secondary-pink {
     background-color: transparent;
-    color: #CD2553;
-    border-color: #CD2553;
+    color: var(--color-pink-accent);
+    border-color: var(--color-pink-accent);
 }
 
 .btn-secondary-pink:hover {
@@ -467,13 +473,13 @@ body.no-bottom-nav .app {
 }
 
 .btn-danger {
-    background-color: #333;
-    color: white;
-    border: 2px dashed var(--color-danger-border);
+    background-color: var(--color-danger-bg);
+    color: var(--color-pink-accent);
+    border: 2px solid var(--color-pink-accent);
 }
 
 .btn-danger:hover {
-    background-color: var(--color-danger-hover);
+    background-color: var(--color-danger-bg-hover);
 }
 
 /* Hidden proxy, triggered via .click() instead of shown to the user. */
@@ -514,7 +520,7 @@ body.no-bottom-nav .app {
     left: 0;
     bottom: 0;
     width: 0%;
-    background-color: rgba(0, 0, 0, 0.25);
+    background-color: var(--color-medium-gray);
 }
 
 .delete-confirm-button.holding .delete-confirm-fill {
@@ -536,7 +542,7 @@ body.no-bottom-nav .app {
 }
 
 .btn-text:hover {
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 /* A screen's own black delete icon, sitting in its .screen-actions row
@@ -552,7 +558,7 @@ body.no-bottom-nav .app {
 }
 
 .delete-icon-button:hover {
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 .back-button .fa-solid {
@@ -589,7 +595,7 @@ body.no-bottom-nav .app {
     text-align: center;
     padding: 18px 34px;
     border-radius: 8px;
-    border: 1px solid #888;
+    border: 1px solid var(--color-medium-gray);
     font-size: 24px;
     opacity: 0;
     pointer-events: none;
@@ -600,13 +606,13 @@ body.no-bottom-nav .app {
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .toast {
         background-color: white;
-        color: #000;
+        color: var(--color-toast-text-dark);
     }
 }
 
 :root[data-theme="dark"] .toast {
     background-color: white;
-    color: #000;
+    color: var(--color-toast-text-dark);
 }
 
 .toast.visible {
@@ -616,7 +622,7 @@ body.no-bottom-nav .app {
 
 #to-top {
     border-radius: 8px;
-    border: 2px solid #0099ff;
+    border: 2px solid var(--color-accent-blue);
     background-color: transparent;
     text-align: center;
     padding: 16px 40px;
@@ -624,7 +630,7 @@ body.no-bottom-nav .app {
     bottom: 32px;
     left: auto;
     right: 64px;
-    color: #0099ff;
+    color: var(--color-accent-blue);
     font-size: 20px;
     font-weight: bold;
     z-index: 2;
@@ -665,7 +671,7 @@ body.show-to-top #to-top {
     padding: 12px 14px;
     border-radius: 8px;
     background-color: var(--color-blue-bg);
-    border: 2px solid #0099ff;
+    border: 2px solid var(--color-accent-blue);
     font-size: 14px;
 }
 
@@ -676,7 +682,7 @@ body.show-to-top #to-top {
 
 .banner-action {
     flex-shrink: 0;
-    background-color: #0099ff;
+    background-color: var(--color-accent-blue);
     color: white;
     font-weight: bold;
     font-size: 14px;
@@ -740,14 +746,14 @@ body.show-to-top #to-top {
 }
 
 .modal-close:hover {
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 .modal-title {
     margin: 0 0 12px 0;
     font-size: 20px;
     font-weight: bold;
-    color: #0099ff;
+    color: var(--color-accent-blue);
 }
 
 .modal-description {
@@ -769,12 +775,12 @@ body.show-to-top #to-top {
 
 .modal-input:focus {
     outline: none;
-    border-color: #0099ff;
+    border-color: var(--color-accent-blue);
 }
 
 .modal-error {
     margin-top: 8px;
-    color: #CD2553;
+    color: var(--color-pink-accent);
     font-size: 14px;
 }
 
